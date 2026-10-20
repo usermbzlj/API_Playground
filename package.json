@@ -1,0 +1,43 @@
+{
+  "name": "api-playground",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "本地优先的多模态 AI API 游乐场：深入体验国内外厂商的原生特性",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n server,web -c blue,green \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "node --watch --disable-warning=ExperimentalWarning server/index.ts",
+    "dev:web": "vite",
+    "build": "vite build",
+    "start": "node --disable-warning=ExperimentalWarning server/index.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "check:catalog": "node --disable-warning=ExperimentalWarning scripts/check-catalog.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "hono": "^4.13.13",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-python": "^6.2.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/ws": "^8.18.2",
+    "@uiw/react-codemirror": "^4.25.12",
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "lucide-react": "^1.60.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}
