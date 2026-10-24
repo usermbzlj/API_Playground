@@ -1,2 +1,5 @@
-# Keep the vendored snapshot unchanged, including its original final blank lines.
-integrations/llm-bench/upstream/** whitespace=-blank-at-eof
+# Match the formatter on Windows, macOS and Linux.
+* text=auto eol=lf
+
+# Keep the vendored snapshot unchanged, including its original line endings.
+integrations/llm-bench/upstream/** -text whitespace=-blank-at-eof
