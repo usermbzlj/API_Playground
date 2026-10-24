@@ -19,6 +19,8 @@ export function validateOperationInput(op: OperationDef, ctx: BuildContext): voi
     throw new Error('请填写对话消息或添加参考素材');
   if (op.workbench === 'fim' && !String(input.prefix ?? '').trim()) throw new Error('请填写光标之前的代码或文本');
   if (op.workbench === 'tts' && !String(input.text ?? '').trim()) throw new Error('请填写要合成的文字');
+  if (op.workbench === 'music' && !String(input.prompt ?? '').trim() && !String(input.lyrics ?? '').trim())
+    throw new Error('请填写音乐描述或歌词');
   if (op.workbench === 'asr' && !input.audio) throw new Error('请先选择音频素材');
   if (['image', 'video', 'model3d'].includes(op.workbench)) {
     if (!(String(input.prompt ?? '').trim() || input.images?.length || input.firstFrame))

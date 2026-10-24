@@ -59,6 +59,7 @@ function renderBody(p: OutputProps) {
     case 'fim':
       return <FimOutput {...p} />;
     case 'tts':
+    case 'music':
       return <AudioOutput {...p} />;
     case 'image':
       return <ImageOutput {...p} />;

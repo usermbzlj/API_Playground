@@ -1,6 +1,6 @@
 # 厂商原生适配与验证边界
 
-2026-10-24 融合版新增 [Gemini 原生内容与语音](gemini-coverage.md)。2026-10-25 的 v0.4.0 再补 12 个原生操作：OpenAI Responses / GPT Image 2.5 / Embeddings、Anthropic 官方 Messages、Gemini 图像与 Embeddings、Qwen Wan 3.0 视频与 ASR、Ark Seedance 视频与 Seedream 图像、Tripo 图片到 3D、MiniMax H3 v2。现为 12 个服务入口、36 个原生操作、39 个内置预设。新增能力全部为 `documented`，没有继承或伪造真实调用证据。性能评测复用兼容协议连接，属于独立的真实性能引擎入口，不计入原生操作数量。
+2026-10-24 融合版新增 [Gemini 原生内容与语音](gemini-coverage.md)。2026-10-25 的 v0.4.0 再补 13 个原生操作：OpenAI Responses / GPT Image 2.5 / Embeddings、Anthropic 官方 Messages、Gemini 图像与 Embeddings、Qwen Wan 3.0 视频与 ASR、Ark Seedance 视频与 Seedream 图像、Tripo 图片到 3D、MiniMax H3 v2 与音乐生成。现为 12 个服务入口、37 个原生操作、40 个内置预设。新增能力全部为 `documented`，没有继承或伪造真实调用证据。性能评测复用兼容协议连接，属于独立的真实性能引擎入口，不计入原生操作数量。
 
 文档核对日期：**2026-10-25（北京时间）**。本文记录当前代码实现，不能代替账户实测。`documented` 表示已核对官方文档并完成请求构建/解析适配，**不表示真实 Key 调用成功**。只有下述具体操作/模型范围有历史文本调用证据；验证方法和待验收范围见 [验证说明](verification.md)，私人账户记录不随源码分发。
 
@@ -49,13 +49,33 @@ MiniMax 视频采用三段原生流程：创建取得 task_id → [查询状态]
 | `gemini.image` | `generateContent` + `responseModalities:["IMAGE"]` + `imageConfig`；保存 inlineData | HTTP / 图片 | Imagen 端点已停用；thought=true 中间图不保存；Veo 已从 Gemini API 关闭 | [Image generation](https://ai.google.dev/gemini-api/docs/image-generation) |
 | `gemini.embedding` | `:batchEmbedContents`、`embedContentConfig` | HTTP / 向量 | 只发文本 parts；多模态聚合未开放 | [Embeddings](https://ai.google.dev/api/embeddings) |
 | `minimax.video-v2` | `/v2/video_generation` 的 content 数组、首/尾帧 role、H3 系列分辨率与时长 | 异步 / 视频 | 无独立 camera 字段；首尾帧与 reference 素材互斥；只开放首尾帧 | [v2 create](https://platform.minimax.io/docs/api-reference/video-generation-v2-create) |
+| `minimax.music` | `/v1/music_generation` 的描述/歌词、纯器乐、url 或 hex 音频 | HTTP / 音频 | 请求无时长参数；url 24 小时有效；付费音乐 API 对新用户关闭，存量账户可用 | [Music](https://platform.minimax.io/docs/api-reference/music-generation) |
 | `qwen.video` | Wan 3.0 `input.media` 首/尾帧、`X-DashScope-Async`、`/api/v1/tasks/{id}` | 异步 / 视频 | 旧 `img_url` 只属于 ≤2.6；模型/域名/Key 必须同地域；没有伪造取消 | [Wan 3.0](https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference) |
 | `qwen.asr` | `qwen3-asr-flash` 同步音频 parts、asr_options | HTTP / 转写 JSON | 只做 ≤5 分钟、≤10 MB 同步；异步 filetrans / Paraformer 未接 | [Qwen-ASR](https://help.aliyun.com/zh/model-studio/qwen-asr-api-reference) |
 | `ark.video` | Seedance 2.5 内容任务、首/尾帧 role、状态查询与 video_url | 异步 / 视频 | 需要账户余额/资源包；seed/camera_fixed 属 1.0，不显示 | [创建视频任务](https://docs.volcengine.com/docs/ark/create-video-generation-task-api) |
 | `ark.image` | Seedream 5.0 `/api/v3/images/generations`、参考图数组、url/b64_json | HTTP / 图片 | 官方未列 seed；水印默认开启；尺寸只开放 1K/1.5K/2K | [图像生成](https://docs.volcengine.com/docs/ark/image-generation-api) |
 | `tripo.image-to-model` | V3 `/generation/image-to-model`，input 为公网 URL，异步查询 GLB | 异步 / 3D | 只开放公网 URL；file_token 上传与绑骨/动画端点未接 | [图片到 3D](https://developers.tripo3d.ai/en/docs/generation-image-to-model/standard) |
 
-Gemini 原生 generateContent 已在融合版实现；本轮的图像与 Embeddings 继续使用同一 Developer API。Veo 3.1 已从 Gemini API 关闭，视频方向改用 Omni/Interactions 或 Vertex，因而没有把旧 `predictLongRunning` 流程当作可用能力。Anthropic 官方 Messages 与通用 Anthropic 兼容入口分开记录：前者遵循 2026-10-21 之后移除采样参数、adaptive thinking 等语义，后者仍保留兼容端点的旧参数。下一步编辑、预测输出、专用翻译、MCP 客户端执行等仍未适配，不能计入可运行覆盖。
+Gemini 原生 generateContent 已在融合版实现；本轮的图像与 Embeddings 继续使用同一 Developer API。Veo 3.1 已从 Gemini API 关闭，视频方向改用 Omni/Interactions 或 Vertex，因而没有把旧 `predictLongRunning` 流程当作可用能力。Anthropic 官方 Messages 与通用 Anthropic 兼容入口分开记录：前者遵循 2026-10-21 之后移除采样参数、adaptive thinking 等语义，后者仍保留兼容端点的旧参数。MCP 工具声明可以随 OpenAI Responses 透传，但本项目不会在本地执行 MCP 工具或 GUI 操作。
+
+## 仍保留为线索的能力
+
+这些能力没有可安全落地的公开原生端点，或需要与实验台无关的账号/产品权限。界面继续标为线索，不用伪造适配器凑数量：
+
+| 能力 | 未落地原因 |
+|---|---|
+| 长上下文 / 文件问答 | 模型上下文已具备，但“文件问答”需要 Files 上传、检索与清理流程；本期未接文件生命周期。 |
+| 专用翻译 | 需要专用翻译模型与术语表接口，当前账户、模型与端点未核对。 |
+| 下一步编辑 / Apply Edit | 供应商专用编辑预测接口未核对到稳定公开 REST。 |
+| 预测输出 | Responses 不支持；只有旧 Chat Completions 的 GPT-4o/4.1 支持 `prediction`，不把旧模型包装成新能力。 |
+| GUI 操作 / 电脑使用 | 需要界面代理执行环境；本项目只展示模型动作，不在本机执行任何操作。 |
+| 深度研究 | 厂商托管的多步研究产品，账户与产品权限不统一，未确认可复用 REST。 |
+| OCR / 文档解析 | 专用 OCR 模型的当前端点与版面参数未核对，不能拿普通视觉对话冒充 OCR。 |
+| 声音设计 / 音色复刻 | MiniMax 有 voice_design / voice_clone，但需要素材上传、授权与 voice_id 生命周期；本期只完成音乐生成。 |
+| 视频编辑 / 延长 / 特效 | Wan / Seedance 的编辑端点未核对到公开稳定 REST；Veo 已从 Gemini API 关闭。 |
+| 路由与多提供方 | 不是单一厂商 API；对比页已覆盖部分路由差异，但没有可适配端点。 |
+
+“原始请求”和“模型发现”虽然不挂载实验操作，但分别有 `/raw` 页面与连接页的 `/models` 刷新入口，界面不再把它们标成未适配线索。
 
 ## 费用说明
 

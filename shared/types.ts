@@ -158,7 +158,18 @@ export interface ParamSpec {
 }
 
 export type WorkbenchKind =
-  'chat' | 'fim' | 'tts' | 'asr' | 'image' | 'video' | 'realtime' | 'embedding' | 'rerank' | 'model3d' | 'raw';
+  | 'chat'
+  | 'fim'
+  | 'tts'
+  | 'music'
+  | 'asr'
+  | 'image'
+  | 'video'
+  | 'realtime'
+  | 'embedding'
+  | 'rerank'
+  | 'model3d'
+  | 'raw';
 
 export type CostTier = 'free' | 'low' | 'medium' | 'high';
 

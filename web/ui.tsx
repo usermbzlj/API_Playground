@@ -89,6 +89,7 @@ export const WORKBENCH_LABEL: Record<string, string> = {
   chat: '对话',
   fim: 'FIM 补全',
   tts: '语音合成',
+  music: '音乐生成',
   asr: '语音识别',
   image: '图像',
   video: '视频任务',

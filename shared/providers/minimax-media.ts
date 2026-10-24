@@ -1,10 +1,11 @@
-import type { AsyncSpec, ModelDef, OperationDef, ParamSpec } from '../types.ts';
+import type { ArtifactRef, AsyncSpec, ModelDef, OperationDef, ParamSpec } from '../types.ts';
 import { applyParams } from '../util.ts';
 import { documented, enumOptions } from './native-evidence.ts';
 
 // MiniMax 视频 v2（Hailuo H3 系列）。旧的 /v1/video_generation 与 Hailuo 2.3 / 02 仍保留在
 // minimax-video.ts；这里是独立的新端点与内容结构，不能只替换模型名就当成 v2。
 const DOC = 'https://platform.minimax.io/docs/api-reference/video-generation-v2-create';
+const MUSIC = 'https://platform.minimax.io/docs/api-reference/music-generation';
 
 const resolutions = ['480P', '768P', '2K'];
 const allowedResolutions: Record<string, string[]> = {
@@ -38,6 +39,18 @@ export const minimaxMediaModels: ModelDef[] = [
     modalities: ['text-in', 'image-in', 'video-out'],
     verification: documented(DOC),
     notes: '480P/768P，5–15 秒，质量优先。',
+  },
+  {
+    id: 'music-3.0',
+    modalities: ['text-in', 'audio-out'],
+    verification: documented(MUSIC),
+    notes: '原生音乐生成；付费音乐 API 自 2026-08-20 起对新用户关闭，存量付费账户可用。',
+  },
+  {
+    id: 'music-2.6',
+    modalities: ['text-in', 'audio-out'],
+    verification: documented(MUSIC),
+    notes: '旧版音乐模型；是否可用以账户与控制台为准。',
   },
 ];
 
@@ -105,6 +118,46 @@ const asyncSpec: AsyncSpec = {
     'v2 产物是限时直链，且任务仅在创建后 7 天内可查询；服务端成功后立即下载到本地。停止本地跟踪不等于取消远端生成。',
 };
 
+const musicParams: ParamSpec[] = [
+  {
+    key: 'is_instrumental',
+    label: '纯音乐',
+    type: 'boolean',
+    default: false,
+    native: true,
+    group: '音乐',
+    description: '开启后不发送歌词；空歌词 + 纯音乐适合器乐片段。',
+  },
+  {
+    key: 'lyrics_optimizer',
+    label: '自动优化歌词',
+    type: 'boolean',
+    default: true,
+    native: true,
+    group: '原生策略',
+    description: '由模型补全/改写歌词；已经有正式歌词时可关闭。',
+  },
+  {
+    key: 'output_format',
+    label: '返回格式',
+    type: 'enum',
+    options: enumOptions(['url', 'hex']),
+    default: 'url',
+    enabledByDefault: true,
+    group: '产物',
+    description: 'url 约 24 小时有效；hex 在响应里直接返回音频字节。',
+  },
+  {
+    key: 'audio_setting.format',
+    label: '音频格式',
+    type: 'enum',
+    options: enumOptions(['mp3', 'wav', 'pcm']),
+    default: 'mp3',
+    enabledByDefault: true,
+    group: '音频',
+  },
+];
+
 export const minimaxMediaOps: OperationDef[] = [
   {
     id: 'minimax.video-v2',
@@ -156,6 +209,71 @@ export const minimaxMediaOps: OperationDef[] = [
       'v2 没有单独的 camera 参数；[Push in] 等运镜指令属于旧版提示词语法，v2 请使用官方当前运镜写法。',
       '首尾帧与 reference_image / reference_video / reference_audio 互斥，本操作只开放首尾帧。',
       '任务创建后 7 天内可查询；产物直链有时效，成功后本项目立即保存到本地素材。',
+    ],
+  },
+  {
+    id: 'minimax.music',
+    providerId: 'minimax',
+    title: 'MiniMax 音乐生成',
+    summary: '原生 /v1/music_generation：描述与歌词生成音乐，支持纯器乐、输出格式与音频格式；真实音频保存到素材库。',
+    features: ['music'],
+    workbench: 'music',
+    lifecycle: 'http',
+    protocol: 'json',
+    models: ['music-3.0', 'music-2.6'],
+    defaultModel: 'music-3.0',
+    freeModel: true,
+    params: musicParams,
+    costTier: 'high',
+    costHint: '按模型与生成时长计价；付费音乐 API 自 2026-08-20 起不再对新用户开放，存量付费账户可用。',
+    verification: documented(MUSIC, '2026-10-25 核对音乐生成文档；未真实调用，账户资格与计费待确认'),
+    docsUrl: MUSIC,
+    build: (ctx) => {
+      const prompt = String(ctx.input.prompt ?? '');
+      const lyrics = String(ctx.input.lyrics ?? '');
+      if (prompt.length > 2000) throw new Error('MiniMax 音乐描述最多 2000 字符');
+      if (lyrics.length > 3500) throw new Error('MiniMax 歌词最多 3500 字符');
+      const body: any = { model: ctx.model };
+      if (prompt.trim()) body.prompt = prompt;
+      if (lyrics.trim()) body.lyrics = lyrics;
+      applyParams(body, musicParams, ctx.params, ctx.model);
+      if (body.is_instrumental === true) delete body.lyrics;
+      return { method: 'POST', path: '/v1/music_generation', body };
+    },
+    artifacts: (response): ArtifactRef[] => {
+      const audio = response?.data?.audio;
+      if (typeof audio !== 'string' || !audio) return [];
+      const format = String(response?.extra_info?.format ?? 'mp3').toLowerCase();
+      const mime = format === 'wav' ? 'audio/wav' : format === 'pcm' ? 'audio/pcm' : 'audio/mpeg';
+      const ext = format === 'wav' ? 'wav' : format === 'pcm' ? 'pcm' : 'mp3';
+      if (/^https?:\/\//i.test(audio)) return [{ kind: 'audio', url: audio, mime, filename: `minimax-music.${ext}` }];
+      if (/^[0-9a-f]+$/i.test(audio) && audio.length % 2 === 0)
+        return [{ kind: 'audio', hex: audio, mime, filename: `minimax-music.${ext}` }];
+      return [];
+    },
+    insights: ({ view }) => {
+      const body = (view as any)?.body;
+      const status = body?.data?.status;
+      const duration = body?.extra_info?.music_duration;
+      return [
+        ...(status === 1
+          ? [
+              {
+                level: 'warn' as const,
+                text: '厂商仍在生成（data.status = 1），本次响应没有音频；请查看原始响应，避免重复计费调用。',
+              },
+            ]
+          : []),
+        ...(status === 2 && duration
+          ? [{ level: 'info' as const, text: `本次音乐时长约 ${duration} 秒；请求没有时长参数。` }]
+          : []),
+      ];
+    },
+    notes: [
+      '输出格式 url 约 24 小时有效；hex 会直接放进 JSON，长音频会明显增大响应体积。',
+      '请求没有时长参数，生成长度由模型决定；不要把未确认的时长当作固定值。',
+      '翻唱参考音频（audio_url / audio_base64 / cover_feature_id）需要额外素材与授权，本操作未开放。',
+      '付费音乐 API 自 2026-08-20 起不再对新用户开放；账号资格与计费请先在控制台确认。',
     ],
   },
 ];

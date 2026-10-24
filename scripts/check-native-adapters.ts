@@ -479,6 +479,26 @@ test('OpenAI Responses builds native items and reduces streamed events', () => {
   assert.equal(view.responseId, 'resp_1');
 });
 
+test('MiniMax music sends prompt/lyrics and saves hex or URL audio', () => {
+  const op = getOperation('minimax.music')!;
+  const body = build(op.id, { prompt: 'rainy jazz', lyrics: '[Verse]\n夜雨落在窗台' }, { output_format: 'hex' })
+    .body as any;
+  assert.equal(body.model, 'music-3.0');
+  assert.equal(body.prompt, 'rainy jazz');
+  assert.equal(body.lyrics, '[Verse]\n夜雨落在窗台');
+  assert.equal(body.output_format, 'hex');
+  const instrumental = build(op.id, { prompt: 'rainy jazz', lyrics: 'ignored' }, { is_instrumental: true }).body as any;
+  assert.equal(instrumental.lyrics, undefined);
+  const hexArtifacts = op.artifacts!({ data: { status: 2, audio: '00ff' }, extra_info: { format: 'wav' } });
+  assert.equal(hexArtifacts[0].kind, 'audio');
+  assert.equal(hexArtifacts[0].mime, 'audio/wav');
+  const urlArtifacts = op.artifacts!({ data: { status: 2, audio: 'https://example.com/music.mp3' } });
+  assert.equal(urlArtifacts[0].url, 'https://example.com/music.mp3');
+  const insights = op.insights!({ view: { body: { data: { status: 1 } } } } as any);
+  assert.ok(insights.some((i) => i.level === 'warn'));
+  assert.ok(BUILTIN_PRESETS.some((p) => p.operationId === op.id));
+});
+
 test('every new operation has official documentation, an honest status, and a preset', () => {
   const ops = OPERATIONS.filter((o) => /^(kimi\.|mimo\.|qwen\.|ark\.|openai\.|minimax\.video)/.test(o.id));
   assert.ok(ops.length >= 10);

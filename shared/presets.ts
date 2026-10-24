@@ -582,4 +582,14 @@ export const BUILTIN_PRESETS: PresetDef[] = [
     },
     tags: ['OpenAI', '工具', 'JSON', '付费'],
   },
+  {
+    id: 'preset-minimax-music',
+    operationId: 'minimax.music',
+    title: 'MiniMax 音乐：雨夜爵士',
+    description:
+      '描述与歌词生成音乐；纯器乐可留空歌词并开启「纯音乐」。付费音乐 API 对新用户的开放情况需先在控制台确认。',
+    input: { prompt: '雨夜的城市爵士，钢琴与低音提琴，慢速，温暖但略带忧郁。', lyrics: '' },
+    params: { is_instrumental: true, lyrics_optimizer: true, output_format: 'url', 'audio_setting.format': 'mp3' },
+    tags: ['音乐', '器乐', '付费'],
+  },
 ];

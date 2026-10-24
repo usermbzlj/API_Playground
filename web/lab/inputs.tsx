@@ -9,6 +9,7 @@ export const WORKBENCH_DEFAULTS: Record<string, Record<string, unknown>> = {
   chat: { system: '', messages: [{ role: 'user', content: '' }], prefix: '', stream: true, keepReasoning: false },
   fim: { prefix: '', suffix: '', stream: true, lang: 'js' },
   tts: { text: '' },
+  music: { prompt: '', lyrics: '' },
   asr: { audio: null },
   image: { prompt: '', negative: '', images: [] },
   video: { prompt: '', negative: '', firstFrame: null, lastFrame: null, references: [] },
@@ -358,6 +359,8 @@ export function WorkbenchInput({
       return <FimInput input={input} setInput={setInput} />;
     case 'tts':
       return <TtsInput op={op} input={input} setInput={setInput} />;
+    case 'music':
+      return <MusicInput input={input} setInput={setInput} />;
     case 'image':
     case 'video':
     case 'model3d':
@@ -730,6 +733,32 @@ function TtsInput({ op, input, setInput }: { op: OperationDef; input: Record<str
       )}
       <p className="text-[11px] leading-relaxed text-zinc-500">
         音色、语速、情绪、音频格式等在右侧「原生参数」里调整。想听同一句话的不同情绪，用「加入对比」开多条通道一起跑。
+      </p>
+    </div>
+  );
+}
+
+function MusicInput({ input, setInput }: { input: Record<string, unknown>; setInput: SetInput }) {
+  return (
+    <div className="space-y-3">
+      <Field label="音乐描述" hint="风格、乐器、情绪与使用场景；例如「温暖的原声吉他，慢速，适合夜晚独处」。">
+        <textarea
+          className="input min-h-24"
+          value={String(input.prompt ?? '')}
+          onChange={(e) => setInput({ ...input, prompt: e.target.value })}
+          placeholder="描述你想要的音乐…"
+        />
+      </Field>
+      <Field label="歌词（可选）" hint="可写 [Verse] / [Chorus] 等段落标签；纯器乐可留空并打开「纯音乐」。">
+        <textarea
+          className="input min-h-32"
+          value={String(input.lyrics ?? '')}
+          onChange={(e) => setInput({ ...input, lyrics: e.target.value })}
+          placeholder="可留空生成纯器乐…"
+        />
+      </Field>
+      <p className="text-[11px] leading-relaxed text-zinc-500">
+        模型、输出格式、音频格式和纯音乐开关在右侧「原生参数」里调整；生成会按厂商规则计费。
       </p>
     </div>
   );

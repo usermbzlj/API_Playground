@@ -26,12 +26,12 @@ npm start
 
 ## 已有入口
 
-当前注册 **12 个服务入口、36 个操作、39 个预设**，不是 36 项已通过真实账户验收。具体模型、官方来源、适配深度与条件见 [覆盖清单](docs/provider-coverage.md)。
+当前注册 **12 个服务入口、37 个操作、40 个预设**，不是 37 项已通过真实账户验收。具体模型、官方来源、适配深度与条件见 [覆盖清单](docs/provider-coverage.md)。
 
 | 服务 | 可玩的原生操作 |
 | --- | --- |
 | DeepSeek | 对话、前缀续写、FIM、Logprobs、工具与缓存观察 |
-| MiniMax | 对话、TTS 情绪/音色/格式与流式音频、Hailuo 2.3/02 视频、H3 v2 首尾帧与时长 |
+| MiniMax | 对话、TTS 情绪/音色/格式与流式音频、Hailuo 2.3/02 视频、H3 v2 首尾帧与时长、音乐生成 |
 | Kimi | K3 推理强度、K2.6 思考开关、Preserved Thinking、工具与图像 |
 | 小米 MiMo | 原生思考参数与采样生效诊断、专用音频转写 |
 | Qwen / 百炼 | 思考预算、文生图/参考图编辑、实时双向语音、万相 Wan 3.0 视频、Qwen3-ASR |
@@ -45,7 +45,7 @@ npm start
 
 状态含义：`documented` 有官方依据但未实测；`unverified` 尚待确认；`partial` 仅部分验证；`tested` 必须有真实调用证据。界面的本机成功/失败次数与目录声明分开呈现。
 
-**验证边界**：部分 DeepSeek、MiMo、Kimi 和 MiniMax 文本操作有历史真实调用证据；本轮新增的 OpenAI Responses/图像/Embedding、Anthropic 官方 Messages、Gemini 图像/Embedding、Qwen 视频/ASR、Ark Seedance/Seedream、Tripo 图片到 3D 与 MiniMax H3 v2 均为 `documented`，没有真实 Key 验收。自动检查使用隔离数据和本地模拟服务，不调用付费推理。新安装从空工作区开始，不附带私人凭证、连接清单或实验记录。详情见 [验证说明](docs/verification.md)。
+**验证边界**：部分 DeepSeek、MiMo、Kimi 和 MiniMax 文本操作有历史真实调用证据；本轮新增的 OpenAI Responses/图像/Embedding、Anthropic 官方 Messages、Gemini 图像/Embedding、Qwen 视频/ASR、Ark Seedance/Seedream、Tripo 图片到 3D、MiniMax H3 v2 与音乐生成均为 `documented`，没有真实 Key 验收。自动检查使用隔离数据和本地模拟服务，不调用付费推理。新安装从空工作区开始，不附带私人凭证、连接清单或实验记录。长上下文、专用翻译、下一步编辑、预测输出、GUI、深度研究、OCR、声音设计、视频编辑与路由仍保留为线索，原因见 [覆盖清单](docs/provider-coverage.md)。详情见 [验证说明](docs/verification.md)。
 
 ## 界面预览
 
