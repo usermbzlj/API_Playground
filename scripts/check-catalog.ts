@@ -1,7 +1,14 @@
 // Catalog integrity check: run with `npm run check:catalog`.
 // Verifies structural consistency of providers/operations/presets and that
 // every operation's build() produces a valid NativeRequest with a dummy context.
-import { BUILTIN_PRESETS, OPERATIONS, PROVIDERS, getOperation, getProvider, serializeOperation } from '../shared/catalog.ts';
+import {
+  BUILTIN_PRESETS,
+  OPERATIONS,
+  PROVIDERS,
+  getOperation,
+  getProvider,
+  serializeOperation,
+} from '../shared/catalog.ts';
 import { FEATURES, FEATURE_MAP } from '../shared/features.ts';
 import type { NativeRequest } from '../shared/types.ts';
 
@@ -52,7 +59,8 @@ for (const op of OPERATIONS) {
     if (keys.has(spec.key)) err(`${op.id}: 参数 key 重复：${spec.key}`);
     keys.add(spec.key);
     if (spec.type === 'enum' && !spec.options?.length) err(`${op.id}: 枚举参数 ${spec.key} 没有 options`);
-    if (spec.type === 'number' && spec.min != null && spec.max != null && spec.min > spec.max) err(`${op.id}: 参数 ${spec.key} min > max`);
+    if (spec.type === 'number' && spec.min != null && spec.max != null && spec.min > spec.max)
+      err(`${op.id}: 参数 ${spec.key} min > max`);
   }
   for (const f of op.features) {
     if (!FEATURE_MAP.has(f)) err(`${op.id}: 引用了未定义的特性 ${f}`);
@@ -80,7 +88,7 @@ for (const op of OPERATIONS) {
     if (!req || typeof req !== 'object') throw new Error('build 没有返回请求对象');
     const r = req as NativeRequest;
     if (!r.method || !r.path) throw new Error(`请求缺少 method/path：${JSON.stringify(r)}`);
-    if (typeof r.path !== 'string' || !r.path.startsWith('/') && !/^https?:\/\//.test(r.path)) {
+    if (typeof r.path !== 'string' || (!r.path.startsWith('/') && !/^https?:\/\//.test(r.path))) {
       throw new Error(`请求路径必须以 / 开头或为绝对 URL：${r.path}`);
     }
     if (r.body !== undefined && r.bodyType !== 'multipart' && typeof r.body === 'object') {
@@ -114,7 +122,9 @@ for (const preset of BUILTIN_PRESETS) {
 }
 
 // ---- report ----
-console.log(`目录校验：${PROVIDERS.length} 个厂商，${OPERATIONS.length} 个操作，${BUILTIN_PRESETS.length} 个内置预设，${FEATURES.length} 个特性。`);
+console.log(
+  `目录校验：${PROVIDERS.length} 个厂商，${OPERATIONS.length} 个操作，${BUILTIN_PRESETS.length} 个内置预设，${FEATURES.length} 个特性。`,
+);
 for (const w of warnings) console.warn(`⚠ ${w}`);
 if (errors.length) {
   for (const e of errors) console.error(`✗ ${e}`);

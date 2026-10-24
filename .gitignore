@@ -6,3 +6,33 @@ data/
 *.log
 .agent/
 .workbuddy/
+public/vendor/
+.playwright-mcp/
+integrations/llm-bench/.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Private local acceptance records and account inventories.
+docs/connection-import.json
+docs/text-verification.json
+docs/ui-*-current.png
+docs/ui-fusion-*.png
+docs/ui-real-text-comparison.png
+
+# Local stores, credentials, editor state and generated test output.
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+secrets.json
+*.p12
+*.pfx
+*.key
+.vscode/
+.idea/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo

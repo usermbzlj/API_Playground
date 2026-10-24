@@ -1,0 +1,9 @@
+title = "PrismLab secret scan"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public localhost TLS fixture and the upstream redaction test's synthetic key"
+paths = ['''^integrations/llm-bench/tests/localhost-key\.pem$''']
+regexes = ['''sk-actual-secret-1234567890''']

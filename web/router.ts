@@ -38,7 +38,27 @@ export function href(to: string) {
   return `#${to}`;
 }
 
-export function labHref(operationId: string, q: Record<string, string | undefined> = {}) {
+function withQuery(base: string, q: Record<string, string | undefined | null>) {
   const qs = new URLSearchParams(Object.entries(q).filter(([, v]) => v) as [string, string][]).toString();
-  return `#/lab/${encodeURIComponent(operationId)}${qs ? `?${qs}` : ''}`;
+  return `${base}${qs ? `?${qs}` : ''}`;
+}
+
+export function labHref(
+  operationId: string,
+  q: { run?: string; preset?: string; model?: string; connection?: string } = {},
+) {
+  return withQuery(`#/lab/${encodeURIComponent(operationId)}`, q);
+}
+
+export function providerHref(id: string) {
+  return `#/provider/${encodeURIComponent(id)}`;
+}
+
+export function featureHref(id: string) {
+  return `#/feature/${encodeURIComponent(id)}`;
+}
+
+/** Compare page: either lanes from operations (ops=a,b) or recorded runs (runs=x,y). */
+export function compareHref(q: { ops?: string[]; runs?: string[]; from?: string; group?: string }) {
+  return withQuery('#/compare', { ops: q.ops?.join(','), runs: q.runs?.join(','), from: q.from, group: q.group });
 }

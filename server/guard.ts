@@ -9,7 +9,11 @@ const LOOPBACKS = new Set(['127.0.0.1', '::1']);
 /** 默认只放行本 UI 的端口；部署在其它端口时用 PLAYGROUND_ORIGINS 覆盖（逗号分隔）。 */
 function originAllowlist(): string[] {
   const env = process.env.PLAYGROUND_ORIGINS?.trim();
-  if (env) return env.split(',').map((s) => s.trim()).filter(Boolean);
+  if (env)
+    return env
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
   const ports = [process.env.PORT || '8787', process.env.WEB_PORT || '5173'];
   const out: string[] = [];
   for (const host of ['localhost', '127.0.0.1']) {

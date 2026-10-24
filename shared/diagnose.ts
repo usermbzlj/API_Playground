@@ -25,7 +25,8 @@ export function extractVendorError(body: any): { code?: string | number; message
     return { code: body.base_resp.status_code, message: body.base_resp.status_msg };
   }
   // Volcengine style
-  if (body.ResponseMetadata?.Error) return { code: body.ResponseMetadata.Error.Code, message: body.ResponseMetadata.Error.Message };
+  if (body.ResponseMetadata?.Error)
+    return { code: body.ResponseMetadata.Error.Code, message: body.ResponseMetadata.Error.Message };
   // 数值 code + message 的信封（部分国内厂商 2xx 带错）。字符串 code 形状过于模糊，
   // 交给 HTTP 状态码分支处理，避免把 {code:"0",message:"ok"} 误判为错误。
   if (typeof body.code === 'number' && body.code !== 0 && body.code !== 200 && (body.msg || body.message)) {
@@ -64,9 +65,9 @@ const VENDOR_CODES: Record<string, Record<string, string>> = {
     AuthenticationError: 'API Key 无效或已删除。',
     AccountOverdueError: '账户欠费。',
     RateLimitExceeded: '触发限流。',
-    'SetLimitExceeded': '达到了你在控制台设置的推理限额（安全体验模式等）。',
-    'InputTextSensitiveContentDetected': '输入内容未通过审核。',
-    'OutputVideoSensitiveContentDetected': '生成的视频未通过审核。',
+    SetLimitExceeded: '达到了你在控制台设置的推理限额（安全体验模式等）。',
+    InputTextSensitiveContentDetected: '输入内容未通过审核。',
+    OutputVideoSensitiveContentDetected: '生成的视频未通过审核。',
   },
 };
 
@@ -80,7 +81,8 @@ export function diagnose(input: {
   if (networkError) {
     const hints = ['检查网络与代理设置；部分海外服务在国内需要代理，部分国内服务在海外访问较慢。'];
     if (/ENOTFOUND|EAI_AGAIN/.test(networkError)) hints.unshift('域名无法解析：检查 Base URL 是否拼写正确。');
-    if (/ETIMEDOUT|timeout|aborted due to timeout/i.test(networkError)) hints.unshift('请求超时：生成类任务可能本身较慢，也可能是网络问题。');
+    if (/ETIMEDOUT|timeout|aborted due to timeout/i.test(networkError))
+      hints.unshift('请求超时：生成类任务可能本身较慢，也可能是网络问题。');
     if (/ECONNREFUSED|ECONNRESET/.test(networkError)) hints.unshift('连接被拒绝或被重置。');
     if (/certificate|SSL|TLS/i.test(networkError)) hints.unshift('TLS 证书问题：检查代理或系统时间。');
     return { title: '网络错误', hints, vendorMessage: networkError };
@@ -89,7 +91,8 @@ export function diagnose(input: {
   const hints: string[] = [];
   let title = httpStatus ? `HTTP ${httpStatus}` : '调用失败';
   const codeStr = ve?.code != null ? String(ve.code) : '';
-  const table = providerId ? VENDOR_CODES[providerId] : undefined;
+  const alias: Record<string, string> = { qwen: 'dashscope', ark: 'volcengine' };
+  const table = providerId ? VENDOR_CODES[alias[providerId] ?? providerId] : undefined;
   if (table && codeStr) {
     const hit = table[codeStr] ?? Object.entries(table).find(([k]) => codeStr.startsWith(k))?.[1];
     if (hit) hints.push(hit);
@@ -134,6 +137,11 @@ export function diagnose(input: {
       title = `服务端错误 (${httpStatus})`;
       hints.push('厂商服务暂时异常或过载，可稍后重试；长时间无响应也可能是网关超时。');
       break;
+  }
+  // Provider account errors can use HTTP 400. Keep their meaning above generic status advice.
+  if (['Arrearage', 'AccountOverdueError', '1008', 'insufficient_balance_error'].includes(codeStr)) {
+    title = `账户欠费或余额不足${httpStatus ? ` (${httpStatus})` : ''}`;
+    hints.splice(0, hints.length, table?.[codeStr] ?? '检查对应账户余额、账单与套餐；充值或恢复账户后再重试。');
   }
   if (!hints.length) hints.push('查看下方原始响应获取厂商给出的详细信息。');
   return { title, hints, vendorCode: ve?.code, vendorMessage: ve?.message };

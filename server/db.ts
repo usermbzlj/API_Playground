@@ -88,6 +88,23 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 `);
 
+function ensureColumn(table: string, column: string, ddl: string) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+  if (!cols.some((c) => c.name === column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+}
+
+ensureColumn('connections', 'network', "network TEXT NOT NULL DEFAULT 'auto'");
+ensureColumn('connections', 'revision', 'revision INTEGER NOT NULL DEFAULT 0');
+ensureColumn('tasks', 'next_poll_at', 'next_poll_at TEXT');
+ensureColumn('tasks', 'retry_count', 'retry_count INTEGER NOT NULL DEFAULT 0');
+// Full lab state (connection, model, input, param toggles) so a run can be replayed exactly.
+ensureColumn('runs', 'state_json', 'state_json TEXT');
+ensureColumn('runs', 'summary', 'summary TEXT');
+// Runs launched together from the compare page share a group id.
+ensureColumn('runs', 'group_id', 'group_id TEXT');
+db.exec('CREATE INDEX IF NOT EXISTS runs_group ON runs(group_id)');
+db.exec('CREATE INDEX IF NOT EXISTS runs_op ON runs(operation_id, model)');
+
 export function json<T = any>(s: unknown): T | undefined {
   if (typeof s !== 'string' || !s) return undefined;
   try {
@@ -99,6 +116,15 @@ export function json<T = any>(s: unknown): T | undefined {
 
 export function now(): string {
   return new Date().toISOString();
+}
+
+export function pagination(limit: unknown, offset: unknown, fallback = 100) {
+  const n = Number(limit);
+  const at = Number(offset);
+  return {
+    limit: Number.isFinite(n) ? Math.max(1, Math.min(500, Math.floor(n))) : fallback,
+    offset: Number.isFinite(at) ? Math.max(0, Math.min(1_000_000_000, Math.floor(at))) : 0,
+  };
 }
 
 export function getSetting<T>(key: string, fallback: T): T {

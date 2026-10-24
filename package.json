@@ -1,24 +1,42 @@
 {
   "name": "api-playground",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "本地优先的多模态 AI API 游乐场：深入体验国内外厂商的原生特性",
   "engines": {
     "node": ">=24"
   },
   "scripts": {
-    "dev": "concurrently -k -n server,web -c blue,green \"npm:dev:server\" \"npm:dev:web\"",
+    "dev": "npm run prepare:viewer && concurrently -k -n server,web -c blue,green \"npm:dev:server\" \"npm:dev:web\"",
     "dev:server": "node --watch --disable-warning=ExperimentalWarning server/index.ts",
     "dev:web": "vite",
-    "build": "vite build",
+    "build": "npm run prepare:viewer && vite build",
     "start": "node --disable-warning=ExperimentalWarning server/index.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "check:catalog": "node --disable-warning=ExperimentalWarning scripts/check-catalog.ts"
+    "check:catalog": "node --disable-warning=ExperimentalWarning scripts/check-catalog.ts",
+    "prepare:viewer": "node scripts/prepare-viewer.ts",
+    "test:core": "node --disable-warning=ExperimentalWarning --test scripts/test-core.ts",
+    "test:backend": "node --disable-warning=ExperimentalWarning scripts/test-backend.ts",
+    "test:adapters": "node --disable-warning=ExperimentalWarning --test scripts/check-native-adapters.ts",
+    "test:import": "node --disable-warning=ExperimentalWarning --test scripts/test-import.ts",
+    "format": "prettier --write web server shared scripts",
+    "format:check": "prettier --check web server shared scripts",
+    "check": "npm run typecheck && npm run check:catalog && npm run test:core && npm run test:adapters && npm run test:import && npm run test:gemini && npm run test:fusion && npm run test:workspace && npm run test:backend && npm run test:bench && npm run build",
+    "setup:bench": "node scripts/setup-bench.ts",
+    "test:fusion": "node --test scripts/test-fusion.ts",
+    "test:gemini": "node --test scripts/test-gemini.ts",
+    "test:bench": "node --disable-warning=ExperimentalWarning scripts/test-bench.ts",
+    "test:workspace": "node --disable-warning=ExperimentalWarning --test scripts/test-workspace.ts"
   },
   "dependencies": {
+    "@google/model-viewer": "^4.4.0",
     "@hono/node-server": "^2.1.5",
+    "dompurify": "^3.4.17",
     "hono": "^4.13.13",
+    "https-proxy-agent": "^9.1.0",
+    "marked": "^18.1.1",
+    "undici": "^8.12.3",
     "ws": "^8.22.0"
   },
   "devDependencies": {
@@ -34,6 +52,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "concurrently": "^10.0.6",
     "lucide-react": "^1.60.0",
+    "prettier": "^3.9.10",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tailwindcss": "^4.3.3",

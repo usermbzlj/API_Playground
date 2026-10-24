@@ -19,6 +19,301 @@ body {
   font-size: 14px;
 }
 
+button,
+a,
+input,
+select,
+textarea,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(button, a, input, select, textarea, summary):focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 3px;
+}
+html {
+  scroll-padding-top: 5rem;
+}
+.resume-card {
+  transition:
+    border-color 140ms,
+    background-color 140ms;
+}
+.resume-card:hover {
+  background-color: #211a30;
+}
+.mobile-runbar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 25;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid #3f3653;
+  background: #14101ef5;
+  box-shadow: 0 -8px 24px #0005;
+  backdrop-filter: blur(16px);
+}
+.lab-mobile-controls {
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .mobile-runbar {
+    display: none;
+  }
+}
+@media (max-width: 767px) {
+  main {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+  .mobile-runbar button {
+    min-height: 44px;
+  }
+  .workspace-actionbar {
+    scroll-margin-top: 70px;
+  }
+  .btn-primary,
+  .btn-outline,
+  .btn-ghost,
+  .btn-danger {
+    touch-action: manipulation;
+  }
+}
+@media (prefers-contrast: more) {
+  .text-zinc-500,
+  .text-zinc-600 {
+    color: #b6b6c0;
+  }
+  .border-zinc-800 {
+    border-color: #62626e;
+  }
+}
+
+.app-shell {
+  background: radial-gradient(ellipse at 80% -15%, #29233b55, transparent 48%), #0b0b10;
+}
+.app-sidebar {
+  background: linear-gradient(170deg, #17141f, #0e0d14 45%);
+}
+.workspace-topbar {
+  background: #0c0c12a6;
+}
+.eyebrow {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.6;
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: #ddd6fe;
+  color: #17121f;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+.atlas-hero {
+  background:
+    radial-gradient(ellipse at 88% 25%, #4a337942, transparent 58%), linear-gradient(115deg, #191720, #111019 65%);
+}
+.prism-orbit {
+  position: absolute;
+  right: -35px;
+  top: -80px;
+  width: 440px;
+  height: 440px;
+  opacity: 0.6;
+  pointer-events: none;
+  transform: rotate(-25deg);
+}
+.prism-orbit::before {
+  content: '';
+  position: absolute;
+  inset: 100px;
+  border: 1px solid #a78bfa33;
+  transform: rotate(45deg);
+  background: linear-gradient(130deg, #a78bfa18, #4338ca05);
+  border-radius: 22px;
+  box-shadow: 0 0 100px #8b5cf618;
+}
+.prism-orbit span {
+  position: absolute;
+  inset: 20px;
+  border: 1px solid #a78bfa1a;
+  border-radius: 50%;
+}
+.prism-orbit span:nth-child(2) {
+  inset: 55px;
+}
+.prism-orbit span:nth-child(3) {
+  inset: 90px;
+}
+.atlas-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #30303b;
+  border-radius: 8px;
+  padding: 8px 11px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #a1a1aa;
+  background: #14131b;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
+}
+.atlas-filter:hover {
+  color: #e4e4e7;
+  border-color: #52525b;
+}
+.atlas-filter.is-active {
+  color: #ddd6fe;
+  background: #8b5cf614;
+  border-color: #8b5cf670;
+}
+.atlas-route {
+  background: linear-gradient(145deg, #191820e0, #121219);
+  transition: border-color 0.2s;
+}
+.atlas-route:hover {
+  border-color: #575064;
+}
+.atlas-route-icon {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 45px;
+  color: #c4b5fd;
+  border: 1px solid #8b5cf633;
+  background: #8b5cf611;
+  border-radius: 13px;
+}
+.atlas-route-voice .atlas-route-icon {
+  color: #7dd3fc;
+  border-color: #38bdf833;
+  background: #38bdf80c;
+}
+.atlas-route-visual .atlas-route-icon {
+  color: #f9a8d4;
+  border-color: #f472b633;
+  background: #f472b60c;
+}
+.atlas-route-spatial .atlas-route-icon {
+  color: #fcd34d;
+  border-color: #fbbf2433;
+  background: #fbbf240c;
+}
+.atlas-route-tools .atlas-route-icon {
+  color: #6ee7b7;
+  border-color: #34d39933;
+  background: #34d3990c;
+}
+.provider-monogram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #3f3b4d;
+  border-radius: 10px;
+  background: #23202e;
+  color: #c4b5fd;
+  font-size: 15px;
+}
+.interactive-card {
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.interactive-card:hover {
+  border-color: #76648e;
+  background: #1c1927;
+}
+.model-matrix-grid > div {
+  min-width: 0;
+}
+@media (min-width: 1280px) {
+  .model-matrix-grid > div + div {
+    border-left: 1px solid #27272a;
+    padding-left: 18px;
+  }
+}
+button,
+a,
+input,
+select,
+textarea,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+select,
+summary,
+input[type='checkbox'] {
+  cursor: pointer;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #a78bfa;
+  outline-offset: 3px;
+}
+input[type='checkbox'],
+input[type='range'] {
+  accent-color: #8b5cf6;
+}
+::selection {
+  background: #7c3aed66;
+}
+textarea {
+  resize: vertical;
+}
+fieldset {
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .app-sidebar[data-open='false'] {
+    visibility: hidden;
+  }
+  .prism-orbit {
+    opacity: 0.25;
+    right: -230px;
+  }
+  .atlas-filter {
+    min-height: 40px;
+  }
+  .btn-primary,
+  .btn-outline,
+  .btn-danger,
+  .btn-ghost {
+    min-height: 40px;
+  }
+  .input {
+    max-width: 100%;
+    font-size: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -33,32 +328,40 @@ body {
   background: transparent;
 }
 
-.input {
-  @apply w-full rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500/40 disabled:opacity-50;
+@utility input {
+  @apply w-full rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 py-2 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500/40 disabled:opacity-50;
+}
+.atlas-discovery input[type='search'] {
+  padding-left: 2.5rem;
+  min-height: 44px;
+}
+.atlas-discovery select {
+  width: auto;
+  min-height: 44px;
 }
 /* Tailwind v4：@apply 只能用于工具类。可被 @apply 的自定义类必须用 @utility 声明。 */
 @utility btn {
-  @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
 }
-.btn-primary {
+@utility btn-primary {
   @apply btn bg-violet-600 text-white hover:bg-violet-500;
 }
-.btn-ghost {
+@utility btn-ghost {
   @apply btn text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100;
 }
-.btn-outline {
+@utility btn-outline {
   @apply btn border border-zinc-700 text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800;
 }
-.btn-danger {
+@utility btn-danger {
   @apply btn bg-rose-600/90 text-white hover:bg-rose-500;
 }
-.card {
+@utility card {
   @apply rounded-xl border border-zinc-800 bg-zinc-900/60;
 }
-.label {
+@utility label {
   @apply text-xs font-medium text-zinc-400;
 }
-.chip {
+@utility chip {
   @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] leading-4 whitespace-nowrap;
 }
 .mono {
