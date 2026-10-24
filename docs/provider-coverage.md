@@ -1,8 +1,8 @@
 # 厂商原生适配与验证边界
 
-2026-10-24 融合版新增 [Gemini 原生内容与语音](gemini-coverage.md)，现为 11 个服务入口、24 个原生操作、25 个内置预设。Gemini 为 `documented`，没有继承其他版本的“已验证”声明。性能评测复用兼容协议连接，属于独立的真实性能引擎入口，不计入原生操作数量。
+2026-10-24 融合版新增 [Gemini 原生内容与语音](gemini-coverage.md)。2026-10-25 的 v0.4.0 再补 12 个原生操作：OpenAI Responses / GPT Image 2.5 / Embeddings、Anthropic 官方 Messages、Gemini 图像与 Embeddings、Qwen Wan 3.0 视频与 ASR、Ark Seedance 视频与 Seedream 图像、Tripo 图片到 3D、MiniMax H3 v2。现为 12 个服务入口、36 个原生操作、39 个内置预设。新增能力全部为 `documented`，没有继承或伪造真实调用证据。性能评测复用兼容协议连接，属于独立的真实性能引擎入口，不计入原生操作数量。
 
-文档核对日期：**2026-10-22（北京时间）**。本文记录当前代码实现，不能代替账户实测。`documented` 表示已核对官方文档并完成请求构建/解析适配，**不表示真实 Key 调用成功**。只有下述具体操作/模型范围有历史文本调用证据；验证方法和待验收范围见 [验证说明](verification.md)，私人账户记录不随源码分发。
+文档核对日期：**2026-10-25（北京时间）**。本文记录当前代码实现，不能代替账户实测。`documented` 表示已核对官方文档并完成请求构建/解析适配，**不表示真实 Key 调用成功**。只有下述具体操作/模型范围有历史文本调用证据；验证方法和待验收范围见 [验证说明](verification.md)，私人账户记录不随源码分发。
 
 ## 国内优先的原生切片
 
@@ -36,7 +36,26 @@ MiniMax 视频采用三段原生流程：创建取得 task_id → [查询状态]
 | `tripo.text-to-model` | 原生 V3 文本到 3D，控制几何/纹理种子、面数和 PBR，任务完成后下载 GLB 及预览图 | [Tripo 标准生成](https://developers.tripo3d.ai/en/docs/generation-text-to-model/standard)。documented；消耗账户积分，未进行付费 3D 验证 |
 | 通用 OpenAI / Anthropic | 原有对话、补全、Embedding、Rerank、Messages 协议兜底 | 通用入口不意味着任意厂商都兼容；用户自己提供 Base URL 与模型，对方不支持的参数保留真实报错 |
 
-当前未宣布 Gemini 原生 generateContent、Anthropic 官方专属思考新版本、Seedance、下一步编辑等已完成。它们仍是后续适配方向；“按能力探索”中的未接入条目不能被计入可运行覆盖。
+## v0.4.0 新增原生操作（2026-10-25 核对）
+
+以下操作都只做了文档级请求/响应适配和离线契约测试，没有真实账户调用。`documented` 不等于可用；模型开通、地域、余额、计费与安全策略需逐项验收。
+
+| 操作 | 原生要点 | 生命周期 / 产物 | 限制与未做事项 | 官方来源 |
+|---|---|---|---|---|
+| `openai.responses` | Responses 原生 input 项、instructions、函数/内置/MCP 工具、`text.format` JSON Schema、推理摘要与 usage | SSE / 文本、工具 | 工具回合的加密 reasoning item 未回传；prediction 仅旧 Chat Completions 支持，未适配 | [Responses create](https://developers.openai.com/api/reference/resources/responses/methods/create) |
+| `openai.image` | `/v1/images/generations` 与 multipart `/v1/images/edits`；`image[]`、mask、b64_json | HTTP / 图片 | 仅 GPT Image 2.5；流式图像事件未接；尺寸集合以官方为准 | [Images](https://developers.openai.com/api/reference/resources/images) |
+| `openai.embedding` | `/v1/embeddings`、dimensions、encoding_format | HTTP / 向量 | text-embedding-3 系列；未接 batch 之外的老模型 | [Embeddings](https://developers.openai.com/api/reference/resources/embeddings/methods/create) |
+| `anthropic.messages` | Messages、adaptive thinking、`output_config.effort`、顶层/块级 cache_control、工具与签名回传 | SSE / 文本、思考、工具 | 官方 5.x 已移除采样参数；4.6+ 拒绝预填；5.5 拒绝强制 tool_choice | [Messages](https://platform.claude.com/docs/en/api/messages/create) |
+| `gemini.image` | `generateContent` + `responseModalities:["IMAGE"]` + `imageConfig`；保存 inlineData | HTTP / 图片 | Imagen 端点已停用；thought=true 中间图不保存；Veo 已从 Gemini API 关闭 | [Image generation](https://ai.google.dev/gemini-api/docs/image-generation) |
+| `gemini.embedding` | `:batchEmbedContents`、`embedContentConfig` | HTTP / 向量 | 只发文本 parts；多模态聚合未开放 | [Embeddings](https://ai.google.dev/api/embeddings) |
+| `minimax.video-v2` | `/v2/video_generation` 的 content 数组、首/尾帧 role、H3 系列分辨率与时长 | 异步 / 视频 | 无独立 camera 字段；首尾帧与 reference 素材互斥；只开放首尾帧 | [v2 create](https://platform.minimax.io/docs/api-reference/video-generation-v2-create) |
+| `qwen.video` | Wan 3.0 `input.media` 首/尾帧、`X-DashScope-Async`、`/api/v1/tasks/{id}` | 异步 / 视频 | 旧 `img_url` 只属于 ≤2.6；模型/域名/Key 必须同地域；没有伪造取消 | [Wan 3.0](https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference) |
+| `qwen.asr` | `qwen3-asr-flash` 同步音频 parts、asr_options | HTTP / 转写 JSON | 只做 ≤5 分钟、≤10 MB 同步；异步 filetrans / Paraformer 未接 | [Qwen-ASR](https://help.aliyun.com/zh/model-studio/qwen-asr-api-reference) |
+| `ark.video` | Seedance 2.5 内容任务、首/尾帧 role、状态查询与 video_url | 异步 / 视频 | 需要账户余额/资源包；seed/camera_fixed 属 1.0，不显示 | [创建视频任务](https://docs.volcengine.com/docs/ark/create-video-generation-task-api) |
+| `ark.image` | Seedream 5.0 `/api/v3/images/generations`、参考图数组、url/b64_json | HTTP / 图片 | 官方未列 seed；水印默认开启；尺寸只开放 1K/1.5K/2K | [图像生成](https://docs.volcengine.com/docs/ark/image-generation-api) |
+| `tripo.image-to-model` | V3 `/generation/image-to-model`，input 为公网 URL，异步查询 GLB | 异步 / 3D | 只开放公网 URL；file_token 上传与绑骨/动画端点未接 | [图片到 3D](https://developers.tripo3d.ai/en/docs/generation-image-to-model/standard) |
+
+Gemini 原生 generateContent 已在融合版实现；本轮的图像与 Embeddings 继续使用同一 Developer API。Veo 3.1 已从 Gemini API 关闭，视频方向改用 Omni/Interactions 或 Vertex，因而没有把旧 `predictLongRunning` 流程当作可用能力。Anthropic 官方 Messages 与通用 Anthropic 兼容入口分开记录：前者遵循 2026-10-21 之后移除采样参数、adaptive thinking 等语义，后者仍保留兼容端点的旧参数。下一步编辑、预测输出、专用翻译、MCP 客户端执行等仍未适配，不能计入可运行覆盖。
 
 ## 费用说明
 

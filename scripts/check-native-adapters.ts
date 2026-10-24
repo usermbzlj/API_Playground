@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getOperation, OPERATIONS, BUILTIN_PRESETS } from '../shared/catalog.ts';
+import { reduceOpenAIResponses } from '../shared/protocols.ts';
 import { initialParamState, fillTemplate } from '../shared/util.ts';
 
 const build = (
@@ -148,6 +149,70 @@ test('Hailuo task lifecycle resolves file ids and does not fake cancellation', (
   assert.throws(() => build('minimax.video', {}, { duration: 10, resolution: '1080P' }), /只支持 6 秒/);
 });
 
+test('Hailuo H3 v2 uses the content array and drops ratio for keyframes', () => {
+  const op = getOperation('minimax.video-v2')!;
+  const text = build(op.id, { prompt: 'river at dawn' }).body as any;
+  assert.equal(text.model, 'MiniMax-H3');
+  assert.deepEqual(text.content, [{ type: 'text', text: 'river at dawn' }]);
+  assert.equal(text.ratio, '16:9');
+  assert.equal(text.resolution, '768P');
+  assert.equal(text.duration, 6);
+  const frames = build(op.id, { prompt: 'transition', firstFrame: 'a', lastFrame: 'b' }).body as any;
+  assert.equal(frames.ratio, undefined);
+  assert.deepEqual(frames.content[1], {
+    type: 'image_url',
+    image_url: { url: { $asset: 'a', as: 'dataUrl' } },
+    role: 'first_frame',
+  });
+  assert.equal(frames.content[2].role, 'last_frame');
+  assert.equal(fillTemplate(op.async!.poll.path, { id: 'task-1' }), '/v2/query/video_generation/task-1');
+  assert.equal(op.async!.statusMap.succeeded, 'succeeded');
+  assert.equal(op.async!.statusMap.queued, 'pending');
+  const refs = op.async!.results({ task: { content: { url: 'https://example.com/h3.mp4' } } });
+  assert.equal(refs[0].kind, 'video');
+  assert.throws(() => build(op.id, { prompt: 'x' }, { resolution: '2K' }, 'MiniMax-H3-Lite'), /不支持 2K/);
+  assert.throws(() => build(op.id, { prompt: 'x' }, { duration: 4 }, 'MiniMax-H3-Max'), /最短 5 秒/);
+});
+
+test('Anthropic official Messages uses adaptive thinking and rejects removed sampling/prefill', () => {
+  const op = getOperation('anthropic.messages')!;
+  assert.ok(op);
+  assert.ok(!op.params.some((p) => ['temperature', 'top_p', 'top_k'].includes(p.key)));
+  const request = build(
+    op.id,
+    { system: 'sys', messages: [{ role: 'user', content: 'hi' }] },
+    {
+      thinking: { type: 'adaptive', display: 'summarized' },
+      'output_config.effort': 'high',
+      cache_control: { type: 'ephemeral' },
+    },
+  );
+  assert.equal(request.path, '/v1/messages');
+  const body = request.body as any;
+  assert.equal(body.system, 'sys');
+  assert.deepEqual(body.thinking, { type: 'adaptive', display: 'summarized' });
+  assert.equal(body.output_config.effort, 'high');
+  assert.deepEqual(body.cache_control, { type: 'ephemeral' });
+  assert.equal(body.max_tokens, 4096);
+  assert.equal(body.temperature, undefined);
+  assert.throws(() => build(op.id, { messages: [], prefix: 'continue' }), /prefill/);
+  assert.throws(() => build(op.id, { messages: [] }, { thinking: { type: 'enabled' } }), /adaptive/);
+  assert.throws(
+    () => build(op.id, { messages: [] }, { thinking: { type: 'disabled' } }, 'claude-opus-5-5'),
+    /不接受关闭思考/,
+  );
+  assert.equal(
+    (build(op.id, { messages: [] }, { thinking: { type: 'between_tools' } }, 'claude-sonnet-5-5').body as any).thinking
+      .type,
+    'between_tools',
+  );
+  assert.throws(
+    () => build(op.id, { messages: [] }, { tool_choice: { type: 'any' } }, 'claude-opus-5-5'),
+    /拒绝强制 tool_choice/,
+  );
+  assert.ok(BUILTIN_PRESETS.some((p) => p.operationId === op.id));
+});
+
 test('OpenAI ASR sends multipart and realtime uses GA audio fields', () => {
   const asr = build('openai.asr', { audio: 'recording' }, { prompt: 'vocabulary' });
   assert.equal(asr.bodyType, 'multipart');
@@ -186,6 +251,232 @@ test('Qwen realtime has a native session contract distinct from OpenAI GA', () =
   assert.equal(body.session.type, undefined);
   assert.equal(body.session.output_modalities, undefined);
   assert.equal(body.session.audio.input.turn_detection, undefined);
+});
+
+test('Qwen Wan 3.0 uses input.media and the DashScope async header', () => {
+  const op = getOperation('qwen.video')!;
+  const text = build(op.id, { prompt: 'river' });
+  assert.equal(text.method, 'POST');
+  assert.equal(text.headers!['X-DashScope-Async'], 'enable');
+  const body = text.body as any;
+  assert.equal(body.model, 'wan3.0-video');
+  assert.equal(body.input.prompt, 'river');
+  assert.equal(body.parameters.resolution, '1080P');
+  assert.equal(body.parameters.duration, 5);
+  const frames = build(op.id, { prompt: 'transition', firstFrame: 'a', lastFrame: 'b' }).body as any;
+  assert.deepEqual(frames.input.media[0], { type: 'first_frame', url: { $asset: 'a', as: 'dataUrl' } });
+  assert.equal(frames.input.media[1].type, 'last_frame');
+  assert.equal(op.async!.idPath, 'output.task_id');
+  assert.equal(op.async!.statusPath, 'output.task_status');
+  assert.equal(op.async!.statusMap.SUCCEEDED, 'succeeded');
+  assert.equal(fillTemplate(op.async!.poll.path, { id: 'abc' }), '/api/v1/tasks/abc');
+  const refs = op.async!.results({ output: { video_url: 'https://example.com/wan.mp4' } });
+  assert.equal(refs[0].kind, 'video');
+});
+
+test('Qwen ASR sends native audio parts and options', () => {
+  const body = build('qwen.asr', { audio: 'recording' }, { 'parameters.asr_options.language': 'zh' }).body as any;
+  assert.equal(body.model, 'qwen3-asr-flash');
+  assert.deepEqual(body.input.messages[0].content[0].audio, { $asset: 'recording', as: 'dataUrl' });
+  assert.equal(body.parameters.asr_options.language, 'zh');
+  assert.equal(body.parameters.asr_options.enable_itn, undefined);
+});
+
+test('Ark Seedance keeps content roles and maps task states', () => {
+  const op = getOperation('ark.video')!;
+  const body = build(op.id, { prompt: 'rain', firstFrame: 'a', lastFrame: 'b' }).body as any;
+  assert.equal(body.model, 'doubao-seedance-2-5-260628');
+  assert.equal(body.content[0].text, 'rain');
+  assert.equal(body.content[1].role, 'first_frame');
+  assert.equal(body.content[2].role, 'last_frame');
+  assert.equal(op.async!.idPath, 'id');
+  assert.equal(op.async!.statusMap.expired, 'failed');
+  assert.equal(op.async!.statusMap.succeeded, 'succeeded');
+  const refs = op.async!.results({ content: { video_url: 'https://example.com/seedance.mp4' } });
+  assert.equal(refs[0].kind, 'video');
+});
+
+test('Ark Seedream sends image arrays and extracts both url and b64', () => {
+  const op = getOperation('ark.image')!;
+  const body = build(op.id, { prompt: 'poster', images: ['a', 'b'] }).body as any;
+  assert.equal(body.model, 'doubao-seedream-5-0-pro-260628');
+  assert.deepEqual(body.image, [
+    { $asset: 'a', as: 'dataUrl' },
+    { $asset: 'b', as: 'dataUrl' },
+  ]);
+  assert.equal(body.size, '2K');
+  const fromUrl = op.artifacts!({ data: [{ url: 'https://example.com/p.png' }] });
+  assert.equal(fromUrl[0].kind, 'image');
+  const fromB64 = op.artifacts!({ data: [{ b64_json: 'AAAA' }] });
+  assert.equal(fromB64[0].base64, 'AAAA');
+});
+
+test('Gemini image keeps thought images out of artifacts and reports blocks', () => {
+  const op = getOperation('gemini.image')!;
+  const body = build(op.id, { prompt: 'poster', images: ['a'] }).body as any;
+  assert.deepEqual(body.contents[0].parts[0], { inlineData: { $asset: 'a', as: 'geminiInlineData' } });
+  assert.equal(body.contents[0].parts[1].text, 'poster');
+  assert.deepEqual(body.generationConfig.responseModalities, ['IMAGE']);
+  assert.equal(body.generationConfig.imageConfig.aspectRatio, '1:1');
+  const artifacts = op.artifacts!({
+    candidates: [
+      {
+        content: {
+          parts: [
+            { thought: true, inlineData: { mimeType: 'image/png', data: 'THOUGHT' } },
+            { inlineData: { mimeType: 'image/png', data: 'FINAL' } },
+          ],
+        },
+      },
+    ],
+  });
+  assert.equal(artifacts.length, 1);
+  assert.equal(artifacts[0].base64, 'FINAL');
+  assert.throws(() => op.artifacts!({ candidates: [{ finishReason: 'IMAGE_SAFETY' }] }), /IMAGE_SAFETY/);
+});
+
+test('Gemini embeddings use batch requests with nested config', () => {
+  const body = build('gemini.embedding', { texts: ['a', 'b'] }).body as any;
+  assert.equal(body.requests.length, 2);
+  assert.equal(body.requests[0].model, 'models/gemini-embedding-2');
+  assert.equal(body.requests[0].content.parts[0].text, 'a');
+  assert.equal(body.requests[0].embedContentConfig.taskType, 'SEMANTIC_SIMILARITY');
+});
+
+test('OpenAI images switch to multipart edits and keep b64 artifacts', () => {
+  const op = getOperation('openai.image')!;
+  const generated = build(op.id, { prompt: 'cup' });
+  assert.equal(generated.path, '/v1/images/generations');
+  assert.equal((generated.body as any).model, 'gpt-image-2.5-sunburst');
+  const edited = build(op.id, { prompt: 'make it blue', images: ['a', 'b'] });
+  assert.equal(edited.path, '/v1/images/edits');
+  assert.equal(edited.bodyType, 'multipart');
+  const files = (edited.body as any).files;
+  assert.equal(files['image[]'].length, 2);
+  assert.deepEqual(files['image[]'][0], { $asset: 'a' });
+  const artifacts = op.artifacts!({ output_format: 'png', data: [{ b64_json: 'AAAA' }] });
+  assert.equal(artifacts[0].kind, 'image');
+  assert.equal(artifacts[0].mime, 'image/png');
+});
+
+test('OpenAI embeddings post to /v1/embeddings', () => {
+  const req = build('openai.embedding', { texts: ['a', 'b'] });
+  assert.equal(req.path, '/v1/embeddings');
+  assert.deepEqual((req.body as any).input, ['a', 'b']);
+  assert.equal((req.body as any).model, 'text-embedding-3-large');
+});
+
+test('Tripo image-to-3D keeps the single input source and polls tasks', () => {
+  const op = getOperation('tripo.image-to-model')!;
+  const req = build(op.id, { images: ['asset-a'] });
+  assert.equal(req.path, '/generation/image-to-model');
+  assert.deepEqual((req.body as any).input, { $asset: 'asset-a', as: 'remoteUrl' });
+  assert.equal(op.async!.idPath, 'data.task_id');
+  assert.equal(op.async!.statusMap.success, 'succeeded');
+  assert.equal(fillTemplate(op.async!.poll.path, { id: 't1' }), '/tasks/t1');
+  assert.equal(op.async!.results({ data: { output: { model_url: 'https://example.com/m.glb' } } })[0].kind, 'model3d');
+});
+
+test('OpenAI Responses builds native items and reduces streamed events', () => {
+  const op = getOperation('openai.responses')!;
+  const request = build(op.id, {
+    system: 'sys',
+    messages: [{ role: 'user', content: 'hi', images: ['img'] }],
+  });
+  assert.equal(request.path, '/v1/responses');
+  const body = request.body as any;
+  assert.equal(body.instructions, 'sys');
+  assert.equal(body.model, 'gpt-6-astra');
+  assert.equal(body.stream, true);
+  assert.equal(body.store, false);
+  assert.equal(body.reasoning.effort, 'medium');
+  assert.equal(body.max_output_tokens, 4096);
+  assert.deepEqual(body.input, [
+    {
+      role: 'user',
+      content: [
+        { type: 'input_text', text: 'hi' },
+        { type: 'input_image', image_url: { $asset: 'img', as: 'dataUrl' } },
+      ],
+    },
+  ]);
+  const withTools = build(
+    op.id,
+    { messages: [{ role: 'user', content: 'x' }] },
+    {
+      tools: [{ type: 'function', function: { name: 'f', description: 'd', parameters: { type: 'object' } } }],
+      tool_choice: 'required',
+      'text.format': { type: 'json_schema', name: 'r', strict: true, schema: { type: 'object' } },
+    },
+  ).body as any;
+  assert.deepEqual(withTools.tools, [
+    { type: 'function', name: 'f', description: 'd', parameters: { type: 'object' } },
+  ]);
+  assert.equal(withTools.tool_choice, 'required');
+  assert.equal(withTools.text.format.name, 'r');
+  assert.throws(() => build(op.id, { messages: [{ role: 'user', content: 'x' }], prefix: 'p' }), /预填/);
+
+  const view = reduceOpenAIResponses([
+    { t: 1, type: 'chunk', data: { type: 'response.created', response: { id: 'resp_1', model: 'gpt-6-astra' } } },
+    {
+      t: 2,
+      type: 'chunk',
+      data: { type: 'response.output_item.added', output_index: 0, item: { type: 'message', id: 'msg_1' } },
+    },
+    { t: 3, type: 'chunk', data: { type: 'response.output_text.delta', delta: 'Hello ' } },
+    {
+      t: 4,
+      type: 'chunk',
+      data: { type: 'response.output_item.added', output_index: 1, item: { type: 'reasoning', id: 'rs_1' } },
+    },
+    { t: 5, type: 'chunk', data: { type: 'response.reasoning_summary_text.delta', delta: 'think' } },
+    {
+      t: 6,
+      type: 'chunk',
+      data: {
+        type: 'response.output_item.added',
+        output_index: 2,
+        item: { type: 'function_call', id: 'item_1', call_id: 'call_1', name: 'f', arguments: '' },
+      },
+    },
+    {
+      t: 7,
+      type: 'chunk',
+      data: { type: 'response.function_call_arguments.delta', item_id: 'item_1', delta: '{"x":1}' },
+    },
+    {
+      t: 8,
+      type: 'chunk',
+      data: {
+        type: 'response.completed',
+        response: {
+          id: 'resp_1',
+          model: 'gpt-6-astra',
+          status: 'completed',
+          usage: {
+            input_tokens: 10,
+            output_tokens: 5,
+            total_tokens: 15,
+            input_tokens_details: { cached_tokens: 4 },
+            output_tokens_details: { reasoning_tokens: 2 },
+          },
+          output: [
+            { type: 'message', id: 'msg_1', content: [{ type: 'output_text', text: 'Hello world' }] },
+            { type: 'reasoning', id: 'rs_1', summary: [{ type: 'summary_text', text: 'think' }] },
+            { type: 'function_call', id: 'item_1', call_id: 'call_1', name: 'f', arguments: '{"x":1}' },
+          ],
+        },
+      },
+    },
+  ] as any);
+  assert.equal(view.text, 'Hello ');
+  assert.equal(view.reasoning, 'think');
+  assert.equal(view.toolCalls.length, 1);
+  assert.equal(view.toolCalls[0].args, '{"x":1}');
+  assert.equal(view.usage?.prompt_tokens, 10);
+  assert.equal(view.usage?.prompt_cache_hit_tokens, 4);
+  assert.equal(view.usage?.reasoning_tokens, 2);
+  assert.equal(view.responseId, 'resp_1');
 });
 
 test('every new operation has official documentation, an honest status, and a preset', () => {

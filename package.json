@@ -1,7 +1,7 @@
 {
   "name": "api-playground",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "本地优先的多模态 AI API 游乐场：深入体验国内外厂商的原生特性",
   "engines": {

@@ -319,7 +319,9 @@ try {
     },
     (req, res) => mock.emit('request', req, res),
   );
-  secure.listen(0, '127.0.0.1');
+  // Dual-stack listener: localhost resolves to ::1 before 127.0.0.1 on this host,
+  // and the pinned-IP transport must still complete the localhost TLS handshake.
+  secure.listen(0, '::');
   await once(secure, 'listening');
   const securePort = (secure.address() as { port: number }).port;
   const priorCert = process.env.SSL_CERT_FILE;

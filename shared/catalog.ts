@@ -11,15 +11,20 @@ import { mimoOps, mimoProvider } from './providers/mimo.ts';
 import { qwenOps, qwenProvider } from './providers/qwen.ts';
 import { arkOps, arkProvider } from './providers/ark.ts';
 import { minimaxVideoModels, minimaxVideoOps } from './providers/minimax-video.ts';
+import { minimaxMediaModels, minimaxMediaOps } from './providers/minimax-media.ts';
 import { openaiNativeOps, openaiNativeProvider } from './providers/openai-native.ts';
 import { tripoOps, tripoProvider } from './providers/tripo.ts';
 import { geminiOps, geminiProvider } from './providers/gemini.ts';
+import { anthropicOps, anthropicProvider } from './providers/anthropic.ts';
 
 const PROVIDER_MODULES: { provider: ProviderDef; ops: OperationDef[] }[] = [
   { provider: deepseekProvider, ops: deepseekOps },
   {
-    provider: { ...minimaxProvider, models: [...minimaxProvider.models, ...minimaxVideoModels] },
-    ops: [...minimaxOps, ...minimaxVideoOps],
+    provider: {
+      ...minimaxProvider,
+      models: [...minimaxProvider.models, ...minimaxVideoModels, ...minimaxMediaModels],
+    },
+    ops: [...minimaxOps, ...minimaxVideoOps, ...minimaxMediaOps],
   },
   { provider: kimiProvider, ops: kimiOps },
   { provider: mimoProvider, ops: mimoOps },
@@ -28,6 +33,7 @@ const PROVIDER_MODULES: { provider: ProviderDef; ops: OperationDef[] }[] = [
   { provider: openaiNativeProvider, ops: openaiNativeOps },
   { provider: geminiProvider, ops: geminiOps },
   { provider: tripoProvider, ops: tripoOps },
+  { provider: anthropicProvider, ops: anthropicOps },
   { provider: customOpenAIProvider, ops: genericOps.filter((o) => o.providerId === customOpenAIProvider.id) },
   { provider: customAnthropicProvider, ops: genericOps.filter((o) => o.providerId === customAnthropicProvider.id) },
 ];

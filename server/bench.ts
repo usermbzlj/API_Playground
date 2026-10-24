@@ -286,7 +286,10 @@ export async function startBenchmark(input: unknown): Promise<BenchRecord> {
   if (!['http:', 'https:'].includes(target.protocol) || target.username || target.password)
     throw new Error('压测仅支持 HTTP(S) 无内嵌凭据的地址');
   const host = target.hostname.replace(/^\[|\]$/g, '');
-  const addresses = isIP(host) ? [host] : (await lookup(host, { all: true, verbatim: true })).map((a) => a.address);
+  const resolved = isIP(host) ? [host] : (await lookup(host, { all: true, verbatim: true })).map((a) => a.address);
+  // Prefer IPv4 when a name resolves to both families: the pinned transport and local
+  // proxies are far more commonly IPv4-only. The exact address is still pinned per request.
+  const addresses = [...resolved].sort((a, b) => Number(a.includes(':')) - Number(b.includes(':')));
   if (!addresses.length || addresses.some((a) => !allowedBenchAddress(a)))
     throw new Error('拒绝云元数据、链路本地、组播或未指定的目标地址');
   const body: Record<string, unknown> = cfg.customBody

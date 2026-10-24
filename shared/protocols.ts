@@ -265,6 +265,143 @@ export function reduceOpenAICompletion(events: TraceEvent[]): ChatView {
   return view;
 }
 
+/** OpenAI Responses API: typed SSE events plus the final response object. */
+export function reduceOpenAIResponses(events: TraceEvent[]): ChatView {
+  const view = emptyChat();
+  const toolByItem = new Map<string, ToolCallView>();
+  const streamedItems = new Set<string>();
+  const absorbItem = (item: any, index = view.toolCalls.length) => {
+    if (!item || typeof item !== 'object') return;
+    if (item.type === 'message') {
+      if (item.id && streamedItems.has(item.id)) return;
+      if (item.id) streamedItems.add(item.id);
+      for (const part of item.content ?? []) {
+        if (part?.type === 'output_text') {
+          view.text += part.text ?? '';
+          collectCitations(view, part);
+        } else if (part?.type === 'refusal') {
+          view.text += part.refusal ?? '';
+        }
+      }
+      return;
+    }
+    if (item.type === 'reasoning') {
+      if (item.id && streamedItems.has(item.id)) return;
+      if (item.id) streamedItems.add(item.id);
+      for (const s of item.summary ?? []) view.reasoning += s?.text ?? '';
+      if (item.encrypted_content) mergeExtra(view.extras, 'reasoning.encrypted_content', item.encrypted_content);
+      return;
+    }
+    if (item.type === 'function_call') {
+      let tc = toolByItem.get(item.id ?? item.call_id ?? '');
+      if (!tc) {
+        tc = { index, id: item.call_id ?? item.id, type: 'function', name: item.name ?? '', args: '' };
+        view.toolCalls.push(tc);
+        if (item.id) toolByItem.set(item.id, tc);
+        if (item.call_id) toolByItem.set(item.call_id, tc);
+      }
+      tc.name = item.name ?? tc.name;
+      if (typeof item.arguments === 'string' && item.arguments) tc.args = item.arguments;
+      return;
+    }
+    if (item.type) mergeExtra(view.extras, `item.${item.type}`, item);
+  };
+  const absorbResponse = (resp: any) => {
+    if (!resp || typeof resp !== 'object') return;
+    if (resp.id) view.responseId = resp.id;
+    if (resp.model) view.responseModel = resp.model;
+    if (resp.status) view.finishReason = resp.status;
+    const u = resp.usage;
+    if (u && typeof u === 'object') {
+      view.usage = {
+        ...u,
+        prompt_tokens: u.input_tokens,
+        completion_tokens: u.output_tokens,
+        total_tokens: u.total_tokens,
+        prompt_cache_hit_tokens: u.input_tokens_details?.cached_tokens,
+        reasoning_tokens: u.output_tokens_details?.reasoning_tokens,
+      };
+    }
+    const output = Array.isArray(resp.output) ? resp.output : [];
+    output.forEach((item: any, i: number) => absorbItem(item, i));
+    for (const [k, v] of Object.entries(resp))
+      if (
+        !['id', 'object', 'created_at', 'model', 'output', 'usage', 'status', 'error', 'incomplete_details'].includes(k)
+      )
+        mergeExtra(view.extras, k, v);
+    if (resp.error) mergeExtra(view.extras, 'error', resp.error);
+    if (resp.incomplete_details) mergeExtra(view.extras, 'incomplete_details', resp.incomplete_details);
+  };
+  for (const ev of events) {
+    if (ev.type !== 'chunk' && ev.type !== 'body') continue;
+    const p = payloadOf(ev);
+    if (!p || typeof p !== 'object') continue;
+    view.chunks++;
+    view.lastMs = ev.t;
+    if (ev.type === 'body') {
+      absorbResponse(p);
+      continue;
+    }
+    switch (p.type) {
+      case 'response.created':
+        if (p.response) {
+          view.responseId = p.response.id ?? view.responseId;
+          view.responseModel = p.response.model ?? view.responseModel;
+        }
+        break;
+      case 'response.output_item.added': {
+        const item = p.item ?? {};
+        if ((item.type === 'message' || item.type === 'reasoning') && item.id) streamedItems.add(item.id);
+        absorbItem(item, p.output_index ?? view.toolCalls.length);
+        break;
+      }
+      case 'response.output_text.delta':
+        if (typeof p.delta === 'string') {
+          view.text += p.delta;
+          if (view.firstTextMs === undefined) view.firstTextMs = ev.t;
+        }
+        break;
+      case 'response.refusal.delta':
+        if (typeof p.delta === 'string') {
+          view.text += p.delta;
+          if (view.firstTextMs === undefined) view.firstTextMs = ev.t;
+        }
+        break;
+      case 'response.reasoning_summary_text.delta':
+        if (typeof p.delta === 'string') {
+          view.reasoning += p.delta;
+          if (view.firstReasoningMs === undefined) view.firstReasoningMs = ev.t;
+        }
+        break;
+      case 'response.reasoning_summary_text.done':
+        if (!view.reasoning && typeof p.text === 'string') view.reasoning = p.text;
+        break;
+      case 'response.function_call_arguments.delta': {
+        const tc = toolByItem.get(p.item_id ?? '');
+        if (tc) tc.args += p.delta ?? '';
+        break;
+      }
+      case 'response.function_call_arguments.done': {
+        const tc = toolByItem.get(p.item_id ?? '');
+        if (tc && typeof p.arguments === 'string') tc.args = p.arguments;
+        break;
+      }
+      case 'response.completed':
+        absorbResponse(p.response);
+        break;
+      case 'response.failed':
+        mergeExtra(view.extras, 'failed', p.response ?? p);
+        break;
+      case 'error':
+        mergeExtra(view.extras, 'error', p.error ?? p);
+        break;
+      default:
+        mergeExtra(view.extras, p.type ?? 'event', p);
+    }
+  }
+  return view;
+}
+
 export function reduceAnthropic(events: TraceEvent[]): ChatView {
   const view = emptyChat();
   const byIndex = new Map<number, { type: string; text: string; data: any }>();
@@ -387,6 +524,8 @@ export function reduceEvents(protocol: ProtocolId | undefined, events: TraceEven
       return reduceOpenAIChat(events);
     case 'openai-completion':
       return reduceOpenAICompletion(events);
+    case 'openai-responses':
+      return reduceOpenAIResponses(events);
     case 'anthropic-messages':
       return reduceAnthropic(events);
     case 'gemini-generate':
@@ -520,7 +659,12 @@ export function chatInsights(ctx: InsightContext): Insight[] {
 }
 
 export function genericInsights(protocol: ProtocolId | undefined, ctx: InsightContext): Insight[] {
-  if (protocol === 'openai-chat' || protocol === 'openai-completion' || protocol === 'anthropic-messages')
+  if (
+    protocol === 'openai-chat' ||
+    protocol === 'openai-completion' ||
+    protocol === 'openai-responses' ||
+    protocol === 'anthropic-messages'
+  )
     return chatInsights(ctx);
   return [];
 }

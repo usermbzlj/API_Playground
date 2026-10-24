@@ -261,7 +261,13 @@ export interface Insight {
 }
 
 export type ProtocolId =
-  'openai-chat' | 'openai-completion' | 'anthropic-messages' | 'gemini-generate' | 'minimax-t2a' | 'json';
+  | 'openai-chat'
+  | 'openai-completion'
+  | 'openai-responses'
+  | 'anthropic-messages'
+  | 'gemini-generate'
+  | 'minimax-t2a'
+  | 'json';
 
 export interface InsightContext {
   request: NativeRequest | undefined;

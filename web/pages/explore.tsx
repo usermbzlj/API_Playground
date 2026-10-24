@@ -384,7 +384,10 @@ export function ExplorePage() {
             </div>
             <div className="flex flex-wrap gap-2">
               {filteredFeatures.map((f) => {
-                const implemented = OPERATIONS.some((o) => o.features.includes(f.id));
+                const implemented =
+                  OPERATIONS.some((o) => o.features.includes(f.id)) ||
+                  f.id === 'raw' ||
+                  (f.id === 'model-discovery' && PROVIDERS.some((p) => p.modelsPath));
                 return (
                   <a
                     key={f.id}

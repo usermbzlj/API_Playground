@@ -88,11 +88,15 @@ export function FeaturePage({ id }: { id: string }) {
         </div>
       ) : (
         <EmptyHint>
-          此能力目前仅作为研究线索，尚无专属适配。可查看服务商文档后在
-          <a className="text-violet-300" href="#/raw">
-            原始请求台
-          </a>
-          尝试，不代表本项目已经支持。
+          {f.id === 'raw' || f.id === 'model-discovery'
+            ? '此能力由独立入口提供，不挂载在实验操作上：原始请求台可直接发送原生请求，连接页可刷新厂商模型列表。'
+            : '此能力目前仅作为研究线索，尚无专属适配。' + '可查看服务商文档后在'}
+          {f.id !== 'raw' && f.id !== 'model-discovery' && (
+            <a className="text-violet-300" href="#/raw">
+              原始请求台
+            </a>
+          )}
+          {f.id !== 'raw' && f.id !== 'model-discovery' && '尝试，不代表本项目已经支持。'}
         </EmptyHint>
       )}
       {ops.flatMap((o) => presetsFor(o.id)).length > 0 && (

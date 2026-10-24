@@ -13,6 +13,8 @@ import { applyParams } from '../util.ts';
 const API = 'https://ai.google.dev/api/generate-content';
 const MODELS = 'https://ai.google.dev/gemini-api/docs/models';
 const SPEECH = 'https://ai.google.dev/gemini-api/docs/speech-generation';
+const IMAGE = 'https://ai.google.dev/gemini-api/docs/image-generation';
+const EMBED = 'https://ai.google.dev/api/embeddings';
 const verifiedDocs = (source: string): Verification => ({
   status: 'documented',
   date: '2026-10-24',
@@ -22,6 +24,8 @@ const verifiedDocs = (source: string): Verification => ({
 const choices = (values: string[]) => values.map((value) => ({ value }));
 const chatModels = ['gemini-3.8-flash', 'gemini-4-argon'];
 const ttsModels = ['gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts'];
+const imageModels = ['gemini-3.1-flash-image', 'gemini-3-pro-image', 'gemini-nano-banana-2.1'];
+const embeddingModels = ['gemini-embedding-2', 'gemini-embedding-001'];
 
 export const geminiProvider: ProviderDef = {
   id: 'gemini',
@@ -50,6 +54,20 @@ export const geminiProvider: ProviderDef = {
       modalities: ['text-in', 'audio-out'],
       capabilities: ['tts'],
       verification: verifiedDocs(SPEECH),
+    })),
+    ...imageModels.map((id) => ({
+      id,
+      developer: 'Google',
+      modalities: ['text-in', 'image-in', 'image-out'],
+      capabilities: ['image-gen', 'image-edit'],
+      verification: verifiedDocs(IMAGE),
+    })),
+    ...embeddingModels.map((id) => ({
+      id,
+      developer: 'Google',
+      modalities: ['text-in'],
+      capabilities: ['embedding'],
+      verification: verifiedDocs(EMBED),
     })),
   ],
   highlights: [
@@ -486,6 +504,108 @@ const ttsParams: ParamSpec[] = [
   },
 ];
 
+const imageParams: ParamSpec[] = [
+  {
+    key: 'generationConfig.responseModalities',
+    label: '输出模态',
+    type: 'json',
+    default: ['IMAGE'],
+    enabledByDefault: true,
+    native: true,
+    group: '输出',
+    description: '图像生成需要包含 IMAGE，例如 ["IMAGE"] 或 ["TEXT","IMAGE"]。',
+  },
+  {
+    key: 'generationConfig.imageConfig.aspectRatio',
+    label: '画幅比例',
+    type: 'enum',
+    options: choices(['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9']),
+    default: '1:1',
+    enabledByDefault: true,
+    native: true,
+    group: '画面',
+  },
+  {
+    key: 'generationConfig.imageConfig.imageSize',
+    label: '图像尺寸',
+    type: 'enum',
+    options: choices(['512', '1K', '2K', '4K']),
+    default: '1K',
+    enabledByDefault: true,
+    native: true,
+    group: '画面',
+    description: '可用尺寸与模型有关；4K 通常只由更大的图像模型支持。',
+  },
+  {
+    key: 'generationConfig.thinkingConfig.thinkingLevel',
+    label: '图像思考档位',
+    type: 'enum',
+    options: choices(['minimal', 'low', 'medium', 'high']),
+    default: 'low',
+    native: true,
+    group: '思考',
+    advanced: true,
+    description: '部分图像模型支持；不是所有模型都接受，遇到 400 请关闭。',
+  },
+];
+
+function geminiImageArtifacts(response: any): ArtifactRef[] {
+  const out: ArtifactRef[] = [];
+  for (const c of response?.candidates ?? [])
+    for (const part of c?.content?.parts ?? []) {
+      if (part?.thought) continue;
+      const data = part?.inlineData;
+      if (!data?.data || !data.mimeType) continue;
+      if (!/^image\//i.test(String(data.mimeType))) continue;
+      out.push({
+        kind: 'image',
+        mime: String(data.mimeType).split(';')[0],
+        base64: data.data,
+        filename: `gemini-image-${out.length + 1}.png`,
+      });
+    }
+  if (!out.length) {
+    const reason =
+      response?.promptFeedback?.blockReason ?? response?.candidates?.[0]?.finishReason ?? '响应里没有图像 inlineData';
+    throw new Error(`Gemini 未返回可保存图像（${reason}）；请查看原生响应，避免重复计费调用。`);
+  }
+  return out;
+}
+
+const embeddingParams: ParamSpec[] = [
+  {
+    key: 'embedContentConfig.taskType',
+    label: '任务类型',
+    type: 'enum',
+    options: choices(['RETRIEVAL_QUERY', 'RETRIEVAL_DOCUMENT', 'SEMANTIC_SIMILARITY', 'CLASSIFICATION', 'CLUSTERING']),
+    default: 'SEMANTIC_SIMILARITY',
+    enabledByDefault: true,
+    native: true,
+    group: '向量',
+    description: '不同任务类型会改变向量空间；同一实验里保持一致再比较相似度。',
+  },
+  {
+    key: 'embedContentConfig.outputDimensionality',
+    label: '输出维度',
+    type: 'integer',
+    min: 1,
+    max: 3072,
+    default: 768,
+    native: true,
+    group: '向量',
+    advanced: true,
+  },
+  {
+    key: 'embedContentConfig.autoTruncate',
+    label: '自动截断',
+    type: 'boolean',
+    default: true,
+    native: true,
+    group: '向量',
+    advanced: true,
+  },
+];
+
 export const geminiOps: OperationDef[] = [
   {
     id: 'gemini.chat',
@@ -500,6 +620,7 @@ export const geminiOps: OperationDef[] = [
       'builtin-search',
       'builtin-tools',
       'vision',
+      'video-understanding',
       'json-output',
       'logprobs',
     ],
@@ -600,6 +721,87 @@ export const geminiOps: OperationDef[] = [
       '3.8 TTS 将 text 当作实际朗读稿，风格应放入 speechMetadata；多段文本使用明确 speaker。',
       'WAV 响应直接保存，只有 MIME 声明为 PCM/L16 时才加 WAV 头；没有合成占位音频或虚构时长。',
       '此操作完成普通 HTTP 合成与产物保存，不声明 Live、流式播放、声音复刻或声音设计支持。',
+    ],
+  },
+  {
+    id: 'gemini.image',
+    providerId: 'gemini',
+    title: 'Gemini 原生图像生成 / 参考图编辑',
+    summary:
+      'generateContent 的 IMAGE 响应模态：提示词与参考图进入 parts，按 imageConfig 控制比例与尺寸，返回的 inlineData 保存为图片。',
+    features: ['image-gen', 'image-edit'],
+    workbench: 'image',
+    lifecycle: 'http',
+    protocol: 'json',
+    models: imageModels,
+    defaultModel: imageModels[0],
+    freeModel: true,
+    inputFields: ['prompt', 'images'],
+    inputHints: {
+      prompt: '描述要生成或编辑的画面；参考图会作为 inlineData parts 一起发送。',
+      images: '本地图片会以内联数据发送；只有远程链接的素材不能当作 inlineData。',
+    },
+    params: imageParams,
+    artifacts: geminiImageArtifacts,
+    costTier: 'medium',
+    costHint: '按官方图像模型计价；未核验账户价格，失败或安全拦截也可能计费。',
+    verification: verifiedDocs(IMAGE),
+    docsUrl: IMAGE,
+    build: (ctx) => {
+      const images = (ctx.input.images ?? []) as string[];
+      const parts: any[] = images.map((id) => ({ inlineData: { $asset: String(id), as: 'geminiInlineData' } }));
+      parts.push({ text: String(ctx.input.prompt ?? '') });
+      const body: any = {
+        contents: [{ role: 'user', parts }],
+        generationConfig: { responseModalities: ['IMAGE'] },
+      };
+      applyParams(body, imageParams, ctx.params, ctx.model);
+      const modalities = body.generationConfig?.responseModalities;
+      if (Array.isArray(modalities) && !modalities.includes('IMAGE'))
+        throw new Error('图像生成需要 responseModalities 包含 IMAGE。');
+      return { method: 'POST', path: modelPath(ctx.model), body };
+    },
+    notes: [
+      'Gemini API 侧的 Imagen 已停用，本操作使用官方当前的图像生成模型；不要用 :predict/instances 的旧 Imagen 结构。',
+      'part.thought=true 的中间图不会当作最终产物保存；安全拦截会在 artifacts 阶段给出具体 finishReason。',
+      '视频 Veo 已从 Gemini API 关闭，本适配没有把旧 predictLongRunning 流程当作可用能力。',
+    ],
+  },
+  {
+    id: 'gemini.embedding',
+    providerId: 'gemini',
+    title: 'Gemini 原生向量（批量）',
+    summary:
+      'batchEmbedContents：每个文本独立请求，embedContentConfig 控制任务类型、维度与截断；保留真实向量与 usage。',
+    features: ['embedding'],
+    workbench: 'embedding',
+    lifecycle: 'http',
+    protocol: 'json',
+    models: embeddingModels,
+    defaultModel: embeddingModels[0],
+    freeModel: true,
+    params: embeddingParams,
+    costTier: 'low',
+    costHint: '按输入 Token 计费；未核验账户价格。',
+    verification: verifiedDocs(EMBED),
+    docsUrl: EMBED,
+    build: (ctx) => {
+      const texts = ((ctx.input.texts ?? []) as string[]).filter((t) => String(t).trim());
+      const configured: any = {};
+      applyParams(configured, embeddingParams, ctx.params, ctx.model);
+      const config = configured.embedContentConfig;
+      const body: any = {
+        requests: texts.map((text) => ({
+          model: `models/${ctx.model}`,
+          content: { parts: [{ text: String(text) }] },
+          ...(config ? { embedContentConfig: config } : {}),
+        })),
+      };
+      return { method: 'POST', path: `/v1beta/models/${encodeURIComponent(ctx.model)}:batchEmbedContents`, body };
+    },
+    notes: [
+      '批量接口返回 embeddings[].values；结果区会把每条文本的向量和两两相似度画出来。',
+      'gemini-embedding-2 支持多模态输入聚合；本操作当前只发送文本 parts。',
     ],
   },
 ];

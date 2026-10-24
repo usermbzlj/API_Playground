@@ -28,6 +28,8 @@ export function validateOperationInput(op: OperationDef, ctx: BuildContext): voi
   }
   if (op.id === 'minimax.video-keyframes' && (!input.firstFrame || !input.lastFrame))
     throw new Error('首尾帧视频必须同时选择首帧和尾帧');
+  if (op.id === 'tripo.image-to-model' && !input.images?.length)
+    throw new Error('请先添加公网图片链接；本地文件需要先有可公开访问的 URL');
   if (op.workbench === 'embedding' && !(input.texts ?? []).some((t: string) => t.trim()))
     throw new Error('请至少填写一条文本');
   if (

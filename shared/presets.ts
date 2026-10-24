@@ -114,6 +114,42 @@ export const BUILTIN_PRESETS: PresetDef[] = [
     tags: ['Gemini', '语音', '多人'],
   },
   {
+    id: 'preset-anthropic-thinking',
+    operationId: 'anthropic.messages',
+    title: 'Claude 5.5：自适应思考与 effort',
+    description:
+      'Opus 5.5 默认 medium effort；打开 summarized 思考摘要，再复制为 high 对照答案和用量。思考 Token 计入 max_tokens。',
+    model: 'claude-opus-5-5',
+    input: {
+      messages: [{ role: 'user', content: '用反例说明：所有能被 4 整除的整数都是 8 的倍数。' }],
+      stream: true,
+    },
+    params: {
+      max_tokens: 8192,
+      thinking: { type: 'adaptive', display: 'summarized' },
+      'output_config.effort': 'high',
+    },
+    tags: ['Claude', '自适应思考', 'effort'],
+  },
+  {
+    id: 'preset-anthropic-cache',
+    operationId: 'anthropic.messages',
+    title: 'Claude：长前缀缓存命中',
+    description:
+      '启用顶层自动缓存，把同一段长系统提示连续发送两次，对照 cache_creation_input_tokens 与 cache_read_input_tokens。',
+    model: 'claude-sonnet-5-5',
+    input: {
+      system:
+        '以下是一份用于实验的本地规则说明：所有回答先给出结论，再给出不超过五条的依据；' +
+        '引用数字时保留原始单位；遇到不确定的信息明确写出假设，不编造来源。' +
+        '这段文字足够长，用于观察同一个前缀在第二次请求中是否被缓存读取。',
+      messages: [{ role: 'user', content: '复述上面规则中关于“不确定信息”的要求。' }],
+      stream: true,
+    },
+    params: { max_tokens: 1024, cache_control: { type: 'ephemeral' } },
+    tags: ['Claude', '缓存', '连续运行'],
+  },
+  {
     id: 'preset-deepseek-thinking-low',
     operationId: 'deepseek.chat',
     title: 'Flash 原生思考与参数生效',
@@ -318,6 +354,20 @@ export const BUILTIN_PRESETS: PresetDef[] = [
     tags: ['首尾帧', '需添加素材', '付费'],
   },
   {
+    id: 'preset-minimax-video-v2',
+    operationId: 'minimax.video-v2',
+    title: 'H3 v2：文生视频与首尾帧',
+    description:
+      'v2 内容结构：文本和首/尾帧进入 content 数组。先跑文生视频，再添加首帧观察角色一致性；创建任务即可能计费。',
+    input: {
+      prompt: '清晨的江南水乡，薄雾从河面升起，一只小船缓缓划过石桥，镜头平稳推进。',
+      firstFrame: null,
+      lastFrame: null,
+    },
+    params: { resolution: '768P', duration: 6, ratio: '16:9' },
+    tags: ['视频', '异步', '付费', 'v2'],
+  },
+  {
     id: 'preset-mimo-asr-dialect',
     operationId: 'mimo.asr',
     title: 'MiMo：中文与方言录音转写',
@@ -364,5 +414,172 @@ export const BUILTIN_PRESETS: PresetDef[] = [
       texture_quality: 'standard',
     },
     tags: ['3D', '材质', '异步', '付费'],
+  },
+  {
+    id: 'preset-qwen-wan-video',
+    operationId: 'qwen.video',
+    title: 'Wan 3.0：江南清晨与首帧',
+    description: '先跑文生视频，再添加首帧观察图生视频；Wan 3.0 使用 input.media，不是旧版 img_url。提交即可能计费。',
+    input: {
+      prompt: '清晨的江南水乡，薄雾从河面升起，乌篷船缓缓划过石桥，镜头平稳向前推进。',
+      firstFrame: null,
+      lastFrame: null,
+    },
+    params: {
+      'parameters.resolution': '1080P',
+      'parameters.ratio': '16:9',
+      'parameters.duration': 5,
+      'parameters.prompt_extend': true,
+    },
+    tags: ['万相', '视频', '异步', '付费'],
+  },
+  {
+    id: 'preset-qwen-asr-short',
+    operationId: 'qwen.asr',
+    title: 'Qwen3-ASR：一分钟内短音频',
+    description: '先上传自己的短录音；同步接口限制 5 分钟、10 MB。可对照 auto 与 zh 的识别结果。',
+    input: { audio: null },
+    params: { 'parameters.asr_options.language': 'zh', 'parameters.asr_options.enable_itn': true },
+    tags: ['ASR', '需添加素材', '付费'],
+  },
+  {
+    id: 'preset-ark-seedance-video',
+    operationId: 'ark.video',
+    title: 'Seedance 2.5：雨夜街道推镜',
+    description: '异步任务：文本与可选首/尾帧进入 content 数组。Seedance 2.5 常要求余额或资源包。',
+    input: {
+      prompt: '雨夜的旧城街道，霓虹倒映在湿漉漉的石板路上，镜头缓慢向前推进，电影感光线。',
+      firstFrame: null,
+      lastFrame: null,
+    },
+    params: { resolution: '720p', ratio: '16:9', duration: 5, generate_audio: false },
+    tags: ['Seedance', '视频', '异步', '付费'],
+  },
+  {
+    id: 'preset-ark-seedream-image',
+    operationId: 'ark.image',
+    title: 'Seedream 5.0：中文书店海报',
+    description: '原生 image 字段可带参考图；先生成 2K 海报，再添加参考图试验编辑。',
+    input: {
+      prompt: '安静的中文书店海报，米白纸张，深绿墨色，标题准确写“雨天读书”，清晰中文排版，大片留白。',
+      images: [],
+    },
+    params: { size: '2K', response_format: 'url', watermark: false },
+    tags: ['Seedream', '图像', '中文渲染', '付费'],
+  },
+  {
+    id: 'preset-gemini-image-poster',
+    operationId: 'gemini.image',
+    title: 'Gemini 图像：参考图改海报',
+    description: '先用 1:1、1K 生成，再加入参考图观察编辑；中间思考图不会当作最终产物保存。',
+    input: {
+      prompt: '一张极简的中文书店海报，米白底、深绿标题“雨天读书”，留白充分，印刷质感。',
+      images: [],
+    },
+    params: {
+      'generationConfig.imageConfig.aspectRatio': '1:1',
+      'generationConfig.imageConfig.imageSize': '1K',
+    },
+    tags: ['Gemini', '图像', '付费'],
+  },
+  {
+    id: 'preset-gemini-embedding',
+    operationId: 'gemini.embedding',
+    title: 'Gemini 向量：语义相似度',
+    description: '三条短文本做两两相似度；固定任务类型与维度后再比较不同模型。',
+    input: { texts: ['雨天适合读书', '阴雨天气读书很舒服', '今天股市大涨'] },
+    params: { 'embedContentConfig.taskType': 'SEMANTIC_SIMILARITY' },
+    tags: ['Gemini', '向量', '入门'],
+  },
+  {
+    id: 'preset-openai-image',
+    operationId: 'openai.image',
+    title: 'GPT Image：干净产品图',
+    description: '文生图默认返回 b64_json；添加参考图后走 multipart 编辑接口（image[]）。',
+    input: { prompt: '一只磨砂质感的陶瓷茶杯，米白色背景，柔和顶光，产品摄影，干净构图。', images: [] },
+    params: { size: '1024x1024', quality: 'high', output_format: 'png', n: 1 },
+    tags: ['OpenAI', '图像', '付费'],
+  },
+  {
+    id: 'preset-openai-embedding',
+    operationId: 'openai.embedding',
+    title: 'OpenAI 向量：两两相似度',
+    description: '固定 dimensions 后比较三条短句；维度变化会改变向量空间，不能与旧结果直接混比。',
+    input: { texts: ['雨天适合读书', '阴雨天气读书很舒服', '今天股市大涨'] },
+    params: { dimensions: 1024 },
+    tags: ['OpenAI', '向量', '入门'],
+  },
+  {
+    id: 'preset-tripo-image-to-model',
+    operationId: 'tripo.image-to-model',
+    title: '图片到 3D：公网图片重建',
+    description:
+      '先在参考图里添加一张公网图片链接（本地文件需先有公开 URL），再提交异步重建；输入图尽量主体清晰、背景干净。',
+    input: { images: [] },
+    params: {
+      face_limit: 20000,
+      texture: true,
+      pbr: true,
+      texture_alignment: 'original_image',
+      orientation: 'default',
+    },
+    tags: ['3D', '图生 3D', '需添加链接', '付费'],
+  },
+  {
+    id: 'preset-openai-responses-thinking',
+    operationId: 'openai.responses',
+    title: 'Responses：推理摘要与输出上限',
+    description:
+      '打开推理摘要，固定 max_output_tokens；Responses 的正文、思考摘要与用量分别来自不同事件，结果区会分开显示。',
+    model: 'gpt-6-astra',
+    input: {
+      system: '先给结论，再用不超过三条依据说明。',
+      messages: [{ role: 'user', content: '为什么二分查找要求数组有序？用反例说明。' }],
+      stream: true,
+    },
+    params: {
+      max_output_tokens: 2048,
+      'reasoning.effort': 'medium',
+      'reasoning.summary': 'auto',
+      store: false,
+    },
+    tags: ['OpenAI', 'Responses', '推理'],
+  },
+  {
+    id: 'preset-openai-responses-tools',
+    operationId: 'openai.responses',
+    title: 'Responses：工具与 JSON Schema',
+    description:
+      '声明函数工具与结构化输出；模型请求工具后，在结果区填写返回值继续。工具与 JSON 是否可同时使用由模型决定。',
+    model: 'gpt-6-astra',
+    input: {
+      messages: [{ role: 'user', content: '查询邵阳今天的天气，并抽取 city、summary 两个字段返回 JSON。' }],
+      stream: true,
+    },
+    params: {
+      max_output_tokens: 2048,
+      tools: [
+        {
+          type: 'function',
+          function: {
+            name: 'get_weather',
+            description: '查询城市天气',
+            parameters: { type: 'object', properties: { city: { type: 'string' } }, required: ['city'] },
+          },
+        },
+      ],
+      tool_choice: 'auto',
+      'text.format': {
+        type: 'json_schema',
+        name: 'weather',
+        strict: true,
+        schema: {
+          type: 'object',
+          properties: { city: { type: 'string' }, summary: { type: 'string' } },
+          required: ['city', 'summary'],
+        },
+      },
+    },
+    tags: ['OpenAI', '工具', 'JSON', '付费'],
   },
 ];

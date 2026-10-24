@@ -494,8 +494,16 @@ function TaskOutput({ taskId, artifacts, running }: OutputProps) {
 }
 
 function AsrOutput({ response, view }: OutputProps) {
+  const nativeContent = response?.output?.choices?.[0]?.message?.content;
+  const nativeText =
+    typeof nativeContent === 'string'
+      ? nativeContent
+      : Array.isArray(nativeContent)
+        ? nativeContent.map((p: any) => (typeof p?.text === 'string' ? p.text : '')).join('')
+        : undefined;
   const text =
     (view.kind === 'chat' ? view.text : undefined) ??
+    nativeText ??
     response?.text ??
     response?.output?.text ??
     response?.result?.text ??
