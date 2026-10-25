@@ -33,6 +33,7 @@ summary {
 }
 html {
   scroll-padding-top: 5rem;
+  color-scheme: dark;
 }
 .resume-card {
   transition:
@@ -100,7 +101,7 @@ html {
   background: #0c0c12a6;
 }
 .eyebrow {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.1em;
   line-height: 1.6;
@@ -163,7 +164,7 @@ html {
   border: 1px solid #30303b;
   border-radius: 8px;
   padding: 8px 11px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
   color: #a1a1aa;
   background: #14131b;
@@ -329,7 +330,7 @@ fieldset {
 }
 
 @utility input {
-  @apply w-full rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 py-2 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500/40 disabled:opacity-50;
+  @apply w-full rounded-lg border border-zinc-700 bg-zinc-900 px-2.5 py-2 text-sm text-zinc-100 outline-none placeholder:text-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500/40 disabled:opacity-50;
 }
 .atlas-discovery input[type='search'] {
   padding-left: 2.5rem;
@@ -344,7 +345,10 @@ fieldset {
   @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
 }
 @utility btn-primary {
-  @apply btn bg-violet-600 text-white hover:bg-violet-500;
+  @apply btn bg-violet-600 text-white hover:bg-violet-700 active:bg-violet-800;
+}
+@utility btn-secondary {
+  @apply btn border border-violet-700/70 text-violet-200 hover:border-violet-500 hover:bg-violet-500/10;
 }
 @utility btn-ghost {
   @apply btn text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100;
@@ -353,7 +357,7 @@ fieldset {
   @apply btn border border-zinc-700 text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800;
 }
 @utility btn-danger {
-  @apply btn bg-rose-600/90 text-white hover:bg-rose-500;
+  @apply btn bg-rose-600/90 text-white hover:bg-rose-700;
 }
 @utility card {
   @apply rounded-xl border border-zinc-800 bg-zinc-900/60;
@@ -362,7 +366,7 @@ fieldset {
   @apply text-xs font-medium text-zinc-400;
 }
 @utility chip {
-  @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] leading-4 whitespace-nowrap;
+  @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs leading-4 whitespace-nowrap;
 }
 .mono {
   font-family: var(--font-mono);

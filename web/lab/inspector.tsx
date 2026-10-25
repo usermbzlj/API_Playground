@@ -22,9 +22,9 @@ export function EventList({ events }: { events: TraceEvent[] }) {
   const shown = filtered.slice(-limit);
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+      <div className="flex flex-wrap items-center gap-1.5 text-xs">
         <button
-          className={!filter ? 'btn-primary px-2 py-0.5 text-[11px]' : 'btn-ghost px-2 py-0.5 text-[11px]'}
+          className={!filter ? 'btn-primary px-2 py-0.5 text-xs' : 'btn-ghost px-2 py-0.5 text-xs'}
           onClick={() => setFilter('')}
         >
           全部 {events.length}
@@ -32,7 +32,7 @@ export function EventList({ events }: { events: TraceEvent[] }) {
         {types.map((t) => (
           <button
             key={t}
-            className={filter === t ? 'btn-primary px-2 py-0.5 text-[11px]' : 'btn-ghost px-2 py-0.5 text-[11px]'}
+            className={filter === t ? 'btn-primary px-2 py-0.5 text-xs' : 'btn-ghost px-2 py-0.5 text-xs'}
             onClick={() => setFilter(t)}
           >
             {t} {events.filter((e) => e.type === t).length}
@@ -40,9 +40,9 @@ export function EventList({ events }: { events: TraceEvent[] }) {
         ))}
       </div>
       {shown.length < filtered.length && (
-        <p className="text-[11px] text-zinc-600">
+        <p className="text-xs text-zinc-400">
           仅显示最近 {shown.length} / {filtered.length} 条
-          <button className="btn-ghost ml-2 px-1.5 py-0 text-[11px]" onClick={() => setLimit((l) => l + 500)}>
+          <button className="btn-ghost ml-2 px-1.5 py-0 text-xs" onClick={() => setLimit((l) => l + 500)}>
             再多显示 500 条
           </button>
         </p>
@@ -50,10 +50,10 @@ export function EventList({ events }: { events: TraceEvent[] }) {
       {shown.length === 0 && <EmptyHint>没有事件</EmptyHint>}
       {shown.map((ev, i) => (
         <div key={i} className="rounded-md border border-zinc-800 bg-zinc-950/40 p-2">
-          <div className="mb-1 flex items-center gap-2 text-[11px]">
+          <div className="mb-1 flex items-center gap-2 text-xs">
             <Chip tone={TYPE_TONE[ev.type] ?? 'zinc'}>{ev.type}</Chip>
             {ev.data?.event && <span className="mono text-sky-300">event: {ev.data.event}</span>}
-            <span className="mono text-zinc-500">+{ev.t} ms</span>
+            <span className="mono text-zinc-400">+{ev.t} ms</span>
           </div>
           <JsonBlock value={ev.type === 'chunk' && ev.data?.data !== undefined ? ev.data.data : ev.data} max={6000} />
         </div>
@@ -65,7 +65,7 @@ export function EventList({ events }: { events: TraceEvent[] }) {
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-md border border-zinc-800 bg-zinc-950/40 px-3 py-2" title={hint}>
-      <div className="text-[11px] text-zinc-500">{label}</div>
+      <div className="text-xs text-zinc-400">{label}</div>
       <div className="mono mt-0.5 text-sm text-zinc-100">{value}</div>
     </div>
   );
@@ -101,7 +101,7 @@ export function MetricsPanel({ metrics, view }: { metrics: RunMetrics | null; vi
           hint={metrics.cost?.basis ?? '目录中没有该模型的可信定价，或厂商未返回用量'}
         />
       </div>
-      {metrics.cost && <p className="text-[11px] text-zinc-500">费用依据：{metrics.cost.basis}。以厂商账单为准。</p>}
+      {metrics.cost && <p className="text-xs text-zinc-400">费用依据：{metrics.cost.basis}。以厂商账单为准。</p>}
       {u && (
         <div>
           <h4 className="label mb-1">usage（厂商原样返回）</h4>

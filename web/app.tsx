@@ -236,8 +236,8 @@ export function App() {
               <FlaskConical size={21} />
             </span>
             <span>
-              PrismLab<span className="ml-1.5 text-[9px] font-medium tracking-widest text-violet-400">LOCAL</span>
-              <div className="mt-1 text-[10px] font-normal tracking-widest text-zinc-500">原生多模态 API 实验室</div>
+              PrismLab<span className="ml-1.5 text-xs font-medium tracking-widest text-violet-400">LOCAL</span>
+              <div className="mt-1 text-xs font-normal tracking-widest text-zinc-400">原生多模态 API 实验室</div>
             </span>
           </a>
           <button className="btn-ghost mx-3 mb-3 md:hidden" onClick={() => setNavOpen(false)}>
@@ -248,7 +248,7 @@ export function App() {
             {NAV.map((n, i) => (
               <div key={n.to}>
                 {(i === 0 || i === 3 || n.to === '/connections') && (
-                  <p className={`eyebrow px-3 pb-2 text-zinc-600 ${i ? 'pt-6' : 'pt-2'}`}>
+                  <p className={`eyebrow px-3 pb-2 text-zinc-400 ${i ? 'pt-6' : 'pt-2'}`}>
                     {i === 0 ? '发现与实验' : i === 3 ? '结果与证据' : '本地工作区'}
                   </p>
                 )}
@@ -256,7 +256,7 @@ export function App() {
               </div>
             ))}
           </nav>
-          <div className="m-3 rounded-xl border border-zinc-800 bg-zinc-950/40 p-3 text-[11px] leading-relaxed text-zinc-500">
+          <div className="m-3 rounded-xl border border-zinc-800 bg-zinc-950/40 p-3 text-xs leading-relaxed text-zinc-400">
             <div className="mb-1 flex items-center gap-2 text-zinc-300">
               <span className={`h-1.5 w-1.5 rounded-full ${server === 'ok' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
               {server === 'ok' ? '本地服务已连接' : server === 'checking' ? '正在连接…' : '本地服务未连接'}
@@ -281,14 +281,14 @@ export function App() {
           </div>
           <div className="workspace-topbar hidden h-14 items-center justify-between gap-3 border-b border-zinc-800/70 px-8 md:flex">
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-zinc-500">本地工作区</span>
+              <span className="text-zinc-400">本地工作区</span>
               <span className="text-zinc-700">/</span>
               <span className="text-zinc-300">
                 {NAV.find((n) => route.path === n.to)?.label ||
                   (/^\/(lab|provider|feature)\//.test(route.path) ? '原生能力实验' : '能力探索')}
               </span>
             </div>
-            <a href="#/connections" className="flex items-center gap-2 text-[11px] text-zinc-400 hover:text-zinc-200">
+            <a href="#/connections" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-200">
               <KeyRound size={13} />
               {connections.length} 个本机连接
             </a>
@@ -329,7 +329,7 @@ export function App() {
       </div>
       <div
         aria-live="polite"
-        className="pointer-events-none fixed right-4 bottom-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col gap-2 md:max-w-md"
+        className="pointer-events-none fixed right-4 bottom-24 z-50 flex max-w-[calc(100vw-2rem)] flex-col gap-2 md:max-w-md xl:bottom-4"
       >
         {toasts.map((t) => (
           <div
@@ -475,6 +475,6 @@ function Routes() {
     case 'settings':
       return <SettingsPage />;
     default:
-      return <div className="p-10 text-zinc-500">页面不存在</div>;
+      return <div className="p-10 text-zinc-400">页面不存在</div>;
   }
 }

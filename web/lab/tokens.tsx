@@ -30,7 +30,7 @@ export function TokenMicroscope({ tokens }: { tokens: TokenProb[] }) {
   const cur = active != null ? tokens[active] : null;
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center gap-3 text-[11px] text-zinc-400">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
         <span>{tokens.length} 个 Token</span>
         <span>平均概率 {(stats.avg * 100).toFixed(1)}%</span>
         <span>最低 {(stats.min * 100).toFixed(1)}%</span>
@@ -84,13 +84,13 @@ export function TokenMicroscope({ tokens }: { tokens: TokenProb[] }) {
                       {JSON.stringify(alt.token)}
                     </span>
                     <span className="h-2 rounded bg-violet-500/70" style={{ width: `${Math.max(2, p * 240)}px` }} />
-                    <span className="mono text-zinc-500">{(p * 100).toFixed(2)}%</span>
+                    <span className="mono text-zinc-400">{(p * 100).toFixed(2)}%</span>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <p className="text-zinc-500">该 Token 没有返回候选（把 top_logprobs 设为大于 0 可查看候选）。</p>
+            <p className="text-zinc-400">该 Token 没有返回候选（把 top_logprobs 设为大于 0 可查看候选）。</p>
           )}
         </div>
       )}

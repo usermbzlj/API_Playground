@@ -253,7 +253,7 @@ function AssetLibraryPicker({
                   </span>
                 )}
                 <span className="block break-all text-xs text-zinc-200">{asset.filename}</span>
-                <span className="block text-[11px] text-zinc-500">{fmtBytes(asset.size)} · 选择</span>
+                <span className="block text-xs text-zinc-400">{fmtBytes(asset.size)} · 选择</span>
               </button>
             ))}
           </div>
@@ -302,7 +302,7 @@ function AssetSlot({
           <AssetPicker accept={`${kind}/*`} kind={kind} onAdd={(id) => onChange(id)} />
         )}
       </div>
-      {hint && <p className="mt-0.5 text-[11px] text-zinc-500">{hint}</p>}
+      {hint && <p className="mt-0.5 text-xs text-zinc-400">{hint}</p>}
     </div>
   );
 }
@@ -336,7 +336,7 @@ function AssetList({
           <AssetPicker accept={`${kind}/*`} kind={kind} onAdd={(id) => onChange([...value, id])} />
         )}
       </div>
-      {hint && <p className="mt-0.5 text-[11px] text-zinc-500">{hint}</p>}
+      {hint && <p className="mt-0.5 text-xs text-zinc-400">{hint}</p>}
     </div>
   );
 }
@@ -392,7 +392,7 @@ export function WorkbenchInput({
         </div>
       );
     default:
-      return <p className="text-xs text-zinc-500">该工作台没有输入项。</p>;
+      return <p className="text-xs text-zinc-400">该工作台没有输入项。</p>;
   }
 }
 
@@ -408,7 +408,7 @@ function ListInput({ label, items, onChange }: { label: string; items: string[];
       <div className="mt-1 space-y-1.5">
         {items.map((t, i) => (
           <div key={i} className="flex gap-1.5">
-            <span className="mono w-5 pt-1.5 text-right text-[11px] text-zinc-600">{i}</span>
+            <span className="mono w-5 pt-1.5 text-right text-xs text-zinc-400">{i}</span>
             <textarea
               className="input min-h-10 flex-1"
               aria-label={`${label} ${i + 1}`}
@@ -416,7 +416,7 @@ function ListInput({ label, items, onChange }: { label: string; items: string[];
               onChange={(e) => onChange(items.map((x, j) => (j === i ? e.target.value : x)))}
             />
             <button
-              className="btn-ghost px-1.5 text-xs text-zinc-600"
+              className="btn-ghost px-1.5 text-xs text-zinc-400"
               aria-label={`移除${label} ${i + 1}`}
               onClick={() => onChange(items.filter((_, j) => j !== i))}
             >
@@ -495,7 +495,7 @@ function ChatInputEditor({
             </button>
             {messages.length > 1 && (
               <button
-                className="btn-ghost px-2 py-0.5 text-xs text-zinc-500"
+                className="btn-ghost px-2 py-0.5 text-xs text-zinc-400"
                 onClick={() => setMessages([{ role: 'user', content: '' }])}
               >
                 清空
@@ -531,7 +531,7 @@ function ChatInputEditor({
                     }
                   />
                 )}
-                {m.role === 'tool' && m.name && <span className="mono text-[11px] text-amber-300">{m.name}</span>}
+                {m.role === 'tool' && m.name && <span className="mono text-xs text-amber-300">{m.name}</span>}
                 {m.role === 'user' && (
                   <AssetPicker
                     accept="image/*"
@@ -550,14 +550,14 @@ function ChatInputEditor({
                 )}
                 <span className="flex-1" />
                 <button
-                  className="btn-ghost px-1.5 py-0.5 text-xs text-zinc-600"
+                  className="btn-ghost px-1.5 py-0.5 text-xs text-zinc-400"
                   onClick={() => setMessages(messages.filter((_, j) => j !== i))}
                 >
                   删除
                 </button>
               </div>
               {m.reasoning_content && (
-                <details className="mt-1.5 text-[11px] text-zinc-500">
+                <details className="mt-1.5 text-xs text-zinc-400">
                   <summary className="cursor-pointer">
                     附带的思考内容（{m.reasoning_content.length} 字符，勾选「回传历史思考」时会随请求发出）
                   </summary>
@@ -565,10 +565,10 @@ function ChatInputEditor({
                 </details>
               )}
               {!!m.tool_calls?.length && (
-                <div className="mono mt-1.5 space-y-0.5 text-[11px] text-violet-300">
+                <div className="mono mt-1.5 space-y-0.5 text-xs text-violet-300">
                   {m.tool_calls.map((tc: any, k: number) => (
                     <div key={k}>
-                      🔧 {tc.function?.name}({tc.function?.arguments}) <span className="text-zinc-600">{tc.id}</span>
+                      🔧 {tc.function?.name}({tc.function?.arguments}) <span className="text-zinc-400">{tc.id}</span>
                     </div>
                   ))}
                 </div>
@@ -583,7 +583,7 @@ function ChatInputEditor({
                 }
               />
               {op.protocol === 'gemini-generate' && m.role === 'assistant' && !!m.blocks?.length && (
-                <p className="mt-1 text-[11px] text-zinc-500">
+                <p className="mt-1 text-xs text-zinc-400">
                   已保留原生 parts 与思考签名，供下一轮原样回传。要改写此回答，请删除此条并添加新的 assistant 消息。
                 </p>
               )}
@@ -685,7 +685,7 @@ function FimInput({ input, setInput }: { input: Record<string, unknown>; setInpu
           minHeight={120}
         />
       </Field>
-      <div className="rounded-md border border-dashed border-violet-700/70 bg-violet-950/20 px-3 py-2 text-center text-[11px] text-violet-300">
+      <div className="rounded-md border border-dashed border-violet-700/70 bg-violet-950/20 px-3 py-2 text-center text-xs text-violet-300">
         ▼ 模型要补全的空缺 ▼
       </div>
       <Field label="后缀 suffix（光标之后）">
@@ -731,7 +731,7 @@ function TtsInput({ op, input, setInput }: { op: OperationDef; input: Record<str
           />
         </Field>
       )}
-      <p className="text-[11px] leading-relaxed text-zinc-500">
+      <p className="text-xs leading-relaxed text-zinc-400">
         音色、语速、情绪、音频格式等在右侧「原生参数」里调整。想听同一句话的不同情绪，用「加入对比」开多条通道一起跑。
       </p>
     </div>
@@ -757,7 +757,7 @@ function MusicInput({ input, setInput }: { input: Record<string, unknown>; setIn
           placeholder="可留空生成纯器乐…"
         />
       </Field>
-      <p className="text-[11px] leading-relaxed text-zinc-500">
+      <p className="text-xs leading-relaxed text-zinc-400">
         模型、输出格式、音频格式和纯音乐开关在右侧「原生参数」里调整；生成会按厂商规则计费。
       </p>
     </div>

@@ -116,7 +116,7 @@ export function AssetsPage() {
       title="素材库"
       description="上传素材和生成产物集中保存在本机，可直接选入实验。清理前会检查已保存实验与模板的引用。"
       actions={
-        <label className={`btn-primary cursor-pointer ${busy ? 'opacity-50' : ''}`}>
+        <label className={`btn-primary w-full cursor-pointer sm:w-auto ${busy ? 'opacity-50' : ''}`}>
           {busy ? <Spinner /> : '＋ 添加文件'}
           <input
             className="sr-only"
@@ -133,18 +133,18 @@ export function AssetsPage() {
       }
     >
       {library && (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div className="card p-4">
-            <p className="text-xs text-zinc-500">本地文件占用</p>
+            <p className="text-xs text-zinc-400">本地文件占用</p>
             <p className="mt-1 text-xl text-zinc-100">{fmtBytes(library.totalBytes)}</p>
           </div>
           <div className="card p-4">
-            <p className="text-xs text-zinc-500">未被已保存记录或模板引用</p>
+            <p className="text-xs text-zinc-400">未被已保存记录或模板引用</p>
             <p className="mt-1 text-xl text-zinc-100">
               {library.unusedCount} 个 · {fmtBytes(library.unusedBytes)}
             </p>
           </div>
-          <div className="card col-span-2 p-4 text-xs leading-6 text-zinc-400 lg:col-span-1">
+          <div className="card p-4 text-xs leading-6 text-zinc-400 sm:col-span-2 lg:col-span-1">
             移除缩略图或删除实验历史都会保留文件。需要释放空间时，在这里明确选择未引用素材清理。
           </div>
         </div>
@@ -211,7 +211,7 @@ export function AssetsPage() {
           清理所选未引用素材
         </button>
       </div>
-      <p className="text-xs leading-relaxed text-zinc-500">
+      <p className="text-xs leading-relaxed text-zinc-400">
         当前标签页草稿使用中的素材也会保留。其他标签页的未保存草稿无法自动核对，请在清理前检查；程序不会自动清理。
       </p>
       {loading ? (
@@ -242,7 +242,7 @@ export function AssetsPage() {
                 />
                 <div className="min-w-0 flex-1">
                   <h2 className="break-all text-sm font-medium text-zinc-100">{asset.filename}</h2>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-1 text-xs text-zinc-400">
                     {KIND_LABELS[asset.kind] ?? '文件'} ·{' '}
                     {asset.remoteUrl && !asset.size ? '远程链接' : fmtBytes(asset.size)} ·{' '}
                     {asset.source === 'artifact' ? '生成产物' : '已上传'}
@@ -276,7 +276,7 @@ export function AssetsPage() {
                   下载
                 </a>
               </div>
-              <p className="text-[11px] text-zinc-500">
+              <p className="text-xs text-zinc-400">
                 {fmtTime(asset.createdAt)} ·{' '}
                 {asset.referenceCount ? `${asset.referenceCount} 处引用` : '尚无已保存引用'}
               </p>

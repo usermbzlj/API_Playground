@@ -30,7 +30,7 @@ export function ParamsPanel({
     return [...map.entries()];
   }, [specs]);
 
-  if (specs.length === 0) return <p className="text-xs text-zinc-600">该操作没有可调的原生参数。</p>;
+  if (specs.length === 0) return <p className="text-xs text-zinc-400">该操作没有可调的原生参数。</p>;
   const enabledCount = specs.filter((s) => state[s.key]?.enabled).length;
   const hiddenAdvanced = specs.filter((s) => s.advanced).length;
 
@@ -46,7 +46,7 @@ export function ParamsPanel({
           onChange={(event) => setQuery(event.target.value)}
         />
       )}
-      <div className="flex flex-wrap items-center gap-3 text-[11px] text-zinc-500">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
         <span>
           已启用 {enabledCount} / {specs.length}
         </span>
@@ -71,7 +71,7 @@ export function ParamsPanel({
         if (items.length === 0) return null;
         return (
           <div key={group}>
-            <h3 className="mb-1.5 text-[11px] font-semibold text-zinc-400">{group}</h3>
+            <h3 className="mb-1.5 text-xs font-semibold text-zinc-400">{group}</h3>
             <div className="space-y-2">
               {items.map((s) => {
                 const st = state[s.key] ?? { enabled: false, value: s.default };
@@ -95,11 +95,11 @@ export function ParamsPanel({
                         <span className={`mono text-xs ${st.enabled ? 'text-zinc-100' : 'text-zinc-400'}`}>
                           {s.key}
                         </span>
-                        {s.label !== s.key && <span className="text-[11px] text-zinc-500">{s.label}</span>}
+                        {s.label !== s.key && <span className="text-xs text-zinc-400">{s.label}</span>}
                         {s.in && s.in !== 'body' && <Chip tone="blue">{s.in === 'header' ? '请求头' : '查询串'}</Chip>}
                         {s.native && <Chip tone="violet">原生</Chip>}
                         {s.verification && <VerificationChip v={s.verification} />}
-                        {!applies && <span className="text-[11px] text-amber-300">当前模型不适用，不会发送</span>}
+                        {!applies && <span className="text-xs text-amber-300">当前模型不适用，不会发送</span>}
                       </div>
                       {(st.enabled || !compact) && (
                         <ParamControl
@@ -109,7 +109,7 @@ export function ParamsPanel({
                         />
                       )}
                       {s.description && !compact && (
-                        <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500">{s.description}</p>
+                        <p className="mt-0.5 text-xs leading-relaxed text-zinc-400">{s.description}</p>
                       )}
                     </div>
                   </div>

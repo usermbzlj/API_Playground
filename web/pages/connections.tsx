@@ -87,7 +87,7 @@ export function ConnectionsPage() {
       {!!env.length && (
         <section className="card space-y-3 p-5">
           <h2 className="font-semibold text-zinc-100">检测到的环境凭证</h2>
-          <p className="text-xs text-zinc-500">导入会在本机创建连接；不会自动向厂商发送请求。</p>
+          <p className="text-xs text-zinc-400">导入会在本机创建连接；不会自动向厂商发送请求。</p>
           {env.map((k) => (
             <div
               className="flex flex-wrap items-center gap-3 border-t border-zinc-800 pt-3"
@@ -95,7 +95,7 @@ export function ConnectionsPage() {
             >
               <span className="flex-1 text-sm text-zinc-200">
                 {k.providerName}{' '}
-                <span className="mono text-xs text-zinc-500">
+                <span className="mono text-xs text-zinc-400">
                   {k.envName} · {k.preview} · {k.source}
                 </span>
               </span>
@@ -131,7 +131,7 @@ export function ConnectionsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-zinc-400">
             {visible.length} / {connections.length} 个连接
           </span>
         </div>
@@ -152,7 +152,7 @@ export function ConnectionsPage() {
                 <Chip>{c.network === 'auto' ? '自动网络' : c.network === 'proxy' ? '强制代理' : '直连'}</Chip>
               </div>
               <p className="mono break-all text-xs text-zinc-400">{c.baseUrl}</p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-zinc-400">
                 Key {c.keyPreview || '未配置'} · {fmtTime(c.createdAt)}
               </p>
               {c.extra.sourceStatus && (
@@ -178,12 +178,12 @@ export function ConnectionsPage() {
                   {c.lastTest.message} · {fmtTime(c.lastTest.at)}
                 </div>
               ) : (
-                <p className="text-xs text-zinc-500">尚未验证 · 保存凭证不会自动调用服务</p>
+                <p className="text-xs text-zinc-400">尚未验证 · 保存凭证不会自动调用服务</p>
               )}
               <div className="flex flex-wrap gap-2">
                 {op && (
                   <a
-                    className="btn-primary"
+                    className="btn-secondary"
                     href={labHref(op.id, { connection: c.id, model: c.extra.defaultModel || undefined })}
                   >
                     进入实验
@@ -250,7 +250,7 @@ export function ConnectionsPage() {
                   删除
                 </button>
               </div>
-              <p className="text-[11px] text-zinc-600">
+              <p className="text-xs text-zinc-400">
                 连接测试仅代表鉴权 / 查询端点可用，不等于所有模型和能力已实测。测试与查询会请求所配置服务。
               </p>
             </article>
@@ -269,7 +269,7 @@ export function ConnectionsPage() {
             识别 {importing.result.sections} 个服务条目、{importing.result.credentials} 把 Key、
             {importing.result.entries.length} 个账户 / 协议入口。
           </p>
-          <p className="mb-4 text-xs text-zinc-500">
+          <p className="mb-4 text-xs text-zinc-400">
             只保存到本机，不会自动调用模型。同服务、地址和 Key
             的已有连接会复用，独立账号和不同协议分别保留。文件中的状态与备注仅供参考。
           </p>
@@ -282,7 +282,7 @@ export function ConnectionsPage() {
                 <p className="mono mt-1 break-all text-zinc-400">
                   {entry.baseUrl} · {entry.keyPreview}
                 </p>
-                <p className="mt-1 text-zinc-500">
+                <p className="mt-1 text-zinc-400">
                   资料记载：{entry.sourceStatus} · {entry.protocol}
                 </p>
               </div>
@@ -329,7 +329,7 @@ export function ConnectionsPage() {
       )}
       {models && (
         <Modal wide title={`${models.label} · 账号模型（${models.models.length}）`} onClose={() => setModels(null)}>
-          <p className="mb-3 text-xs text-zinc-500">账号可见不代表对应操作支持该模型的全部能力。</p>
+          <p className="mb-3 text-xs text-zinc-400">账号可见不代表对应操作支持该模型的全部能力。</p>
           <JsonBlock value={models.models} max={150000} />
         </Modal>
       )}
@@ -358,6 +358,10 @@ function ConnectionEditor({
   const p = getProvider(pid)!;
   const [label, setLabel] = useState(current?.label ?? '');
   const [base, setBase] = useState(current?.baseUrl ?? p.baseUrls[0]?.url ?? '');
+  const [customEndpoint, setCustomEndpoint] = useState(
+    () => !p.baseUrls.some((b) => b.url === (current?.baseUrl ?? p.baseUrls[0]?.url ?? '')),
+  );
+  const baseInput = useRef<HTMLInputElement>(null);
   const [key, setKey] = useState('');
   const [extra, setExtra] = useState<Record<string, string>>(current?.extra ?? {});
   const [network, setNetwork] = useState<NetworkMode>(current?.network ?? 'auto');
@@ -424,8 +428,10 @@ function ConnectionEditor({
             disabled={!!current}
             onChange={(e) => {
               const next = getProvider(e.target.value)!;
+              const firstBase = next.baseUrls[0]?.url ?? '';
               setPid(next.id);
-              setBase(next.baseUrls[0]?.url ?? '');
+              setBase(firstBase);
+              setCustomEndpoint(!next.baseUrls.some((b) => b.url === firstBase));
               setExtra({});
             }}
           >
@@ -440,13 +446,21 @@ function ConnectionEditor({
           <input className="input" value={label} onChange={(e) => setLabel(e.target.value)} placeholder={p.name} />
         </Field>
         {p.baseUrls.length > 1 && (
-          <Field label="官方端点预设">
+          <Field label="官方端点预设" hint="选择“自定义地址”后，可直接在下方编辑完整 Base URL。">
             <select
               className="input"
-              value={p.baseUrls.find((b) => b.url === base)?.id ?? ''}
+              value={customEndpoint ? '' : (p.baseUrls.find((b) => b.url === base)?.id ?? '')}
               onChange={(e) => {
+                if (!e.target.value) {
+                  setCustomEndpoint(true);
+                  baseInput.current?.focus();
+                  baseInput.current?.select();
+                  return;
+                }
                 const b = p.baseUrls.find((x) => x.id === e.target.value);
-                if (b) setBase(b.url);
+                if (!b) return;
+                setCustomEndpoint(false);
+                setBase(b.url);
               }}
             >
               <option value="">自定义地址</option>
@@ -461,10 +475,15 @@ function ConnectionEditor({
         )}
         <Field label="Base URL" hint="路径会追加在此地址后。确认服务域名可信，再保存凭证。">
           <input
+            ref={baseInput}
             className="input mono"
             required
             value={base}
-            onChange={(e) => setBase(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setBase(value);
+              setCustomEndpoint(!p.baseUrls.some((b) => b.url === value));
+            }}
             placeholder="https://api.example.com/v1"
           />
         </Field>

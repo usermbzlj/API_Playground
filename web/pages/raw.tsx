@@ -324,7 +324,7 @@ export function RawPage() {
           已恢复当前标签页的草稿。敏感请求头不会保存到浏览器存储。
         </p>
       )}
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
         <span>编辑会自动保留；切换页面后可从首页继续。</span>
         <a
           href={`#/connections?returnTo=${encodeURIComponent(window.location.hash)}`}
@@ -436,7 +436,7 @@ export function RawPage() {
                       onChange={(e) => setTemplatePrompt(e.target.value)}
                     />
                   </Field>
-                  <p className="text-[11px] text-zinc-500">
+                  <p className="text-xs text-zinc-400">
                     在 JSON 字符串值中使用 {'{{MODEL}}'} 和 {'{{PROMPT}}'}
                     。右侧实时预览替换结果；模板校验本身不会发送请求。
                   </p>

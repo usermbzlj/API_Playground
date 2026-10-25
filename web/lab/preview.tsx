@@ -73,10 +73,8 @@ export function RequestPreview({ preview }: { preview: PreviewResult }) {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="mono rounded bg-violet-900/40 px-1.5 py-0.5 text-[11px] text-violet-200">
-          {preview.method}
-        </span>
-        <span className="mono flex-1 text-[11px] break-all text-zinc-300">{preview.url}</span>
+        <span className="mono rounded bg-violet-900/40 px-1.5 py-0.5 text-xs text-violet-200">{preview.method}</span>
+        <span className="mono flex-1 text-xs break-all text-zinc-300">{preview.url}</span>
         <CopyButton text={powershell} label="复制 PowerShell" />
         <CopyButton text={curl} label="复制 Bash curl" />
         <CopyButton text={JSON.stringify(placeholderize(preview.body), null, 2)} label="复制请求体" />
@@ -99,7 +97,7 @@ export function RequestPreview({ preview }: { preview: PreviewResult }) {
         </div>
         <JsonBlock value={code === 'powershell' ? powershell : curl} max={50000} />
       </details>
-      <p className="text-[11px] leading-relaxed text-zinc-600">
+      <p className="text-xs leading-relaxed text-zinc-400">
         这是按当前输入与参数实时生成的原生请求，点击运行时本地服务会用同一份定义构建并发送。$API_KEY
         在应用内由服务端填入真实密钥。终端示例需自行设置 API_KEY，并手动替换素材和已脱敏字段；签名鉴权应使用厂商 SDK。
       </p>

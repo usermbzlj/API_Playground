@@ -138,7 +138,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
     <div className="space-y-3">
       {v.reasoning && (
         <details open={running && !v.text} className="rounded-md border border-zinc-800 bg-zinc-950/50 p-2">
-          <summary className="cursor-pointer text-[11px] text-zinc-400">
+          <summary className="cursor-pointer text-xs text-zinc-400">
             💭 思考内容 · {v.reasoning.length} 字符
             {v.firstReasoningMs != null && ` · 首个思考块 ${fmtMs(v.firstReasoningMs)}`}
             {v.firstTextMs != null && ` · 正文开始于 ${fmtMs(v.firstTextMs)}`}
@@ -150,7 +150,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
       )}
       {(v.text || running) && (
         <div className="rounded-md bg-emerald-950/20 p-3">
-          <div className="mb-1.5 flex items-center gap-2 text-[11px] text-zinc-500">
+          <div className="mb-1.5 flex items-center gap-2 text-xs text-zinc-400">
             assistant
             {v.finishReason && (
               <Chip tone={v.finishReason === 'length' || v.finishReason === 'max_tokens' ? 'yellow' : 'zinc'}>
@@ -164,7 +164,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
                 {(['md', 'raw', ...(v.logprobs.length ? ['tokens'] : [])] as const).map((m) => (
                   <button
                     key={m}
-                    className={mode === m ? 'btn-primary px-1.5 py-0 text-[11px]' : 'btn-ghost px-1.5 py-0 text-[11px]'}
+                    className={mode === m ? 'btn-primary px-1.5 py-0 text-xs' : 'btn-ghost px-1.5 py-0 text-xs'}
                     onClick={() => setMode(m as any)}
                   >
                     {m === 'md' ? 'Markdown' : m === 'raw' ? '原文' : 'Token 显微镜'}
@@ -172,7 +172,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
                 ))}
               </span>
             )}
-            <CopyButton text={v.text} label="复制" className="px-1.5 py-0 text-[11px]" />
+            <CopyButton text={v.text} label="复制" className="px-1.5 py-0 text-xs" />
           </div>
           {mode === 'tokens' && v.logprobs.length ? (
             <TokenMicroscope tokens={v.logprobs} />
@@ -188,7 +188,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
       )}
       {v.toolCalls.length > 0 && (
         <div className="space-y-2 rounded-md border border-violet-900/60 bg-violet-950/20 p-2">
-          <div className="text-[11px] text-violet-300">🔧 工具调用 · {v.toolCalls.length} 个</div>
+          <div className="text-xs text-violet-300">🔧 工具调用 · {v.toolCalls.length} 个</div>
           {v.toolCalls.map((tc, i) => {
             let pretty = tc.args;
             try {
@@ -202,7 +202,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
                   <span className="mono text-violet-200">{tc.name || '(未命名)'}</span>
                   {tc.builtin && <Chip tone="blue">厂商服务端执行</Chip>}
                   {tc.type && tc.type !== 'function' && <Chip>{tc.type}</Chip>}
-                  <span className="mono text-[10px] text-zinc-600">{tc.id}</span>
+                  <span className="mono text-xs text-zinc-400">{tc.id}</span>
                 </div>
                 <pre className="mono mt-1 break-all whitespace-pre-wrap text-zinc-400">{pretty}</pre>
                 {!tc.builtin && onAppend && !running && (
@@ -217,7 +217,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
                       }
                     />
                     <button
-                      className="btn-ghost px-1.5 text-[11px]"
+                      className="btn-ghost px-1.5 text-xs"
                       title="把调用参数原样作为结果（Kimi 内置 $web_search 等要求这样回传）"
                       onClick={() => setToolResults((previous) => ({ ...previous, [toolKey(tc, i)]: tc.args }))}
                     >
@@ -232,7 +232,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
       )}
       {v.citations.length > 0 && (
         <div className="rounded-md border border-zinc-800 p-2">
-          <div className="mb-1 text-[11px] text-zinc-400">📎 引用 / 搜索来源 · {v.citations.length}</div>
+          <div className="mb-1 text-xs text-zinc-400">📎 引用 / 搜索来源 · {v.citations.length}</div>
           <ol className="list-decimal space-y-0.5 pl-5 text-xs">
             {v.citations.slice(0, 30).map((c, i) => (
               <li key={i} className="text-zinc-400">
@@ -243,7 +243,7 @@ function ChatOutput({ view, running, onAppend, op, compact, resultKey }: OutputP
                 ) : (
                   c.title
                 )}
-                {c.snippet && <span className="text-zinc-600"> — {c.snippet.slice(0, 120)}</span>}
+                {c.snippet && <span className="text-zinc-400"> — {c.snippet.slice(0, 120)}</span>}
               </li>
             ))}
           </ol>
@@ -293,28 +293,28 @@ function FimOutput({ view, input, running }: OutputProps) {
   const [mode, setMode] = useState<'merged' | 'tokens'>('merged');
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+      <div className="flex items-center gap-2 text-xs text-zinc-400">
         补全结果（高亮部分由模型生成）
         {v.finishReason && <Chip>{v.finishReason}</Chip>}
         <span className="flex-1" />
         {v.logprobs.length > 0 && (
           <button
-            className="btn-ghost px-1.5 py-0 text-[11px]"
+            className="btn-ghost px-1.5 py-0 text-xs"
             onClick={() => setMode(mode === 'merged' ? 'tokens' : 'merged')}
           >
             {mode === 'merged' ? 'Token 显微镜' : '合并视图'}
           </button>
         )}
-        <CopyButton text={v.text} label="复制补全" className="px-1.5 py-0 text-[11px]" />
+        <CopyButton text={v.text} label="复制补全" className="px-1.5 py-0 text-xs" />
       </div>
       {mode === 'tokens' ? (
         <TokenMicroscope tokens={v.logprobs} />
       ) : (
         <pre className="mono overflow-x-auto rounded-md bg-zinc-950 p-3 text-xs leading-relaxed whitespace-pre-wrap">
-          <span className="text-zinc-500">{String(input.prefix ?? '')}</span>
+          <span className="text-zinc-400">{String(input.prefix ?? '')}</span>
           <span className="rounded-sm bg-violet-600/30 text-violet-100">{v.text}</span>
           {running && <span className="caret" />}
-          <span className="text-zinc-500">{String(input.suffix ?? '')}</span>
+          <span className="text-zinc-400">{String(input.suffix ?? '')}</span>
         </pre>
       )}
     </div>
@@ -336,7 +336,7 @@ function ArtifactCard({ a }: { a: AssetInfo }) {
         <video controls src={a.url} className="max-h-[28rem] w-full rounded-md border border-zinc-800 bg-black" />
       )}
       {a.kind === 'model3d' && <ModelPreview src={a.url} name={a.filename} />}
-      <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+      <div className="flex items-center gap-2 text-xs text-zinc-400">
         <span className="mono">{a.mime}</span>
         <span>{fmtBytes(a.size)}</span>
         <a className="text-violet-400 underline" href={a.url} download={a.filename}>
@@ -344,7 +344,7 @@ function ArtifactCard({ a }: { a: AssetInfo }) {
         </a>
         {a.remoteUrl && (
           <a
-            className="text-zinc-500 underline"
+            className="text-zinc-400 underline"
             href={a.remoteUrl}
             target="_blank"
             rel="noreferrer"
@@ -373,18 +373,18 @@ function AudioOutput({ view, artifacts, response, running }: OutputProps) {
       {!artifacts.length &&
         !liveSrc &&
         (running ? (
-          <p className="text-xs text-zinc-500">等待音频返回…</p>
+          <p className="text-xs text-zinc-400">等待音频返回…</p>
         ) : (
-          <p className="text-xs text-zinc-500">没有收到音频，查看「原始响应」了解原因。</p>
+          <p className="text-xs text-zinc-400">没有收到音频，查看「原始响应」了解原因。</p>
         ))}
       {v.kind === 'audio' && v.firstAudioMs != null && (
-        <p className="text-[11px] text-zinc-500">
+        <p className="text-xs text-zinc-400">
           首个音频分片：{fmtMs(v.firstAudioMs)} · 共 {v.chunks} 个分片
         </p>
       )}
       {v.kind === 'audio' && Object.keys(v.extras).length > 0 && (
-        <details className="text-[11px]">
-          <summary className="cursor-pointer text-zinc-500">厂商返回的音频信息</summary>
+        <details className="text-xs">
+          <summary className="cursor-pointer text-zinc-400">厂商返回的音频信息</summary>
           <JsonBlock value={v.extras} max={6000} />
         </details>
       )}
@@ -403,7 +403,7 @@ function ImageOutput({ artifacts, response, running }: OutputProps) {
           ))}
         </div>
       ) : running ? (
-        <p className="flex items-center gap-2 text-xs text-zinc-500">
+        <p className="flex items-center gap-2 text-xs text-zinc-400">
           <Spinner /> 生成中…
         </p>
       ) : (
@@ -451,11 +451,11 @@ function TaskOutput({ taskId, artifacts, running }: OutputProps) {
   const results = task?.artifacts?.length ? task.artifacts : artifacts;
   if (!taskId)
     return running ? (
-      <p className="flex items-center gap-2 text-xs text-zinc-500">
+      <p className="flex items-center gap-2 text-xs text-zinc-400">
         <Spinner /> 正在提交任务…
       </p>
     ) : (
-      <p className="text-xs text-zinc-500">任务尚未创建（查看错误信息或原始响应）。</p>
+      <p className="text-xs text-zinc-400">任务尚未创建（查看错误信息或原始响应）。</p>
     );
   return (
     <div className="space-y-3">
@@ -463,11 +463,11 @@ function TaskOutput({ taskId, artifacts, running }: OutputProps) {
         <span className="text-zinc-400">异步任务</span>
         {task ? <StatusBadge status={task.status} /> : <Spinner />}
         {task?.remoteStatus && <Chip>{task.remoteStatus}</Chip>}
-        <span className="mono text-[11px] text-zinc-500">远程 ID {task?.remoteId}</span>
+        <span className="mono text-xs text-zinc-400">远程 ID {task?.remoteId}</span>
         {task && ['pending', 'running'].includes(task.status) && (
-          <span className="text-[11px] text-zinc-500">已轮询 {task.pollCount} 次 · 关闭页面也会在后台继续跟踪</span>
+          <span className="text-xs text-zinc-400">已轮询 {task.pollCount} 次 · 关闭页面也会在后台继续跟踪</span>
         )}
-        <a className="btn-ghost px-1.5 py-0 text-[11px]" href="#/tasks">
+        <a className="btn-ghost px-1.5 py-0 text-xs" href="#/tasks">
           任务队列 →
         </a>
       </div>
@@ -540,7 +540,7 @@ function EmbeddingOutput({ response, input }: OutputProps) {
             <tr>
               <th />
               {vectors.map((_, j) => (
-                <th key={j} className="mono px-2 py-1 font-normal text-zinc-500">
+                <th key={j} className="mono px-2 py-1 font-normal text-zinc-400">
                   {j}
                 </th>
               ))}
@@ -550,7 +550,7 @@ function EmbeddingOutput({ response, input }: OutputProps) {
             {vectors.map((a, i) => (
               <tr key={i}>
                 <td className="max-w-60 truncate py-1 pr-2 text-zinc-400" title={texts[i]}>
-                  <span className="mono text-zinc-600">{i}</span> {texts[i]}
+                  <span className="mono text-zinc-400">{i}</span> {texts[i]}
                 </td>
                 {vectors.map((b, j) => {
                   const s = cosine(a, b);
@@ -565,8 +565,8 @@ function EmbeddingOutput({ response, input }: OutputProps) {
           </tbody>
         </table>
       </div>
-      <details className="text-[11px]">
-        <summary className="cursor-pointer text-zinc-500">向量前 8 维</summary>
+      <details className="text-xs">
+        <summary className="cursor-pointer text-zinc-400">向量前 8 维</summary>
         <JsonBlock value={vectors.map((v) => v.slice(0, 8).map((x) => Number(x.toFixed(5))))} />
       </details>
     </div>
@@ -584,7 +584,7 @@ function RerankOutput({ response, input }: OutputProps) {
         <div key={r.index} className="rounded-md border border-zinc-800 bg-zinc-950/40 p-2 text-xs">
           <div className="flex items-center gap-2">
             <span className="mono w-6 text-violet-300">#{rank + 1}</span>
-            <span className="mono text-zinc-500">原序 {r.index}</span>
+            <span className="mono text-zinc-400">原序 {r.index}</span>
             <span
               className="h-2 rounded bg-violet-500/70"
               style={{ width: `${Math.max(3, (r.score / max) * 200)}px` }}

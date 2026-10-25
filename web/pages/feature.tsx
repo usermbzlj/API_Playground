@@ -32,7 +32,7 @@ export function FeaturePage({ id }: { id: string }) {
         ) : undefined
       }
     >
-      <a href="#/explore" className="inline-flex text-xs text-zinc-500 hover:text-violet-300">
+      <a href="#/explore" className="inline-flex text-xs text-zinc-400 hover:text-violet-300">
         ← 返回能力图谱
       </a>
       <div className="grid gap-3 md:grid-cols-3">
@@ -57,7 +57,7 @@ export function FeaturePage({ id }: { id: string }) {
             <item.icon size={18} className="mt-0.5 shrink-0 text-violet-300" />
             <div>
               <h2 className="text-xs font-medium text-zinc-200">{item.title}</h2>
-              <p className="mt-2 text-xs leading-5 text-zinc-500">{item.description}</p>
+              <p className="mt-2 text-xs leading-5 text-zinc-400">{item.description}</p>
             </div>
           </div>
         ))}
@@ -113,7 +113,7 @@ export function FeaturePage({ id }: { id: string }) {
                 >
                   <h3 className="text-sm font-semibold text-zinc-100">{p.title} →</h3>
                   <p className="text-xs text-zinc-400">{p.description}</p>
-                  <p className="flex items-center gap-1 text-[11px] text-violet-300">
+                  <p className="flex items-center gap-1 text-xs text-violet-300">
                     载入输入与原生参数 <ArrowRight size={12} />
                   </p>
                 </a>

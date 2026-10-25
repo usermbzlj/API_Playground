@@ -262,7 +262,7 @@ export function Spinner() {
 
 export function EmptyHint({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-lg border border-dashed border-zinc-700 p-6 text-center text-sm text-zinc-500">
+    <div className="rounded-lg border border-dashed border-zinc-700 p-6 text-center text-sm text-zinc-400">
       {children}
     </div>
   );
@@ -305,7 +305,7 @@ export function ErrorBox({ error }: { error: any }) {
 
 export function InsightList({ items }: { items: Insight[] }) {
   if (!items.length)
-    return <p className="text-xs text-zinc-600">运行后会在这里给出观察：参数是否生效、缓存命中、截断、工具调用等。</p>;
+    return <p className="text-xs text-zinc-400">运行后会在这里给出观察：参数是否生效、缓存命中、截断、工具调用等。</p>;
   const icon = { ok: '✓', info: 'ℹ', warn: '⚠' } as const;
   const tone = { ok: 'text-emerald-300', info: 'text-sky-300', warn: 'text-amber-300' } as const;
   return (
@@ -330,12 +330,17 @@ export function Tabs<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-1 border-b border-zinc-800 p-2" aria-label="切换内容视图">
+    <div role="group" className="flex flex-wrap gap-1 border-b border-zinc-800 p-2" aria-label="切换内容视图">
       {tabs.map(([k, label]) => (
         <button
           key={k}
+          type="button"
           aria-pressed={value === k}
-          className={value === k ? 'btn-primary px-2.5 py-1 text-xs' : 'btn-ghost px-2.5 py-1 text-xs'}
+          className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
+            value === k
+              ? 'bg-violet-500/15 text-violet-200 ring-1 ring-violet-500/30 ring-inset'
+              : 'text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-100'
+          }`}
           onClick={() => onChange(k)}
         >
           {label}
@@ -422,7 +427,7 @@ export function Field({ label, hint, children }: { label: ReactNode; hint?: Reac
     <label className="block">
       <span className="label">{label}</span>
       <div className="mt-1">{children}</div>
-      {hint && <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500">{hint}</p>}
+      {hint && <p className="mt-0.5 text-xs leading-relaxed text-zinc-400">{hint}</p>}
     </label>
   );
 }

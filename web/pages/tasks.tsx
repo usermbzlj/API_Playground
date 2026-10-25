@@ -89,7 +89,7 @@ export function TasksPage() {
                     查看实验
                   </a>
                 </div>
-                <p className="mono break-all text-xs text-zinc-500">远程 ID {t.remoteId}</p>
+                <p className="mono break-all text-xs text-zinc-400">远程 ID {t.remoteId}</p>
                 {t.progress != null && (
                   <div>
                     <div className="mb-1 text-xs text-zinc-400">服务商进度 {t.progress}%</div>
@@ -111,7 +111,7 @@ export function TasksPage() {
                   ) : (
                     <ErrorBox error={{ title: '任务诊断', hints: [t.error] }} />
                   ))}
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-zinc-400">
                   创建 {fmtTime(t.createdAt)} · 最近轮询 {fmtTime(t.lastPollAt)} · {t.pollCount} 次
                 </p>
                 {op?.async?.resultTtlNote && <p className="text-xs text-amber-300">{op.async.resultTtlNote}</p>}

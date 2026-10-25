@@ -61,7 +61,7 @@ export function ModelPreview({ src, name }: { src: string; name: string }) {
           className="absolute inset-x-3 bottom-3 w-[calc(100%-1.5rem)]"
         />
       )}
-      <p className="border-t border-zinc-800 px-3 py-2 text-[11px] text-zinc-500">
+      <p className="border-t border-zinc-800 px-3 py-2 text-xs text-zinc-400">
         拖动旋转 · 滚轮 / 双指缩放 · Shift 拖动平移
       </p>
     </div>

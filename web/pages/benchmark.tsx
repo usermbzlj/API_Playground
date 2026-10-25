@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Activity, ArrowDownToLine, Gauge, Play, Square, Upload, RefreshCw } from 'lucide-react';
-import { getProvider } from '../../shared/catalog.ts';
+import { getProvider, listOperations } from '../../shared/catalog.ts';
 import { benchLimits } from '../../shared/bench.ts';
 import { auditBenchmarkComparison } from '../../shared/comparison.ts';
 import { usePersistentDraft } from '../workspace-state.ts';
 import { useApp } from '../app.tsx';
 import { benchApi } from '../bench-api.ts';
 import { navigate } from '../router.ts';
+import { useRemoteModels } from '../lab/remote-models.ts';
 import { Page } from './common.tsx';
 import { CodeInput, EmptyHint, Field, JsonBlock, Modal, Spinner, Tabs, fmtTime } from '../ui.tsx';
 
@@ -135,11 +136,59 @@ export function BenchmarkPage() {
   const [deleting, setDeleting] = useState(false);
   const startLock = useRef(false);
   const importInput = useRef<HTMLInputElement>(null);
-  const compatible = connections.filter((c) =>
-    ['deepseek', 'minimax', 'kimi', 'mimo', 'qwen', 'ark', 'custom-openai'].includes(c.providerId),
-  );
+  const compatible = connections.filter((c) => {
+    const provider = getProvider(c.providerId);
+    if (!provider || provider.auth.type === 'signer') return false;
+    return listOperations(c.providerId).some(
+      (op) => op.protocol === 'openai-chat' || op.protocol === 'openai-responses',
+    );
+  });
   const conn = connections.find((c) => c.id === config.connectionId);
+  const provider = conn ? getProvider(conn.providerId) : undefined;
+  const remote = useRemoteModels(conn, provider);
+  const [modelRefreshing, setModelRefreshing] = useState(false);
+  const allowChat = !conn || conn.providerId !== 'openai';
+  const allowResponses = !conn || conn.providerId === 'openai' || !!provider?.generic;
+  const allowedEndpoints = [...(allowChat ? ['chat'] : []), ...(allowResponses ? ['responses'] : [])];
+  const catalogModels = provider?.models ?? [];
+  const recentModels = records
+    .filter((r) => r?.config?.connectionId === config.connectionId && typeof r.config.model === 'string')
+    .map((r) => r.config.model as string);
+  const modelOptions = [
+    ...new Set(
+      [
+        conn?.extra.defaultModel,
+        ...catalogModels.map((m) => m.id),
+        ...(remote.models ?? []).map((m) => m.id),
+        ...recentModels,
+      ].filter((id): id is string => typeof id === 'string' && !!id.trim()),
+    ),
+  ].slice(0, 400);
+  const modelLabels = new Map<string, string>();
+  if (conn?.extra.defaultModel) modelLabels.set(conn.extra.defaultModel, '连接默认模型');
+  for (const m of catalogModels) if (m.label && m.label !== m.id) modelLabels.set(m.id, m.label);
+  for (const m of remote.models ?? []) if (m.name && m.name !== m.id) modelLabels.set(m.id, m.name);
+  const modelHint = !conn
+    ? '选择连接后读取账号模型，也可直接输入模型 ID。'
+    : provider?.modelsPath
+      ? '从当前连接的 /models 读取；也可直接输入模型 ID。'
+      : '该连接没有模型目录，可直接输入模型 ID。';
   const patch = (key: string, value: unknown) => setConfig((v: any) => ({ ...v, [key]: value }));
+
+  useEffect(() => {
+    if (conn && !allowedEndpoints.includes(config.endpoint))
+      setConfig((v: any) => ({ ...v, endpoint: allowedEndpoints[0] ?? 'chat', path: '' }));
+  }, [conn?.id, allowedEndpoints.join(','), config.endpoint, setConfig]);
+
+  async function refreshModels() {
+    if (modelRefreshing) return;
+    setModelRefreshing(true);
+    try {
+      await remote.load(true);
+    } finally {
+      setModelRefreshing(false);
+    }
+  }
 
   useEffect(() => {
     let disposed = false;
@@ -242,10 +291,15 @@ export function BenchmarkPage() {
 
   function chooseConnection(id: string) {
     const c = connections.find((c) => c.id === id);
+    const nextProvider = getProvider(c?.providerId);
+    const nextAllowChat = !c || c.providerId !== 'openai';
+    const nextAllowResponses = !c || c.providerId === 'openai' || !!nextProvider?.generic;
+    const nextEndpoints = [...(nextAllowChat ? ['chat'] : []), ...(nextAllowResponses ? ['responses'] : [])];
     setConfig((v: any) => ({
       ...v,
       connectionId: id,
-      model: c?.extra.defaultModel || getProvider(c?.providerId)?.models[0]?.id || '',
+      model: c?.extra.defaultModel || nextProvider?.models[0]?.id || '',
+      endpoint: nextEndpoints.includes(v.endpoint) ? v.endpoint : (nextEndpoints[0] ?? 'chat'),
       path: '',
     }));
   }
@@ -495,7 +549,7 @@ export function BenchmarkPage() {
         <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(330px,0.85fr)_minmax(0,1.4fr)]">
           <section className="card min-w-0 space-y-4 p-5">
             <div>
-              <p className="text-[10px] tracking-[0.2em] text-sky-400">CONTROL</p>
+              <p className="text-xs tracking-[0.2em] text-sky-400">CONTROL</p>
               <h2 className="mt-1 text-lg font-semibold">配置评测</h2>
             </div>
             <Field label="账户与端点">
@@ -508,7 +562,7 @@ export function BenchmarkPage() {
                 ))}
               </select>
             </Field>
-            {conn && <p className="mono break-all text-[11px] text-zinc-500">{conn.baseUrl}</p>}
+            {conn && <p className="mono break-all text-xs text-zinc-400">{conn.baseUrl}</p>}
             {config.connectionId && !conn && (
               <p className="text-xs text-amber-200">草稿中的连接已失效，请重新选择账户后再运行。</p>
             )}
@@ -522,16 +576,48 @@ export function BenchmarkPage() {
               </EmptyHint>
             )}
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="模型 ID">
-                <input
-                  className="input mono"
-                  value={config.model}
-                  onChange={(e) => patch('model', e.target.value)}
-                  list="bench-models"
-                />
+              <Field label="模型 ID" hint={modelHint}>
+                <div className="flex gap-2">
+                  <input
+                    className="input mono min-w-0 flex-1"
+                    value={config.model}
+                    onChange={(e) => patch('model', e.target.value)}
+                    list="bench-models"
+                    placeholder="选择或输入模型 ID"
+                    aria-label="模型 ID"
+                  />
+                  {conn && provider?.modelsPath && (
+                    <button
+                      type="button"
+                      className="btn-ghost shrink-0 px-2 text-xs"
+                      disabled={modelRefreshing}
+                      onClick={() => void refreshModels()}
+                      title="从当前连接的 /models 刷新模型列表"
+                      aria-label="刷新账号模型"
+                    >
+                      {modelRefreshing ? <Spinner /> : <RefreshCw size={14} />}
+                      刷新
+                    </button>
+                  )}
+                </div>
+                {conn && provider?.modelsPath && !remote.models && !remote.error && (
+                  <p className="mt-1 text-xs text-zinc-400">正在读取账号模型…</p>
+                )}
+                {conn && remote.error && (
+                  <p className="mt-1 text-xs text-amber-300">模型列表加载失败：{remote.error}；仍可手动输入。</p>
+                )}
+                {remote.models && (
+                  <p className="mt-1 text-xs text-zinc-400">
+                    {remote.models.length
+                      ? `账号可见 ${remote.models.length} 个模型，点击输入框选择。`
+                      : '账号模型列表为空，可手动输入。'}
+                  </p>
+                )}
                 <datalist id="bench-models">
-                  {getProvider(conn?.providerId)?.models.map((m) => (
-                    <option key={m.id} value={m.id} />
+                  {modelOptions.map((id) => (
+                    <option key={id} value={id}>
+                      {modelLabels.get(id) ?? ''}
+                    </option>
                   ))}
                 </datalist>
               </Field>
@@ -541,8 +627,8 @@ export function BenchmarkPage() {
                   value={config.endpoint}
                   onChange={(e) => setConfig((v: any) => ({ ...v, endpoint: e.target.value, path: '' }))}
                 >
-                  <option value="chat">Chat Completions</option>
-                  <option value="responses">Responses</option>
+                  {allowChat && <option value="chat">Chat Completions</option>}
+                  {allowResponses && <option value="responses">Responses</option>}
                 </select>
               </Field>
             </div>
@@ -689,7 +775,7 @@ export function BenchmarkPage() {
                 </Field>
               </div>
             </details>
-            <p className="text-[11px] leading-relaxed text-zinc-500">
+            <p className="text-xs leading-relaxed text-zinc-400">
               预热和重试也可能计费。此处复用兼容协议的性能引擎；Gemini、实时语音、视频与 3D
               请在原生实验台体验。所有评测均需逐次确认。
             </p>
@@ -705,12 +791,12 @@ export function BenchmarkPage() {
             <div className="card space-y-4 p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-[10px] tracking-[0.2em] text-emerald-400">MONITOR</p>
+                  <p className="text-xs tracking-[0.2em] text-emerald-400">MONITOR</p>
                   <h2 className="mt-1 text-lg font-semibold">
                     {selected ? (STATUS_LABEL[selected.status] ?? selected.status) : '等待第一次评测'}
                   </h2>
                   {selected && (
-                    <p className="mt-1 break-all text-xs text-zinc-500">
+                    <p className="mt-1 break-all text-xs text-zinc-400">
                       {selected.config?.model} · {MODE_LABEL[selected.config?.mode]} · {fmtTime(selected.createdAt)}
                     </p>
                   )}
@@ -750,7 +836,7 @@ export function BenchmarkPage() {
                     </p>
                   )}
                   {selected.connectionSnapshot && (
-                    <p className="mono break-all text-[11px] text-zinc-500">
+                    <p className="mono break-all text-xs text-zinc-400">
                       {selected.connectionSnapshot.label} · {selected.connectionSnapshot.url} ·{' '}
                       {selected.connectionSnapshot.route}
                     </p>
@@ -815,7 +901,7 @@ export function BenchmarkPage() {
                       复用配置
                     </button>
                   </div>
-                  <p className="text-[11px] leading-relaxed text-zinc-500">
+                  <p className="text-xs leading-relaxed text-zinc-400">
                     TTFT 仅在引擎识别到流式内容时出现；ITL
                     是内容块间隔。用量缺失时保持未知。延迟包含逻辑请求的重试与等待，HTTP 尝试单独统计。
                   </p>
@@ -853,12 +939,12 @@ export function BenchmarkPage() {
                 <div className="card min-w-0 space-y-3 p-5">
                   <h3 className="font-medium">请求样本 · {rows.length} 条</h3>
                   {!rows.length ? (
-                    <p className="text-xs text-zinc-500">请求结束后显示样本及实际发送的请求体。</p>
+                    <p className="text-xs text-zinc-400">请求结束后显示样本及实际发送的请求体。</p>
                   ) : (
                     <>
                       <div className="max-h-72 overflow-auto">
                         <table className="w-full text-left text-xs">
-                          <thead className="text-zinc-500">
+                          <thead className="text-zinc-400">
                             <tr>
                               <th className="p-2">#</th>
                               <th>状态</th>
@@ -891,7 +977,7 @@ export function BenchmarkPage() {
                         </table>
                       </div>
                       {rows.length > 200 && (
-                        <p className="text-xs text-zinc-500">页面展示前 200 条；完整数据可导出。</p>
+                        <p className="text-xs text-zinc-400">页面展示前 200 条；完整数据可导出。</p>
                       )}
                       {sample != null && rows[sample] && (
                         <div>
@@ -956,11 +1042,11 @@ export function BenchmarkPage() {
                   <p className="break-all text-sm font-medium">
                     {r.config?.model ?? '导入结果'} · {MODE_LABEL[r.config?.mode] ?? r.config?.mode}
                   </p>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-1 text-xs text-zinc-400">
                     {fmtTime(r.createdAt)} · {STATUS_LABEL[r.status] ?? r.status}
                     {r.status === 'imported' ? ' · 导入记录' : ''}
                   </p>
-                  <p className="mt-1 break-all text-[11px] text-zinc-500">
+                  <p className="mt-1 break-all text-xs text-zinc-400">
                     {r.connectionLabel ?? '来源账户未记录'}
                     {r.importedAt ? ` · 导入于 ${fmtTime(r.importedAt)}` : ''}
                   </p>
@@ -1023,7 +1109,7 @@ export function BenchmarkPage() {
                     {comparisons.map((r) => (
                       <th key={r.id} className="min-w-48 p-3 align-top">
                         <span className="break-all text-sky-300">{r.config?.model}</span>
-                        <p className="mt-2 font-normal text-zinc-500">
+                        <p className="mt-2 font-normal text-zinc-400">
                           {MODE_LABEL[r.config?.mode]} · {r.config?.endpoint} · {r.connectionLabel ?? '账户未记录'}
                         </p>
                         <select
@@ -1038,7 +1124,7 @@ export function BenchmarkPage() {
                             </option>
                           ))}
                         </select>
-                        <p className="mt-1 font-normal text-zinc-500">{fmtTime(r.createdAt)}</p>
+                        <p className="mt-1 font-normal text-zinc-400">{fmtTime(r.createdAt)}</p>
                       </th>
                     ))}
                   </tr>
@@ -1092,7 +1178,7 @@ export function BenchmarkPage() {
                 </div>
               )}
               {comparisonAudit.notes.map((note) => (
-                <p className="text-xs text-zinc-500" key={note}>
+                <p className="text-xs text-zinc-400" key={note}>
                   {note}
                 </p>
               ))}
@@ -1221,7 +1307,7 @@ function Numeric({
 function Kpi({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
-      <p className="text-[10px] text-zinc-500">{label}</p>
+      <p className="text-xs text-zinc-400">{label}</p>
       <p className="mono mt-2 text-sm text-zinc-100">{value}</p>
     </div>
   );
@@ -1250,10 +1336,10 @@ function Chart({ title, values, unit }: { title: string; values: { label: string
     <div className="card min-w-0 p-5">
       <div className="mb-4 flex justify-between text-xs">
         <h3 className="font-medium text-zinc-200">{title}</h3>
-        <span className="text-zinc-500">{unit}</span>
+        <span className="text-zinc-400">{unit}</span>
       </div>
       {!shown.length ? (
-        <p className="py-5 text-center text-xs text-zinc-500">等待真实时间线数据</p>
+        <p className="py-5 text-center text-xs text-zinc-400">等待真实时间线数据</p>
       ) : (
         <div
           className="flex h-36 min-w-0 items-end gap-1 border-b border-zinc-700"
@@ -1274,7 +1360,7 @@ function Chart({ title, values, unit }: { title: string; values: { label: string
           ))}
         </div>
       )}
-      <p className="mt-2 text-[10px] text-zinc-500">
+      <p className="mt-2 text-xs text-zinc-400">
         {shown[0]?.label} {shown.length > 1 && `→ ${shown.at(-1)?.label}`} · 悬停查看数值
       </p>
     </div>

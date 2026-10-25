@@ -32,7 +32,7 @@ export function RealtimeRecording({ events, outputRate }: { events: TraceEvent[]
   if (!turns.length) return <EmptyHint>没有录到可展示的转写或回复音频。原始双向消息仍可在事件流中查看。</EmptyHint>;
   return (
     <div className="space-y-3">
-      <p className="text-xs leading-relaxed text-zinc-500">
+      <p className="text-xs leading-relaxed text-zinc-400">
         从本机保存的原生消息还原。回复音频包含厂商返回的片段，被打断后未播放的部分也可能保留；没有厂商转写的语音不会生成虚构字幕。
       </p>
       {turns.map((turn) => (
@@ -40,7 +40,7 @@ export function RealtimeRecording({ events, outputRate }: { events: TraceEvent[]
           key={turn.id}
           className={`rounded-lg border border-zinc-800 p-3 ${turn.role === 'user' ? 'bg-violet-950/20' : 'bg-emerald-950/15'}`}
         >
-          <div className="mb-2 flex gap-3 text-xs text-zinc-500">
+          <div className="mb-2 flex gap-3 text-xs text-zinc-400">
             {turn.role}
             {turn.interrupted && <span className="text-amber-300">曾被打断</span>}
           </div>

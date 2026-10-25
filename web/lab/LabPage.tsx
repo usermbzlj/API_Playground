@@ -31,59 +31,9 @@ import type { RemoteModel } from '../../shared/models.ts';
 import { validateOperationInput } from '../../shared/validate.ts';
 import { usePersistentDraft } from '../workspace-state.ts';
 import { configurationSignature } from './input-state.ts';
+import { useRemoteModels } from './remote-models.ts';
 
 type Tab = 'output' | 'insights' | 'sent' | 'response' | 'events' | 'extras' | 'metrics';
-
-const remoteModelCache = new Map<string, RemoteModel[]>();
-function modelCacheKey(conn: ConnectionInfo | undefined) {
-  return conn
-    ? JSON.stringify([
-        conn.id,
-        conn.revision,
-        conn.baseUrl,
-        conn.keyPreview,
-        conn.extra,
-        conn.network,
-        conn.lastTest?.at,
-      ])
-    : '';
-}
-
-export function useRemoteModels(conn: ConnectionInfo | undefined, provider: ProviderDef | undefined) {
-  const cacheKey = modelCacheKey(conn);
-  const currentKey = useRef(cacheKey);
-  currentKey.current = cacheKey;
-  const sequence = useRef(0);
-  const [models, setModels] = useState<RemoteModel[] | null>(remoteModelCache.get(cacheKey) ?? null);
-  const [error, setError] = useState('');
-  const load = useCallback(
-    async (refresh = false) => {
-      if (!conn || !provider?.modelsPath) return;
-      const request = ++sequence.current;
-      const key = cacheKey;
-      try {
-        const r = await api.remoteModels(conn.id, { refresh });
-        remoteModelCache.set(key, r.models);
-        if (key !== currentKey.current || request !== sequence.current) return;
-        setModels(r.models);
-        setError('');
-      } catch (e: any) {
-        if (key !== currentKey.current || request !== sequence.current) return;
-        setError(e.message);
-      }
-    },
-    [cacheKey, provider?.modelsPath],
-  );
-  useEffect(() => {
-    setModels(remoteModelCache.get(cacheKey) ?? null);
-    setError('');
-    if (conn && provider?.modelsPath && !remoteModelCache.has(cacheKey)) void load();
-    return () => {
-      sequence.current++;
-    };
-  }, [cacheKey, provider?.modelsPath, load]);
-  return { models, error, load };
-}
 
 export function ModelPicker({
   op,
@@ -102,7 +52,7 @@ export function ModelPicker({
 }) {
   const catalogModels = modelsFor(op);
   const remoteOnly = (remote ?? []).filter((m) => !catalogModels.some((c) => c.id === m.id));
-  if (op.models && op.models.length === 0) return <span className="text-xs text-zinc-500">（该接口不需要模型）</span>;
+  if (op.models && op.models.length === 0) return <span className="text-xs text-zinc-400">（该接口不需要模型）</span>;
   return (
     <>
       <input
@@ -134,7 +84,7 @@ export function ModelPicker({
 export function ModelInfo({ model, remote }: { model?: ModelDef; remote?: RemoteModel | null }) {
   if (!model && !remote) return null;
   return (
-    <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-zinc-500">
+    <div className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-400">
       {model?.developer && <span>开发方 {model.developer}</span>}
       {model?.context && (
         <Chip>
@@ -178,7 +128,7 @@ export function LabPage({
   const route = useRoute();
   const op = getOperation(operationId);
   const provider = getProvider(op?.providerId);
-  if (!op || !provider) return <div className="p-10 text-zinc-500">操作不存在：{operationId}</div>;
+  if (!op || !provider) return <div className="p-10 text-zinc-400">操作不存在：{operationId}</div>;
   if (op.workbench === 'realtime') return <RealtimeLab op={op} provider={provider} runId={runId} presetId={presetId} />;
   return (
     <Lab
@@ -487,7 +437,7 @@ function Lab({
             <EvidenceChip rows={opEvidence} />
           </div>
           {op.summary && <p className="mt-1 max-w-4xl text-xs leading-relaxed text-zinc-400">{op.summary}</p>}
-          <div className="mt-1 flex gap-3 text-[11px]">
+          <div className="mt-1 flex gap-3 text-xs">
             {op.docsUrl && (
               <a className="text-violet-400 underline" href={op.docsUrl} target="_blank" rel="noreferrer">
                 官方文档 ↗
@@ -500,7 +450,7 @@ function Lab({
 
       {(op.notes ?? []).length > 0 && (
         <details
-          className="rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-[11px] text-zinc-400"
+          className="rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-400"
           open={op.verification.status !== 'tested'}
         >
           <summary className="cursor-pointer text-zinc-300">使用说明与已知限制（{op.notes!.length}）</summary>
@@ -588,15 +538,19 @@ function Lab({
           </button>
         )}
         {runner.running && (
-          <button className="btn-outline" onClick={runner.abort}>
+          <button className="btn-outline hidden xl:inline-flex" onClick={runner.abort}>
             中止
           </button>
         )}
-        <button className="btn-primary" onClick={() => run(false)} disabled={runner.running || !conn || restoring}>
+        <button
+          className="btn-primary hidden xl:inline-flex"
+          onClick={() => run(false)}
+          disabled={runner.running || !conn || restoring}
+        >
           {runner.running ? <Spinner /> : '▶ 运行'}
         </button>
       </div>
-      <p className="text-[11px] text-zinc-500" role="status">
+      <p className="text-xs text-zinc-400" role="status">
         {restoring
           ? '正在恢复实验配置，请稍候…'
           : draftControl.restored
@@ -674,7 +628,7 @@ function Lab({
           <div className="max-h-[640px] overflow-auto p-4">
             {rightTab === 'params' ? (
               <>
-                <p className="mb-3 text-[11px] text-zinc-600">
+                <p className="mb-3 text-xs text-zinc-400">
                   勾选后才会随请求发出；未勾选的参数完全不出现在请求体里，由厂商使用默认值。
                 </p>
                 <fieldset disabled={runner.running || restoring}>
@@ -730,7 +684,7 @@ function Lab({
                 </div>
               )}
               {runner.runId && !runner.running && (
-                <p className="mt-3 text-[11px] text-zinc-600">
+                <p className="mt-3 text-xs text-zinc-400">
                   已保存为实验记录{' '}
                   <a className="text-violet-400 underline" href={`#/runs/${runner.runId}`}>
                     {runner.runId}
@@ -765,7 +719,7 @@ function Lab({
           {tab === 'extras' &&
             (Object.keys(extras).length ? (
               <div className="space-y-2">
-                <p className="text-[11px] text-zinc-500">
+                <p className="text-xs text-zinc-400">
                   以下是厂商返回、但不属于通用视图（正文 / 思考 / 工具 / 用量）的字段，原样保留：
                 </p>
                 <JsonBlock value={extras} />
@@ -873,7 +827,7 @@ function SavePresetModal({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <p className="text-[11px] text-zinc-500">保存当前输入、模型与已启用的参数（不含连接与密钥）。</p>
+        <p className="text-xs text-zinc-400">保存当前输入、模型与已启用的参数（不含连接与密钥）。</p>
         {error && (
           <p role="alert" className="text-xs text-rose-300">
             {error}

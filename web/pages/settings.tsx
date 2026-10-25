@@ -116,7 +116,7 @@ export function SettingsPage() {
               </Field>
             )}
             {net && (
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-zinc-400">
                 当前来源：{net.source === 'settings' ? '应用设置' : net.source === 'env' ? '环境变量' : '未设置代理'} ·{' '}
                 {net.effectiveProxy ? '已配置代理' : '直连'}。单个连接可选择独立路由。
               </p>
@@ -130,7 +130,7 @@ export function SettingsPage() {
               重新载入
             </button>
           </div>
-          <section className="card space-y-2 p-5 text-xs leading-relaxed text-zinc-500">
+          <section className="card space-y-2 p-5 text-xs leading-relaxed text-zinc-400">
             <h2 className="text-sm font-semibold text-zinc-200">数据与隐私</h2>
             <p>
               连接凭证、实验输入、响应、素材和生成产物都保存在本机。导出会过滤已知凭证字段，但不能识别自由文本中的所有个人信息，请在分享前检查。

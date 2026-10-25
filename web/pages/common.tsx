@@ -49,36 +49,36 @@ export function OperationCard({ op }: { op: OperationDef }) {
           {provider?.name}
         </a>
         <Chip>{WORKBENCH_LABEL[op.workbench]}</Chip>
-        <span className="ml-auto text-[10px] text-zinc-500">{lifecycleLabels[op.lifecycle]}</span>
+        <span className="ml-auto text-xs text-zinc-400">{lifecycleLabels[op.lifecycle]}</span>
       </div>
       <h3 className="text-base font-semibold text-zinc-100">{op.title}</h3>
       <p className="flex-1 text-sm leading-relaxed text-zinc-400">{op.summary}</p>
       {op.defaultModel && (
-        <p className="mono truncate text-[11px] text-zinc-500" title={op.defaultModel}>
+        <p className="mono truncate text-xs text-zinc-400" title={op.defaultModel}>
           {op.defaultModel}
         </p>
       )}
       <div className="flex flex-wrap gap-x-3 gap-y-1.5">
         {op.features.slice(0, 3).map((id) => (
-          <a key={id} href={featureHref(id)} className="text-[11px] text-violet-300 hover:text-violet-100">
+          <a key={id} href={featureHref(id)} className="text-xs text-violet-300 hover:text-violet-100">
             {getFeature(id)?.name.split(' / ')[0] ?? id}
           </a>
         ))}
       </div>
       <div className="space-y-2 border-y border-zinc-800 py-3">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="w-12 shrink-0 text-[10px] text-zinc-500">目录说明</span>
+          <span className="w-12 shrink-0 text-xs text-zinc-400">目录说明</span>
           <VerificationChip v={op.verification} />
           <Chip tone={cost.tone} title={op.costHint}>
             {cost.label}
           </Chip>
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="w-12 shrink-0 text-[10px] text-zinc-500">本机运行</span>
+          <span className="w-12 shrink-0 text-xs text-zinc-400">本机运行</span>
           {rows.length ? (
             <EvidenceChip rows={rows} />
           ) : (
-            <span className="text-[11px] text-zinc-500">尚无此操作的实验记录</span>
+            <span className="text-xs text-zinc-400">尚无此操作的实验记录</span>
           )}
         </div>
       </div>
@@ -94,11 +94,11 @@ export function OperationCard({ op }: { op: OperationDef }) {
         </a>
       )}
       <div className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-1 text-[11px] text-zinc-500">
+        <span className="flex items-center gap-1 text-xs text-zinc-400">
           <Cable size={12} />
           {connected ? '已有对应连接' : '需要添加连接'}
         </span>
-        <a className="btn-primary text-xs" href={labHref(op.id)}>
+        <a className="btn-secondary text-xs" href={labHref(op.id)}>
           进入实验台 <ArrowRight size={13} />
         </a>
       </div>

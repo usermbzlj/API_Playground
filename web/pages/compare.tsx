@@ -14,7 +14,8 @@ import { WORKBENCH_DEFAULTS, WorkbenchInput } from '../lab/inputs.tsx';
 import { ParamsPanel } from '../lab/params.tsx';
 import { OutputView } from '../lab/outputs.tsx';
 import { buildPreview, RequestPreview } from '../lab/preview.tsx';
-import { ModelPicker, ModelInfo, useRemoteModels } from '../lab/LabPage.tsx';
+import { ModelPicker, ModelInfo } from '../lab/LabPage.tsx';
+import { useRemoteModels } from '../lab/remote-models.ts';
 import { EventList, MetricsPanel } from '../lab/inspector.tsx';
 import {
   Chip,
@@ -238,7 +239,7 @@ export function ComparePage() {
       <section className="card space-y-3 p-4" aria-label="对照条件审计">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-sky-200">对照条件审计</h2>
-          <span className="text-[11px] text-zinc-500">
+          <span className="text-xs text-zinc-400">
             {mode === 'new' ? '核对待运行配置；各通道输出保留运行时快照' : '核对当时实际发送的请求与路由'}
           </span>
         </div>
@@ -255,7 +256,7 @@ export function ComparePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-zinc-500">
+                <tr className="text-zinc-400">
                   <th className="p-2">存在差异</th>
                   {(mode === 'new' ? lanes : records).map((_, i) => (
                     <th key={i} className="p-2">
@@ -282,12 +283,12 @@ export function ComparePage() {
           </div>
         )}
         {audit.notes.map((n) => (
-          <p key={n} className="text-[11px] leading-relaxed text-zinc-500">
+          <p key={n} className="text-xs leading-relaxed text-zinc-400">
             {n}
           </p>
         ))}
         {!audit.shared.length && !audit.differences.length && (
-          <p className="text-xs text-zinc-500">载入至少两个通道后显示配置差异。</p>
+          <p className="text-xs text-zinc-400">载入至少两个通道后显示配置差异。</p>
         )}
       </section>
       <div hidden={mode !== 'new'} className="space-y-4">
@@ -432,7 +433,7 @@ export function ComparePage() {
                 <li className="rounded bg-zinc-950 p-3" key={id}>
                   {getOperation(body.operationId)?.title} · {body.model ?? '默认模型'}
                   <br />
-                  <span className="text-zinc-500">
+                  <span className="text-zinc-400">
                     {getOperation(body.operationId)?.costHint ?? '价格请以实际账户与服务商账单为准'}
                   </span>
                 </li>
@@ -710,7 +711,7 @@ function RecordedLane({ record: r, index }: { record: RunRecord; index: number }
           </h2>
           <StatusBadge status={r.status} />
         </div>
-        <p className="mono break-all text-xs text-zinc-500">
+        <p className="mono break-all text-xs text-zinc-400">
           {r.providerId} · {r.model ?? '—'} · {fmtTime(r.createdAt)}
         </p>
         <div className="flex gap-2">

@@ -18,7 +18,8 @@ import type { OperationDef, ProviderDef, TraceEvent } from '../../shared/types.t
 import { Chip, EvidenceChip, JsonBlock, Modal, VerificationChip } from '../ui.tsx';
 import { validateOperationInput } from '../../shared/validate.ts';
 import { ParamsPanel } from './params.tsx';
-import { ModelPicker, useRemoteModels } from './LabPage.tsx';
+import { ModelPicker } from './LabPage.tsx';
+import { useRemoteModels } from './remote-models.ts';
 import { usePersistentDraft } from '../workspace-state.ts';
 import { setExternalRunSession } from './useRunner.ts';
 
@@ -612,14 +613,14 @@ export function RealtimeLab({
           <EvidenceChip rows={evidence.filter((e) => e.operationId === op.id)} />
         </div>
         {op.summary && <p className="mt-1 max-w-4xl text-xs leading-relaxed text-zinc-400">{op.summary}</p>}
-        <p className="mt-1 text-[11px] text-zinc-500">
+        <p className="mt-1 text-xs text-zinc-400">
           麦克风 PCM16 {spec.inputRate / 1000} kHz 上行 · 模型音频 PCM16 {spec.outputRate / 1000} kHz 下行 ·
           浏览器经本地中继连接厂商（密钥不进浏览器）
         </p>
       </header>
 
       {(op.notes?.length || spec.notes?.length) && (
-        <details className="rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-[11px] text-zinc-400" open>
+        <details className="rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-400" open>
           <summary className="cursor-pointer text-zinc-300">使用说明与已知限制</summary>
           <ul className="mt-1.5 list-disc space-y-1 pl-5 leading-relaxed">
             {[...(op.notes ?? []), ...(spec.notes ?? [])].map((n) => (
@@ -657,7 +658,7 @@ export function RealtimeLab({
         />
         <span className="flex-1" />
         <span
-          className={`text-xs ${status === 'open' ? 'text-emerald-300' : status === 'connecting' ? 'text-sky-300' : 'text-zinc-500'}`}
+          className={`text-xs ${status === 'open' ? 'text-emerald-300' : status === 'connecting' ? 'text-sky-300' : 'text-zinc-400'}`}
         >
           {status === 'open'
             ? '● 已连接'
@@ -720,7 +721,7 @@ export function RealtimeLab({
           </button>
         )}
       </div>
-      <p className="text-[11px] leading-relaxed text-zinc-500">
+      <p className="text-xs leading-relaxed text-zinc-400">
         配置自动保存在此浏览器标签页。切换页面会停止麦克风与本地播放，已连接会话继续保留，可在全局运行栏断开。
       </p>
       {(!own.length || (connectionId && !conn)) && (
@@ -741,13 +742,13 @@ export function RealtimeLab({
           <fieldset disabled={!['idle', 'closed'].includes(status)}>
             <ParamsPanel specs={op.params} state={params} setState={setParams} model={model} />
           </fieldset>
-          <details className="text-[11px]">
-            <summary className="cursor-pointer text-zinc-500">将发送的 session.update</summary>
+          <details className="text-xs">
+            <summary className="cursor-pointer text-zinc-400">将发送的 session.update</summary>
             <JsonBlock value={sessionEvent} max={8000} />
           </details>
         </div>
         <div className="card flex scroll-mt-20 flex-col p-4" ref={transcriptRef}>
-          <div className="mb-2 flex flex-wrap items-center gap-3 text-[11px] text-zinc-400">
+          <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-zinc-400">
             <span className="flex items-center gap-1.5">
               麦克风
               <span className="inline-block h-2 w-24 overflow-hidden rounded bg-zinc-800">
@@ -764,7 +765,7 @@ export function RealtimeLab({
             <span title="从检测到你停止说话，到收到第一片回复音频">
               平均响应延迟 {avgLatency != null ? `${avgLatency} ms` : '—'}
             </span>
-            {routeInfo && <span className="text-zinc-600">{routeInfo}</span>}
+            {routeInfo && <span className="text-zinc-400">{routeInfo}</span>}
             {runId && (
               <a className="text-violet-400 underline" href={`#/runs/${runId}`}>
                 实验记录
@@ -773,7 +774,7 @@ export function RealtimeLab({
           </div>
           <div className="min-h-64 flex-1 space-y-2 overflow-auto rounded-md bg-zinc-950/50 p-3">
             {turns.length === 0 && (
-              <p className="text-xs text-zinc-600">
+              <p className="text-xs text-zinc-400">
                 连接后点「开始说话」，直接对着麦克风说话；说话时模型若在回答会被立即打断。
               </p>
             )}
@@ -782,13 +783,13 @@ export function RealtimeLab({
                 key={t.id}
                 className={`rounded-md p-2 text-sm ${t.role === 'user' ? 'ml-10 bg-violet-950/40' : 'mr-10 bg-emerald-950/30'}`}
               >
-                <div className="mb-0.5 flex gap-2 text-[11px] text-zinc-500">
+                <div className="mb-0.5 flex gap-2 text-xs text-zinc-400">
                   {t.role}
                   {t.latencyMs != null && <span className="text-sky-300">首音频 {t.latencyMs} ms</span>}
                   {t.interrupted && <span className="text-amber-300">被打断</span>}
                 </div>
                 <div className="whitespace-pre-wrap text-zinc-100">
-                  {t.text || <span className="text-zinc-600">…</span>}
+                  {t.text || <span className="text-zinc-400">…</span>}
                 </div>
               </div>
             ))}
@@ -850,9 +851,9 @@ export function RealtimeLab({
         <h2 className="label mb-2">事件序列（音频分片只计数不逐条显示）</h2>
         <div className="max-h-96 space-y-1 overflow-auto">
           {log.slice(-200).map((e, i) => (
-            <details key={i} className="rounded border border-zinc-800/80 bg-zinc-950/40 px-2 py-1 text-[11px]">
+            <details key={i} className="rounded border border-zinc-800/80 bg-zinc-950/40 px-2 py-1 text-xs">
               <summary className="mono cursor-pointer">
-                <span className="text-zinc-500">+{e.t}ms</span>{' '}
+                <span className="text-zinc-400">+{e.t}ms</span>{' '}
                 <span
                   className={e.dir === 'out' ? 'text-violet-300' : e.dir === 'in' ? 'text-sky-300' : 'text-zinc-400'}
                 >
@@ -879,7 +880,7 @@ export function RealtimeLab({
           <p className="text-sm leading-relaxed text-zinc-300">
             {op.costHint ?? '实时音频会话按服务商规则计费，连接后请及时断开。'}
           </p>
-          <p className="mt-3 text-xs leading-relaxed text-zinc-500">
+          <p className="mt-3 text-xs leading-relaxed text-zinc-400">
             麦克风只在你点击「开始说话」后开启。会话中的声音和文字会发给所选服务商，并在本机保留实验记录。
           </p>
           <div className="mt-5 flex justify-end gap-2">

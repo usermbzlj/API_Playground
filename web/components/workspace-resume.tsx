@@ -60,7 +60,7 @@ export function WorkspaceResume() {
               href={draft.href}
               className="resume-card rounded-xl border border-violet-800/60 bg-violet-950/20 p-4 hover:border-violet-500"
             >
-              <span className="mb-2 flex items-center gap-2 text-[11px] text-violet-300">
+              <span className="mb-2 flex items-center gap-2 text-xs text-violet-300">
                 <FilePenLine size={14} /> 浏览器草稿
               </span>
               <strong className="block truncate text-sm font-medium text-zinc-100">
@@ -77,14 +77,14 @@ export function WorkspaceResume() {
         <div className="grid gap-3 md:grid-cols-3">
           {recent.map((run) => (
             <a key={run.id} href={runLink(run)} className="resume-card card min-w-0 p-4 hover:border-zinc-600">
-              <span className="mb-2 flex items-center justify-between gap-2 text-[11px] text-zinc-400">
+              <span className="mb-2 flex items-center justify-between gap-2 text-xs text-zinc-400">
                 <span className="flex items-center gap-1.5">
                   <Clock3 size={13} /> {fmtTime(run.createdAt)}
                 </span>
                 <StatusBadge status={run.status} />
               </span>
               <strong className="block truncate text-sm font-medium text-zinc-100">{run.title}</strong>
-              <span className="mt-2 block truncate text-xs text-zinc-500">{run.model || run.providerId}</span>
+              <span className="mt-2 block truncate text-xs text-zinc-400">{run.model || run.providerId}</span>
             </a>
           ))}
         </div>
@@ -98,7 +98,7 @@ export function WorkspaceResume() {
           </a>
         </div>
       ) : null}
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
         {error ? (
           <button onClick={load} className="btn-ghost px-0 text-xs">
             <RefreshCw size={13} /> {error} · 重试

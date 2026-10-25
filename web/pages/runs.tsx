@@ -158,7 +158,7 @@ export function RunsPage() {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="text-zinc-500">
+            <thead className="text-zinc-400">
               <tr>
                 {['选择', '实验 / 时间', '服务 / 模型', '状态', '总耗时', '分组', '操作'].map((x) => (
                   <th className="px-3 py-3 font-medium" key={x}>
@@ -189,7 +189,7 @@ export function RunsPage() {
                       {r.starred ? '★ ' : ''}
                       {r.title}
                     </a>
-                    <p className="mt-1 text-zinc-500">{fmtTime(r.createdAt)}</p>
+                    <p className="mt-1 text-zinc-400">{fmtTime(r.createdAt)}</p>
                   </td>
                   <td className="mono px-3 py-3 text-zinc-400">
                     {r.providerId}
@@ -222,7 +222,7 @@ export function RunsPage() {
               ))}
             </tbody>
           </table>
-          <p className="mt-3 text-xs text-zinc-600">
+          <p className="mt-3 text-xs text-zinc-400">
             显示匹配记录 {offset + 1}–{offset + runs.length}。搜索在所有记录中执行，不限当前页。
           </p>
         </div>
@@ -312,7 +312,7 @@ export function RunDetailPage({ id }: { id: string }) {
     >
       <div className="flex flex-wrap items-center gap-3">
         <StatusBadge status={run.status} />
-        <span className="text-xs text-zinc-500 mono">ID {run.id}</span>
+        <span className="text-xs text-zinc-400 mono">ID {run.id}</span>
         {run.parentId && (
           <a className="text-xs text-violet-300" href={`#/runs/${run.parentId}`}>
             来源实验 →

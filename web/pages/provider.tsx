@@ -30,7 +30,7 @@ export function ProviderPage({ id }: { id: string }) {
         </a>
       }
     >
-      <a href="#/explore" className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-violet-300">
+      <a href="#/explore" className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-violet-300">
         ← 返回能力图谱
       </a>
       <section className="card overflow-hidden">
@@ -43,33 +43,33 @@ export function ProviderPage({ id }: { id: string }) {
         </div>
         <dl className="model-matrix-grid grid gap-5 p-5 sm:grid-cols-2 xl:grid-cols-4">
           <div>
-            <dt className="eyebrow text-zinc-500">01 / 模型研发方</dt>
+            <dt className="eyebrow text-zinc-400">01 / 模型研发方</dt>
             <dd className="mt-2 text-sm text-zinc-300">
               {[...new Set(p.models.map((m) => m.developer).filter(Boolean))].join(' / ') || '按各模型目录记录确认'}
-              <p className="mt-1 text-xs text-zinc-500">服务商与研发方可能不同</p>
+              <p className="mt-1 text-xs text-zinc-400">服务商与研发方可能不同</p>
             </dd>
           </div>
           <div>
-            <dt className="eyebrow text-zinc-500">02 / 实际 API 服务商</dt>
+            <dt className="eyebrow text-zinc-400">02 / 实际 API 服务商</dt>
             <dd className="mt-2 text-sm text-zinc-300">
               {p.name}
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs text-zinc-400">
                 {KIND_LABEL[p.kind]} · {ops.length} 个操作适配
               </p>
             </dd>
           </div>
           <div>
-            <dt className="eyebrow text-zinc-500">03 / 端点与模型快照</dt>
+            <dt className="eyebrow text-zinc-400">03 / 端点与模型快照</dt>
             <dd className="mt-2 text-sm text-zinc-300">
               {p.models.length ? `${p.models.length} 个目录模型` : '支持自定义模型 ID'}
-              <p className="mt-1 text-xs text-zinc-500">{p.baseUrls.length} 个端点选项 · 详见下方</p>
+              <p className="mt-1 text-xs text-zinc-400">{p.baseUrls.length} 个端点选项 · 详见下方</p>
             </dd>
           </div>
           <div>
-            <dt className="eyebrow text-zinc-500">04 / 账户与地域</dt>
+            <dt className="eyebrow text-zinc-400">04 / 账户与地域</dt>
             <dd className="mt-2 text-sm text-zinc-300">
               {localConnections.length} 个本机连接
-              <p className="mt-1 text-xs leading-5 text-zinc-500">
+              <p className="mt-1 text-xs leading-5 text-zinc-400">
                 {p.region === 'cn'
                   ? '服务面向中国市场'
                   : p.region === 'global'
@@ -116,11 +116,11 @@ export function ProviderPage({ id }: { id: string }) {
                   {preset.title}
                   <ArrowRight size={14} className="shrink-0 text-violet-300" />
                 </h3>
-                <p className="mt-2 text-xs leading-6 text-zinc-500">{preset.description}</p>
+                <p className="mt-2 text-xs leading-6 text-zinc-400">{preset.description}</p>
               </a>
             ))}
           </div>
-          <p className="text-[11px] text-zinc-500">预设只载入输入与参数，点击运行后才会调用 API。</p>
+          <p className="text-xs text-zinc-400">预设只载入输入与参数，点击运行后才会调用 API。</p>
         </section>
       )}
       <section className="space-y-3">
@@ -133,7 +133,7 @@ export function ProviderPage({ id }: { id: string }) {
       </section>
       <section className="card space-y-4 p-5">
         <h2 className="text-lg font-semibold text-zinc-100">模型与访问条件</h2>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-zinc-400">
           开发方与 API 服务提供方可能不同。目录信息不代表当前账户权限；在连接页查询账户模型列表。
         </p>
         {p.models.length ? (
