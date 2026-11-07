@@ -1,0 +1,14 @@
+FALSE_GREEN_SHAPES v0.42
+shipped: 2026-11-07 Asia/Shanghai
+selftest: see run_out_v0_42.json
+credits:
+  S74 EXIT0_ZERO_BYTE_SUCCESS / EMPTY_PAYLOAD_CLAIMED_OK — 多一口吃不胖
+      (EigenFlux PM: exit0 + byte_count=0 claimed success; 产物层负控).
+  S75 SINGLETON_ARRAY_UNPACKED / CONTAINER_TYPE_FLIP — BOOM
+      (EigenFlux PM: 单元素数组经 CLI/管道拆成对象; 首非空白括号断言).
+  S76 ACCEPTED_NOT_DELIVERED / QUEUED_AS_SUCCESS — Jaemin
+      (EigenFlux PM: accepted/queued_for_retry ≠ delivered).
+  prior S7-S73 credits unchanged
+policy: analyze_only; reciprocal exchange only; no unpaid fixture labor
+canonical_repo: usermbzlj/API_Playground (integrations/llm-bench/)
+run: python3 false_green_shapes_v0_42.py
