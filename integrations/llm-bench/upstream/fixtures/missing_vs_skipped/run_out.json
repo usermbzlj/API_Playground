@@ -1,0 +1,180 @@
+{
+  "credit": [
+    "Grok Bot",
+    "光盘dvd (EigenFlux Agent)"
+  ],
+  "fixture": "MISSING_VS_SKIPPED",
+  "version": "v0_2",
+  "n_cases": 6,
+  "n_pass": 6,
+  "n_fail": 0,
+  "must_fail_shape": "判词 PASSED 即失败形态；非零退出单列 SCRIPT_ERROR，不并入 FAILED",
+  "expected_status_enum": [
+    "PASSED",
+    "FAILED",
+    "KEY_MISSING",
+    "UNDETERMINED",
+    "EMPTY_RESULT",
+    "IN_FLIGHT",
+    "SCRIPT_ERROR"
+  ],
+  "policy": "analyze_only REFERENCE_ONLY fictional_desensitized no_secrets",
+  "results": [
+    {
+      "case_id": "mvs-arm-a-forward-missing",
+      "expect_verdict": {
+        "status": "KEY_MISSING",
+        "missing_keys": [
+          "k3"
+        ],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 1,
+          "skipped_count": 0
+        }
+      },
+      "got": {
+        "status": "KEY_MISSING",
+        "missing_keys": [
+          "k3"
+        ],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 1,
+          "skipped_count": 0
+        }
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-arm-b-reverse-skipped",
+      "expect_verdict": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 1
+        }
+      },
+      "got": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 1
+        },
+        "skipped_entries": [
+          {
+            "key": "k3",
+            "skip_reason": "out_of_scope"
+          }
+        ]
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-arm-c-control-normal",
+      "expect_verdict": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 3,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0
+        }
+      },
+      "got": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 3,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0
+        }
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-negative-skipped-without-reason",
+      "expect_verdict": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 1,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 1
+        }
+      },
+      "got": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 1,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 1
+        },
+        "skipped_entries": [
+          {
+            "key": "k3",
+            "skip_reason": "unspecified"
+          }
+        ]
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-negative-empty-batch",
+      "expect_verdict": {
+        "status": "EMPTY_RESULT",
+        "missing_keys": [],
+        "covered_count": 0,
+        "entry_count": 0,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0
+        }
+      },
+      "got": {
+        "status": "EMPTY_RESULT",
+        "missing_keys": [],
+        "covered_count": 0,
+        "entry_count": 0,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0
+        }
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-must-fail-shape-crash-misjudged-passed",
+      "expect_verdict": {
+        "status": "SCRIPT_ERROR",
+        "exit_code": 2,
+        "accounting": {
+          "missing_count": null,
+          "skipped_count": null
+        }
+      },
+      "got": {
+        "status": "SCRIPT_ERROR",
+        "exit_code": 2,
+        "accounting": {
+          "missing_count": null,
+          "skipped_count": null
+        }
+      },
+      "ok": true
+    }
+  ]
+}
