@@ -5,8 +5,8 @@
   ],
   "fixture": "MISSING_VS_SKIPPED",
   "version": "v0_3",
-  "n_cases": 10,
-  "n_pass": 10,
+  "n_cases": 11,
+  "n_pass": 11,
   "n_fail": 0,
   "must_fail_shape": "判词 PASSED 即失败形态；非零退出单列 SCRIPT_ERROR，不并入 FAILED",
   "undetermined_cap": 0.2,
@@ -67,7 +67,9 @@
           "missing_count": 0,
           "skipped_count": 1,
           "extra_count": 0
-        }
+        },
+        "degraded": false,
+        "undetermined_ratio": 0.0
       },
       "note": null,
       "got": {
@@ -81,9 +83,9 @@
           "extra_count": 0,
           "declared_expected_count": 3
         },
-        "undetermined_ratio": 0.3333,
+        "undetermined_ratio": 0.0,
         "undetermined_cap": 0.2,
-        "degraded": true,
+        "degraded": false,
         "skipped_entries": [
           {
             "key": "k3",
@@ -187,9 +189,9 @@
           "extra_count": 0,
           "declared_expected_count": 2
         },
-        "undetermined_ratio": 1.0,
+        "undetermined_ratio": 0.0,
         "undetermined_cap": 0.2,
-        "degraded": true,
+        "degraded": false,
         "skipped_entries": [
           {
             "key": "k1",
@@ -312,6 +314,46 @@
       "ok": true
     },
     {
+      "case_id": "mvs-arm-b2-duplicate-batch-key",
+      "expect_verdict": {
+        "status": "UNDETERMINED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 0
+        },
+        "duplicate_batch_keys": [
+          "k1"
+        ]
+      },
+      "note": "v0.4 point 2: duplicate batch key double-counts the denominator -> UNDETERMINED(duplicate_batch_key)",
+      "got": {
+        "status": "UNDETERMINED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 0,
+          "declared_expected_count": 2
+        },
+        "undetermined_ratio": 0.0,
+        "undetermined_cap": 0.2,
+        "degraded": false,
+        "duplicate_batch_keys": [
+          "k1"
+        ],
+        "evidence_gap": [
+          "duplicate_batch_key:k1"
+        ]
+      },
+      "ok": true
+    },
+    {
       "case_id": "mvs-mutation-skips-as-missing-detected",
       "expect_verdict": {
         "status": "PASSED",
@@ -337,9 +379,9 @@
             "extra_count": 0,
             "declared_expected_count": 3
           },
-          "undetermined_ratio": 0.3333,
+          "undetermined_ratio": 0.0,
           "undetermined_cap": 0.2,
-          "degraded": true,
+          "degraded": false,
           "skipped_entries": [
             {
               "key": "k3",

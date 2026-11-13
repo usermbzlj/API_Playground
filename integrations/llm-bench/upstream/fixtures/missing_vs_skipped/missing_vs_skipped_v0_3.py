@@ -16,6 +16,13 @@ Structure-only fixture. Failure shapes from EigenFlux PMs:
     3. keys outside the declared batch (e.g. typo k2x) were counted into
        skipped_count -> must be a separate extra_keys arm.
 
+  Grok Bot (third review, two more probes):
+    4. arm B judged PASSED while degraded=true: an explicit SKIPPED entry is a
+       declared classification, not a missing judgment, so it must not enter
+       undetermined_ratio. Ratio is now (declared - covered - missing - skipped).
+    5. a batch listing the same key twice ([k1, k1], declared 2) judged PASSED:
+       duplicates double-count the denominator -> UNDETERMINED(duplicate_batch_key).
+
   PrismLab / API_Playground (PR #5 review) — status enums that fold script
   crashes into FAILED hide the difference between "the check said no" and
   "the check never ran".
@@ -95,6 +102,7 @@ def judge(receipt: dict[str, Any], *, skips_as_missing: bool = False) -> dict[st
     missing: list[str] = []
     extra: list[str] = []
     evidence_gaps: list[str] = []
+    duplicate_batch_keys: list[str] = []
 
     provided_keys: dict[str, Any] = {}
     for entry in receipt.get("provided") or []:
@@ -102,6 +110,13 @@ def judge(receipt: dict[str, Any], *, skips_as_missing: bool = False) -> dict[st
         if key is None:
             continue
         provided_keys[key] = entry
+
+    # v0.4 point 2: a batch that lists the same key twice double-counts the
+    # denominator; the coverage rate is then not trustworthy.
+    seen: dict[str, int] = {}
+    for key in batch:
+        seen[key] = seen.get(key, 0) + 1
+    duplicate_batch_keys = [k for k, n in seen.items() if n > 1]
 
     # probe 3: keys outside the declared batch are extra, never skipped
     for key in provided_keys:
@@ -136,14 +151,21 @@ def judge(receipt: dict[str, Any], *, skips_as_missing: bool = False) -> dict[st
         "declared_expected_count": declared,
     }
 
+    # v0.4 point 1: an explicit SKIPPED entry is a declared classification, not
+    # a missing judgment. Folding it into the undetermined ratio made arm B
+    # report PASSED with degraded=true, which is self-contradictory.
     undetermined_ratio = 0.0
     if entry_count:
         declared_ref = declared if isinstance(declared, int) and declared > entry_count else entry_count
-        undetermined_ratio = (declared_ref - len(covered) - len(missing)) / declared_ref
+        resolved = len(covered) + len(missing) + len(skipped)
+        undetermined_ratio = (declared_ref - resolved) / declared_ref
         undetermined_ratio = round(max(undetermined_ratio, 0.0), 4)
 
     if entry_count == 0:
         status = "EMPTY_RESULT"
+    elif duplicate_batch_keys:
+        evidence_gaps.append("duplicate_batch_key:" + ",".join(duplicate_batch_keys))
+        status = "UNDETERMINED"
     elif evidence_gaps:
         status = "UNDETERMINED"
     elif missing:
@@ -172,6 +194,8 @@ def judge(receipt: dict[str, Any], *, skips_as_missing: bool = False) -> dict[st
         verdict["skipped_entries"] = skipped
     if extra:
         verdict["extra_keys"] = extra
+    if duplicate_batch_keys:
+        verdict["duplicate_batch_keys"] = duplicate_batch_keys
     if evidence_gaps:
         verdict["evidence_gap"] = evidence_gaps
     return verdict
@@ -226,6 +250,8 @@ CASES: list[dict[str, Any]] = [
             "covered_count": 2,
             "entry_count": 3,
             "accounting": {"missing_count": 0, "skipped_count": 1, "extra_count": 0},
+            "degraded": False,
+            "undetermined_ratio": 0.0,
         },
     },
     {
@@ -322,6 +348,23 @@ CASES: list[dict[str, Any]] = [
         "must_fail_note": "PASSED on this input is the failure shape Grok probe 1 found in v0.2",
     },
     {
+        "case_id": "mvs-arm-b2-duplicate-batch-key",
+        "receipt": {
+            "batch": ["k1", "k1"],
+            "provided": ["k1"],
+            "declared_expected_count": 2,
+        },
+        "expected_verdict": {
+            "status": "UNDETERMINED",
+            "missing_keys": [],
+            "covered_count": 2,
+            "entry_count": 2,
+            "accounting": {"missing_count": 0, "skipped_count": 0, "extra_count": 0},
+            "duplicate_batch_keys": ["k1"],
+        },
+        "note": "v0.4 point 2: duplicate batch key double-counts the denominator -> UNDETERMINED(duplicate_batch_key)",
+    },
+    {
         "case_id": "mvs-mutation-skips-as-missing-detected",
         "receipt": {
             "batch": ["k1", "k2", "k3"],
@@ -361,10 +404,13 @@ CASES: list[dict[str, Any]] = [
 
 COMPARED_KEYS = (
     "status",
+    "degraded",
+    "undetermined_ratio",
     "missing_keys",
     "covered_count",
     "entry_count",
     "extra_keys",
+    "duplicate_batch_keys",
     "exit_code",
 )
 
