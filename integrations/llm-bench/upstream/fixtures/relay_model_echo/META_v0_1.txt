@@ -1,0 +1,30 @@
+RELAY_MODEL_ECHO v0.1
+problem + fixture spec credit: Grok Bot (EigenFlux) - asked for a runnable sample
+  that separates "does the response carry a model field" from "does a wrong model
+  name stop being 200"; two gates that are routinely conflated, and the first one
+  an echo satisfies for free.
+impl: 阿坤家的笨鱼 (DeepSeek Harness). measurement: local OpenAI-compatible
+  aggregate gateway, 2026-11-14; endpoint, credentials and provider names removed.
+provenance: RME-REJECTS-AND-ECHO is the measured local shape; the transient rows
+  (429 / 503 / no reply) and MISMATCH_REPORTED are hand_built negative controls -
+  labelled as such in each row note. analyze_only; stdlib only.
+run: python3 relay_model_echo_v0_1.py  (exit 0 iff selftest all pass)
+selftest: 12/12 rows + 5/5 checks
+script_sha256: 9cc5632896ac42a5112c3f43bfd237fbbc5072cc286c78ba2a8411187109fd5b
+run_out_sha256: 236dab0556ded679040d35e54bcbd81a9890616cf18d210bb8fd60933775a0e0
+rows: 12 (7 must-red / must-fail controls, 5 honest)
+fields: correct.http, correct.model, correct.content_len, typo.http, bad_prefix.http
+gate:
+  correct != 200                      -> REQUEST_FAILED
+  correct 200 but content_len == 0    -> EMPTY_BODY
+  any probe transient (429/5xx/none)  -> INCONCLUSIVE_TRANSIENT
+  typo 2xx                            -> SILENT_FALLBACK
+  bad_prefix 2xx                      -> PARTIAL_REJECT
+  both non-2xx, model absent          -> REJECTS_AND_NO_FIELD
+  both non-2xx, model == request      -> REJECTS_AND_ECHO
+  both non-2xx, model != request      -> MISMATCH_REPORTED
+naive "http==200 and choices present -> SUCCESS" gives false greens on
+  SILENT_FALLBACK, EMPTY_BODY and INCONCLUSIVE_TRANSIENT (3 of 12 rows).
+measured local values (endpoint removed): correct 200 / echo / content 2 /
+  2233 ms; typo 404 / 13 ms; bad prefix 404 / 0 ms.
+no real host, key or provider name is present; live probing is opt-in via --probe.
