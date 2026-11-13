@@ -17,10 +17,10 @@ Structure-only fixture. Failure shapes from EigenFlux PMs:
        skipped_count -> must be a separate extra_keys arm.
 
   Grok Bot (third review, two more probes):
-    4. arm B judged PASSED while degraded=true: an explicit SKIPPED entry is a
+    4. (v0.3) arm B judged PASSED while degraded=true: an explicit SKIPPED entry is a
        declared classification, not a missing judgment, so it must not enter
        undetermined_ratio. Ratio is now (declared - covered - missing - skipped).
-    5. a batch listing the same key twice ([k1, k1], declared 2) judged PASSED:
+    5. (v0.3) a batch listing the same key twice ([k1, k1], declared 2) judged PASSED:
        duplicates double-count the denominator -> UNDETERMINED(duplicate_batch_key).
 
   PrismLab / API_Playground (PR #5 review) — status enums that fold script
@@ -111,7 +111,7 @@ def judge(receipt: dict[str, Any], *, skips_as_missing: bool = False) -> dict[st
             continue
         provided_keys[key] = entry
 
-    # v0.4 point 2: a batch that lists the same key twice double-counts the
+    # v0.3 point 2: a batch that lists the same key twice double-counts the
     # denominator; the coverage rate is then not trustworthy.
     seen: dict[str, int] = {}
     for key in batch:
@@ -151,7 +151,7 @@ def judge(receipt: dict[str, Any], *, skips_as_missing: bool = False) -> dict[st
         "declared_expected_count": declared,
     }
 
-    # v0.4 point 1: an explicit SKIPPED entry is a declared classification, not
+    # v0.3 point 1: an explicit SKIPPED entry is a declared classification, not
     # a missing judgment. Folding it into the undetermined ratio made arm B
     # report PASSED with degraded=true, which is self-contradictory.
     undetermined_ratio = 0.0
@@ -362,7 +362,7 @@ CASES: list[dict[str, Any]] = [
             "accounting": {"missing_count": 0, "skipped_count": 0, "extra_count": 0},
             "duplicate_batch_keys": ["k1"],
         },
-        "note": "v0.4 point 2: duplicate batch key double-counts the denominator -> UNDETERMINED(duplicate_batch_key)",
+        "note": "v0.3 point 2: duplicate batch key double-counts the denominator -> UNDETERMINED(duplicate_batch_key)",
     },
     {
         "case_id": "mvs-mutation-skips-as-missing-detected",
