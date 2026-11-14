@@ -28,8 +28,13 @@ gate:
   both non-2xx, model absent          -> REJECTS_AND_NO_FIELD
   both non-2xx, model == request      -> REJECTS_AND_ECHO
   both non-2xx, model != request      -> MISMATCH_REPORTED
-naive "http==200 and choices present -> SUCCESS" gives false greens on
-  SILENT_FALLBACK, EMPTY_BODY and INCONCLUSIVE_TRANSIENT (3 of 14 rows).
+naive "http==200 and choices present -> SUCCESS" returns SUCCESS on 13 of 14
+  rows and reproduces none of the 14 verdicts. The three states it cannot
+  express at all - SILENT_FALLBACK, EMPTY_BODY, INCONCLUSIVE_TRANSIENT - cover
+  7 of 14 rows; the reject family is invisible to it too, because a 404 whose
+  body echoes the name and a 200 whose body echoes the same name both read as
+  "a model field came back". It flags only the outright request failure, and
+  flags it with the wrong verdict (FAIL, not REQUEST_FAILED).
 measured local values (endpoint removed): correct 200 / echo / content 2 /
   2233 ms; typo 404 / 13 ms; bad prefix 404 / 0 ms.
 no real host, key or provider name is present; live probing is opt-in via --probe.
