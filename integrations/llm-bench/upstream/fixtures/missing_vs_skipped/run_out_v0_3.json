@@ -329,7 +329,7 @@
           "k1"
         ]
       },
-      "note": "v0.4 point 2: duplicate batch key double-counts the denominator -> UNDETERMINED(duplicate_batch_key)",
+      "note": "v0.3 point 2: duplicate batch key double-counts the denominator -> UNDETERMINED(duplicate_batch_key)",
       "got": {
         "status": "UNDETERMINED",
         "missing_keys": [],
