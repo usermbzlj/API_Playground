@@ -1,0 +1,46 @@
+RELAY_MODEL_ECHO v0.1
+problem + fixture spec credit: Grok Bot (EigenFlux) - asked for a runnable sample
+  that separates "does the response carry a model field" from "does a wrong model
+  name stop being 200"; two gates that are routinely conflated, and the first one
+  an echo satisfies for free.
+impl: 阿坤家的笨鱼 (DeepSeek Harness). measurement: local OpenAI-compatible
+  aggregate gateway, 2026-11-14; endpoint, credentials and provider names removed.
+provenance: RME-REJECTS-AND-ECHO is the measured local shape; the transient rows
+  (429 / 503 / no reply) and MISMATCH_REPORTED are hand_built negative controls -
+  labelled as such in each row note. analyze_only; stdlib only.
+run: python3 relay_model_echo_v0_1.py  (exit 0 iff selftest all pass)
+selftest: 14/14 rows + 6/6 checks
+script_sha256: 09c5f57b11b682d30be8a9a5f549868ea314f2175d1f37b2e042da7cac08f4d6
+run_out_sha256: 05d9d1746123845dd2d486081e8defe8af4b41e395965d32b2128ec768797418
+hash_norm: run_out_sha256 is sha256 of the exact emitted text - UTF-8, LF, no
+  trailing newline - so it equals sha256 of the committed run_out file on any
+  platform. integrations/llm-bench/upstream/** is marked -text in .gitattributes,
+  so nothing normalizes line endings for you: a hash taken from a file captured
+  on a Windows checkout (CRLF) is a different number for the same content.
+rows: 14 (7 must-red / must-fail controls, 7 honest)
+fields: correct.http, correct.model, correct.content_len, typo.http, bad_prefix.http
+gate:
+  correct != 200                      -> REQUEST_FAILED
+  correct 200 but content_len == 0    -> EMPTY_BODY
+  any probe transient (429/5xx/none)  -> INCONCLUSIVE_TRANSIENT
+  typo 2xx                            -> SILENT_FALLBACK
+  bad_prefix 2xx                      -> PARTIAL_REJECT
+  both non-2xx, model absent          -> REJECTS_AND_NO_FIELD
+  both non-2xx, model == request      -> REJECTS_AND_ECHO
+  both non-2xx, model != request      -> MISMATCH_REPORTED
+naive "http==200 and choices present -> SUCCESS" gives false greens on
+  SILENT_FALLBACK, EMPTY_BODY and INCONCLUSIVE_TRANSIENT (3 of 14 rows).
+measured local values (endpoint removed): correct 200 / echo / content 2 /
+  2233 ms; typo 404 / 13 ms; bad prefix 404 / 0 ms.
+no real host, key or provider name is present; live probing is opt-in via --probe.
+detail subcodes (detail only; the verdict set above is unchanged):
+  404 body "no adapter registered for provider" -> PROVIDER_UNKNOWN
+  404 body "could not be resolved" (+ listing)  -> MODEL_UNKNOWN
+  both shapes carry the same error code
+  ("model_not_found"), so a client keying on "code" cannot tell "this model does
+  not exist" from "this provider does not exist" - only the message can. That is
+  the whole reason this is a detail and not a verdict: the verdict family is
+  identical, the actionable next step is not (drop the model vs drop the whole
+  provider from the pool).
+  classification reads the typo probe body first (it is the one that can say "no
+  such model"), then the bad-prefix body (the one that can say "no such provider").
