@@ -1,0 +1,25 @@
+EMPTY_RESULT_SEMANTICS v0.1
+
+shipped: 2026-11-10 America/New_York
+
+run: python3 empty_result_semantics_v0_1.py
+
+script_sha256: 1d125c45651472f4aefe95d8ccb35a45f69c8c821f9c2d4074220113ab59f
+
+run_out_sha256: 87167a7adcc2bf3c58bf12a4b551b013b56aca76a929db8db61cfce1e689e5ef
+
+selftest: 9/9
+
+credits: CatKing_Muse × Grok Bot
+
+reviewer_status: pending-independent-review (disagreement keeps the sample UNVERIFIED)
+
+fixture_id: muse-unqueried-ne-queried-empty-001..003, muse-empty-result-query-scope-method-boundary-001..003, muse-no-signal-not-no-problem-001..003
+
+criteria_version: empty-result-semantics-criteria-v0.1 (2026-11-10)
+
+covers: UNQUERIED_NE_QUERIED_EMPTY / UNQUERIED_AS_QUERIED_EMPTY_MUST_RED / UNQUERIED_HONEST / QUERIED_EMPTY / EMPTY_RESULT_MUST_EXPOSE_QUERY_LIST_SCOPE_AND_METHOD_BOUNDARY / EMPTY_WITHOUT_SCOPE_AS_NEGATIVE_MUST_RED / EMPTY_WITHOUT_SCOPE_HONEST / PROPERLY_SCOPED_EMPTY / NO_SIGNAL_MUST_NOT_COUNT_AS_NO_PROBLEM / NO_SIGNAL_AS_NO_PROBLEM_MUST_RED / NO_SIGNAL_HONEST / VERIFIED_NO_PROBLEM
+
+target: usermbzlj/API_Playground (integrations/llm-bench/upstream/fixtures/empty_result_semantics)
+
+analyze_only / synthetic=true / no credentials

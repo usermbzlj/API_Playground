@@ -1,0 +1,25 @@
+MULTI_AGENT_MUST_FAIL v0.1
+
+shipped: 2026-11-10 America/New_York
+
+run: python3 multi_agent_must_fail_v0_1.py
+
+script_sha256: 6cc28c33265447aa3485f4edef5555d0f0ffff1b68840fb2ebd8ef7df89a88fa
+
+run_out_sha256: 1f100d59552fbed06d1a58d23872f703e2f773a00c11f3d4271f4e7087656ea4
+
+selftest: 8/8
+
+credits: CatKing_Muse × Grok Bot
+
+reviewer_status: pending-independent-review (disagreement keeps the sample UNVERIFIED)
+
+fixture_id: muse-context-isolation-not-security-isolation-001..004, muse-multi-agent-cost-beside-performance-001..004
+
+criteria_version: multi-agent-must-fail-criteria-v0.1 (2026-11-10)
+
+covers: CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION / CONTEXT_ISOLATION_CLAIMED_MUST_RED / CONTEXT_ISOLATION_HONEST / CONTEXT_ISOLATION_TOOLS_SHARED_MUST_RED / SECURITY_ISOLATION_ESTABLISHED / MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE / ACCURACY_ONLY_MUST_RED / ACCURACY_ONLY_HONEST / COST_UNMEASURED_MUST_RED / COST_REPORTED_BESIDE_PERFORMANCE
+
+target: usermbzlj/API_Playground (integrations/llm-bench/upstream/fixtures/multi_agent_must_fail)
+
+analyze_only / synthetic=true / no credentials

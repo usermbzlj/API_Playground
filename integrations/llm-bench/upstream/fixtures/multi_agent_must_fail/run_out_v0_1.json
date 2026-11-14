@@ -1,0 +1,175 @@
+{
+  "all_match": true,
+  "credits": [
+    "CatKing_Muse × Grok Bot"
+  ],
+  "criteria_version": "multi-agent-must-fail-criteria-v0.1 (2026-11-10)",
+  "n": 8,
+  "n_match": 8,
+  "reviewer_status": "pending-independent-review",
+  "rows": [
+    {
+      "case_id": "MUSE-CONTEXT-ISOLATION-CLAIMED-MUST-RED",
+      "control_arm": "MUSE-CONTEXT-ISOLATION-HONEST",
+      "expect": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION",
+      "fixture_id": "muse-context-isolation-not-security-isolation-001",
+      "got": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION",
+      "got_judge": "FAIL",
+      "judge": {
+        "detail": {
+          "hot_probes": [
+            "context_isolated_but_credentials_shared"
+          ],
+          "missed": [
+            "context_isolated_but_credentials_shared"
+          ]
+        },
+        "judge": "FAIL",
+        "reason_code": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION"
+      },
+      "match": true,
+      "should_get": "FAIL"
+    },
+    {
+      "case_id": "MUSE-CONTEXT-ISOLATION-HONEST",
+      "control_arm": "MUSE-CONTEXT-ISOLATION-HONEST",
+      "expect": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION",
+      "fixture_id": "muse-context-isolation-not-security-isolation-002",
+      "got": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "honest": true,
+          "hot_probes": [
+            "context_isolated_but_credentials_shared"
+          ]
+        },
+        "judge": "PASS",
+        "reason_code": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION"
+      },
+      "match": true,
+      "should_get": "PASS"
+    },
+    {
+      "case_id": "MUSE-CONTEXT-ISOLATION-TOOLS-SHARED-MUST-RED",
+      "control_arm": "MUSE-SECURITY-ISOLATION-ESTABLISHED",
+      "expect": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION",
+      "fixture_id": "muse-context-isolation-not-security-isolation-003",
+      "got": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION",
+      "got_judge": "FAIL",
+      "judge": {
+        "detail": {
+          "hot_probes": [
+            "context_isolated_but_tools_shared"
+          ],
+          "missed": [
+            "context_isolated_but_tools_shared"
+          ]
+        },
+        "judge": "FAIL",
+        "reason_code": "CONTEXT_ISOLATION_MUST_NOT_COUNT_AS_SECURITY_ISOLATION"
+      },
+      "match": true,
+      "should_get": "FAIL"
+    },
+    {
+      "case_id": "MUSE-SECURITY-ISOLATION-ESTABLISHED",
+      "control_arm": "MUSE-SECURITY-ISOLATION-ESTABLISHED",
+      "expect": "SECURITY_ISOLATION_ESTABLISHED",
+      "fixture_id": "muse-context-isolation-not-security-isolation-004",
+      "got": "SECURITY_ISOLATION_ESTABLISHED",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "clean": true
+        },
+        "judge": "PASS",
+        "reason_code": "SECURITY_ISOLATION_ESTABLISHED"
+      },
+      "match": true,
+      "should_get": "PASS"
+    },
+    {
+      "case_id": "MUSE-ACCURACY-ONLY-MUST-RED",
+      "control_arm": "MUSE-ACCURACY-ONLY-HONEST",
+      "expect": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE",
+      "fixture_id": "muse-multi-agent-cost-beside-performance-001",
+      "got": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE",
+      "got_judge": "FAIL",
+      "judge": {
+        "detail": {
+          "hot_probes": [
+            "accuracy_reported_cost_missing"
+          ],
+          "missed": [
+            "accuracy_reported_cost_missing"
+          ]
+        },
+        "judge": "FAIL",
+        "reason_code": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE"
+      },
+      "match": true,
+      "should_get": "FAIL"
+    },
+    {
+      "case_id": "MUSE-ACCURACY-ONLY-HONEST",
+      "control_arm": "MUSE-ACCURACY-ONLY-HONEST",
+      "expect": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE",
+      "fixture_id": "muse-multi-agent-cost-beside-performance-002",
+      "got": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "honest": true,
+          "hot_probes": [
+            "accuracy_reported_cost_missing"
+          ]
+        },
+        "judge": "PASS",
+        "reason_code": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE"
+      },
+      "match": true,
+      "should_get": "PASS"
+    },
+    {
+      "case_id": "MUSE-COST-UNMEASURED-MUST-RED",
+      "control_arm": "MUSE-COST-REPORTED-BESIDE-PERFORMANCE",
+      "expect": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE",
+      "fixture_id": "muse-multi-agent-cost-beside-performance-003",
+      "got": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE",
+      "got_judge": "FAIL",
+      "judge": {
+        "detail": {
+          "hot_probes": [
+            "cost_reported_without_measurement"
+          ],
+          "missed": [
+            "cost_reported_without_measurement"
+          ]
+        },
+        "judge": "FAIL",
+        "reason_code": "MULTI_AGENT_COST_MUST_BE_REPORTED_BESIDE_PERFORMANCE"
+      },
+      "match": true,
+      "should_get": "FAIL"
+    },
+    {
+      "case_id": "MUSE-COST-REPORTED-BESIDE-PERFORMANCE",
+      "control_arm": "MUSE-COST-REPORTED-BESIDE-PERFORMANCE",
+      "expect": "COST_REPORTED_BESIDE_PERFORMANCE",
+      "fixture_id": "muse-multi-agent-cost-beside-performance-004",
+      "got": "COST_REPORTED_BESIDE_PERFORMANCE",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "clean": true
+        },
+        "judge": "PASS",
+        "reason_code": "COST_REPORTED_BESIDE_PERFORMANCE"
+      },
+      "match": true,
+      "should_get": "PASS"
+    }
+  ],
+  "version": "MULTI_AGENT_MUST_FAIL/v0.1"
+}

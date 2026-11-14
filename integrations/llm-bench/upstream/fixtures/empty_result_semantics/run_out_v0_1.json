@@ -1,0 +1,190 @@
+{
+  "all_match": true,
+  "credits": [
+    "CatKing_Muse × Grok Bot"
+  ],
+  "criteria_version": "empty-result-semantics-criteria-v0.1 (2026-11-10)",
+  "n": 9,
+  "n_match": 9,
+  "reviewer_status": "pending-independent-review",
+  "rows": [
+    {
+      "case_id": "MUSE-UNQUERIED-AS-QUERIED-EMPTY-MUST-RED",
+      "control_arm": "MUSE-UNQUERIED-HONEST",
+      "expect": "UNQUERIED_NE_QUERIED_EMPTY",
+      "fixture_id": "muse-unqueried-ne-queried-empty-001",
+      "got": "UNQUERIED_NE_QUERIED_EMPTY",
+      "got_judge": "FAIL",
+      "judge": {
+        "detail": {
+          "hot_probes": [
+            "unqueried_recorded_as_queried_empty"
+          ],
+          "missed": [
+            "unqueried_recorded_as_queried_empty"
+          ]
+        },
+        "judge": "FAIL",
+        "reason_code": "UNQUERIED_NE_QUERIED_EMPTY"
+      },
+      "match": true,
+      "should_get": "FAIL"
+    },
+    {
+      "case_id": "MUSE-UNQUERIED-HONEST",
+      "control_arm": "MUSE-UNQUERIED-HONEST",
+      "expect": "UNQUERIED_NE_QUERIED_EMPTY",
+      "fixture_id": "muse-unqueried-ne-queried-empty-002",
+      "got": "UNQUERIED_NE_QUERIED_EMPTY",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "honest": true,
+          "hot_probes": [
+            "unqueried_recorded_as_queried_empty"
+          ]
+        },
+        "judge": "PASS",
+        "reason_code": "UNQUERIED_NE_QUERIED_EMPTY"
+      },
+      "match": true,
+      "should_get": "PASS"
+    },
+    {
+      "case_id": "MUSE-QUERIED-EMPTY",
+      "control_arm": "MUSE-QUERIED-EMPTY",
+      "expect": "QUERIED_EMPTY",
+      "fixture_id": "muse-unqueried-ne-queried-empty-003",
+      "got": "QUERIED_EMPTY",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "clean": true
+        },
+        "judge": "PASS",
+        "reason_code": "QUERIED_EMPTY"
+      },
+      "match": true,
+      "should_get": "PASS"
+    },
+    {
+      "case_id": "MUSE-EMPTY-WITHOUT-SCOPE-AS-NEGATIVE-MUST-RED",
+      "control_arm": "MUSE-EMPTY-WITHOUT-SCOPE-HONEST",
+      "expect": "EMPTY_RESULT_MUST_EXPOSE_QUERY_LIST_SCOPE_AND_METHOD_BOUNDARY",
+      "fixture_id": "muse-empty-result-query-scope-method-boundary-001",
+      "got": "EMPTY_RESULT_MUST_EXPOSE_QUERY_LIST_SCOPE_AND_METHOD_BOUNDARY",
+      "got_judge": "FAIL",
+      "judge": {
+        "detail": {
+          "hot_probes": [
+            "empty_without_query_scope"
+          ],
+          "missed": [
+            "empty_without_query_scope"
+          ]
+        },
+        "judge": "FAIL",
+        "reason_code": "EMPTY_RESULT_MUST_EXPOSE_QUERY_LIST_SCOPE_AND_METHOD_BOUNDARY"
+      },
+      "match": true,
+      "should_get": "FAIL"
+    },
+    {
+      "case_id": "MUSE-EMPTY-WITHOUT-SCOPE-HONEST",
+      "control_arm": "MUSE-EMPTY-WITHOUT-SCOPE-HONEST",
+      "expect": "EMPTY_RESULT_MUST_EXPOSE_QUERY_LIST_SCOPE_AND_METHOD_BOUNDARY",
+      "fixture_id": "muse-empty-result-query-scope-method-boundary-002",
+      "got": "EMPTY_RESULT_MUST_EXPOSE_QUERY_LIST_SCOPE_AND_METHOD_BOUNDARY",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "honest": true,
+          "hot_probes": [
+            "empty_without_query_scope"
+          ]
+        },
+        "judge": "PASS",
+        "reason_code": "EMPTY_RESULT_MUST_EXPOSE_QUERY_LIST_SCOPE_AND_METHOD_BOUNDARY"
+      },
+      "match": true,
+      "should_get": "PASS"
+    },
+    {
+      "case_id": "MUSE-PROPERLY-SCOPED-EMPTY",
+      "control_arm": "MUSE-PROPERLY-SCOPED-EMPTY",
+      "expect": "PROPERLY_SCOPED_EMPTY",
+      "fixture_id": "muse-empty-result-query-scope-method-boundary-003",
+      "got": "PROPERLY_SCOPED_EMPTY",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "clean": true
+        },
+        "judge": "PASS",
+        "reason_code": "PROPERLY_SCOPED_EMPTY"
+      },
+      "match": true,
+      "should_get": "PASS"
+    },
+    {
+      "case_id": "MUSE-NO-SIGNAL-AS-NO-PROBLEM-MUST-RED",
+      "control_arm": "MUSE-NO-SIGNAL-HONEST",
+      "expect": "NO_SIGNAL_MUST_NOT_COUNT_AS_NO_PROBLEM",
+      "fixture_id": "muse-no-signal-not-no-problem-001",
+      "got": "NO_SIGNAL_MUST_NOT_COUNT_AS_NO_PROBLEM",
+      "got_judge": "FAIL",
+      "judge": {
+        "detail": {
+          "hot_probes": [
+            "no_signal_recorded_as_no_problem"
+          ],
+          "missed": [
+            "no_signal_recorded_as_no_problem"
+          ]
+        },
+        "judge": "FAIL",
+        "reason_code": "NO_SIGNAL_MUST_NOT_COUNT_AS_NO_PROBLEM"
+      },
+      "match": true,
+      "should_get": "FAIL"
+    },
+    {
+      "case_id": "MUSE-NO-SIGNAL-HONEST",
+      "control_arm": "MUSE-NO-SIGNAL-HONEST",
+      "expect": "NO_SIGNAL_MUST_NOT_COUNT_AS_NO_PROBLEM",
+      "fixture_id": "muse-no-signal-not-no-problem-002",
+      "got": "NO_SIGNAL_MUST_NOT_COUNT_AS_NO_PROBLEM",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "honest": true,
+          "hot_probes": [
+            "no_signal_recorded_as_no_problem"
+          ]
+        },
+        "judge": "PASS",
+        "reason_code": "NO_SIGNAL_MUST_NOT_COUNT_AS_NO_PROBLEM"
+      },
+      "match": true,
+      "should_get": "PASS"
+    },
+    {
+      "case_id": "MUSE-VERIFIED-NO-PROBLEM",
+      "control_arm": "MUSE-VERIFIED-NO-PROBLEM",
+      "expect": "VERIFIED_NO_PROBLEM",
+      "fixture_id": "muse-no-signal-not-no-problem-003",
+      "got": "VERIFIED_NO_PROBLEM",
+      "got_judge": "PASS",
+      "judge": {
+        "detail": {
+          "clean": true
+        },
+        "judge": "PASS",
+        "reason_code": "VERIFIED_NO_PROBLEM"
+      },
+      "match": true,
+      "should_get": "PASS"
+    }
+  ],
+  "version": "EMPTY_RESULT_SEMANTICS/v0.1"
+}
