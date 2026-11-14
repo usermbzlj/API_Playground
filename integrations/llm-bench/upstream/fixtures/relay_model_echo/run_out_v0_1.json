@@ -20,16 +20,21 @@
     {
       "name": "silent fallback never a pass",
       "ok": true
+    },
+    {
+      "name": "detail subcodes separate model-unknown from provider-unknown",
+      "ok": true
     }
   ],
   "fixture": "relay_model_echo",
-  "n": 12,
-  "n_checks": 5,
-  "n_checks_ok": 5,
-  "n_match": 12,
+  "n": 14,
+  "n_checks": 6,
+  "n_checks_ok": 6,
+  "n_match": 14,
   "rows": [
     {
       "case_id": "RME-SILENT-FALLBACK-MUST-RED",
+      "detail_code": null,
       "expect": "SILENT_FALLBACK",
       "got": "SILENT_FALLBACK",
       "match": true,
@@ -39,6 +44,7 @@
     },
     {
       "case_id": "RME-EMPTY-BODY-MUST-RED",
+      "detail_code": null,
       "expect": "EMPTY_BODY",
       "got": "EMPTY_BODY",
       "match": true,
@@ -48,6 +54,7 @@
     },
     {
       "case_id": "RME-TYPO-429-NOT-A-REJECTION-MUST-RED",
+      "detail_code": null,
       "expect": "INCONCLUSIVE_TRANSIENT",
       "got": "INCONCLUSIVE_TRANSIENT",
       "match": true,
@@ -57,6 +64,7 @@
     },
     {
       "case_id": "RME-TYPO-503-MUST-RED",
+      "detail_code": null,
       "expect": "INCONCLUSIVE_TRANSIENT",
       "got": "INCONCLUSIVE_TRANSIENT",
       "match": true,
@@ -66,6 +74,7 @@
     },
     {
       "case_id": "RME-TYPO-NO-REPLY-MUST-RED",
+      "detail_code": null,
       "expect": "INCONCLUSIVE_TRANSIENT",
       "got": "INCONCLUSIVE_TRANSIENT",
       "match": true,
@@ -75,6 +84,7 @@
     },
     {
       "case_id": "RME-REJECTS-AND-ECHO-HONEST",
+      "detail_code": null,
       "expect": "REJECTS_AND_ECHO",
       "got": "REJECTS_AND_ECHO",
       "match": true,
@@ -84,6 +94,7 @@
     },
     {
       "case_id": "RME-REJECTS-NO-FIELD",
+      "detail_code": null,
       "expect": "REJECTS_AND_NO_FIELD",
       "got": "REJECTS_AND_NO_FIELD",
       "match": true,
@@ -93,6 +104,7 @@
     },
     {
       "case_id": "RME-MISMATCH-REPORTED",
+      "detail_code": null,
       "expect": "MISMATCH_REPORTED",
       "got": "MISMATCH_REPORTED",
       "match": true,
@@ -102,6 +114,7 @@
     },
     {
       "case_id": "RME-PARTIAL-REJECT",
+      "detail_code": null,
       "expect": "PARTIAL_REJECT",
       "got": "PARTIAL_REJECT",
       "match": true,
@@ -111,6 +124,7 @@
     },
     {
       "case_id": "RME-REQUEST-FAILED",
+      "detail_code": null,
       "expect": "REQUEST_FAILED",
       "got": "REQUEST_FAILED",
       "match": true,
@@ -120,6 +134,7 @@
     },
     {
       "case_id": "RME-EMPTY-BEFORE-TRANSIENT",
+      "detail_code": null,
       "expect": "EMPTY_BODY",
       "got": "EMPTY_BODY",
       "match": true,
@@ -129,12 +144,33 @@
     },
     {
       "case_id": "RME-SILENT-FALLBACK-BEATS-ECHO",
+      "detail_code": null,
       "expect": "SILENT_FALLBACK",
       "got": "SILENT_FALLBACK",
       "match": true,
       "naive": "SUCCESS",
       "naive_false_green": true,
       "note": "fallback outranks field state: the field would look fine either way"
+    },
+    {
+      "case_id": "RME-DETAIL-MODEL-UNKNOWN",
+      "detail_code": "MODEL_UNKNOWN",
+      "expect": "REJECTS_AND_ECHO",
+      "got": "REJECTS_AND_ECHO",
+      "match": true,
+      "naive": "SUCCESS",
+      "naive_false_green": false,
+      "note": "measured 404 body: unknown model name, body lists what is available; body excerpt, model list truncated with an ellipsis"
+    },
+    {
+      "case_id": "RME-DETAIL-PROVIDER-UNKNOWN",
+      "detail_code": "PROVIDER_UNKNOWN",
+      "expect": "REJECTS_AND_ECHO",
+      "got": "REJECTS_AND_ECHO",
+      "match": true,
+      "naive": "SUCCESS",
+      "naive_false_green": false,
+      "note": "measured 404 body: no adapter for the provider. Same error code as the row above - only the message separates the two"
     }
   ],
   "version": "0.1"

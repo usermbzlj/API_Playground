@@ -20,6 +20,11 @@ Measured shapes on the local gateway (endpoint and credentials removed):
   one char wrong -> 404, body lists the provider's available model names
   bad prefix     -> 404, "no adapter registered for provider"
 
+Both 404 shapes carry the SAME error code ("model_not_found"); only the message
+separates them. So the distinction is emitted as a detail subcode
+(MODEL_UNKNOWN / PROVIDER_UNKNOWN) and the verdict set is untouched - a client
+that reads "code" alone will merge "drop this model" with "drop this provider".
+
 Third trap, and the reason this fixture exists in its current shape:
   a transient status (429 / 5xx / no response) is NOT a rejection.
   Reading 429 as "the gateway rejected the wrong name" turns an unknown into a
@@ -45,6 +50,26 @@ import json
 import sys
 
 TRANSIENT = {408, 425, 429, 500, 502, 503, 504}
+
+# Detail subcodes for the two 404 shapes this gateway actually emits. Both carry
+# the SAME error code ("model_not_found"), so a client keying on "code" cannot
+# tell "this model does not exist" from "this provider does not exist" - only the
+# message can. That is why this is a detail and not a verdict: the verdict family
+# is identical, the actionable next step is not.
+REJECT_SHAPES = (
+    ("no adapter registered for provider", "PROVIDER_UNKNOWN"),
+    ("could not be resolved", "MODEL_UNKNOWN"),
+)
+
+
+def _reject_shape(body):
+    if not body:
+        return None
+    low = body.lower()
+    for needle, code in REJECT_SHAPES:
+        if needle in low:
+            return code
+    return None
 
 
 def _probe(rec, name):
@@ -84,11 +109,14 @@ def judge(rec):
     if prefix_ok:
         return {"verdict": "PARTIAL_REJECT", "detail": "bad prefix not rejected while wrong name was"}
     resp_model = ok.get("model")
+    # The typo probe names the model, so its body is the one that says "no such
+    # model". The bad-prefix probe is the one that can say "no such provider".
+    shape = _reject_shape(_probe(rec, "typo").get("body")) or _reject_shape(_probe(rec, "bad_prefix").get("body"))
     if not resp_model:
-        return {"verdict": "REJECTS_AND_NO_FIELD", "detail": "wrong name rejected; no model field to trust"}
+        return {"verdict": "REJECTS_AND_NO_FIELD", "detail": "wrong name rejected; no model field to trust", "detail_code": shape}
     if resp_model == requested:
-        return {"verdict": "REJECTS_AND_ECHO", "detail": "wrong name rejected; model field is an echo"}
-    return {"verdict": "MISMATCH_REPORTED", "detail": "wrong name rejected; model field differs from request"}
+        return {"verdict": "REJECTS_AND_ECHO", "detail": "wrong name rejected; model field is an echo", "detail_code": shape}
+    return {"verdict": "MISMATCH_REPORTED", "detail": "wrong name rejected; model field differs from request", "detail_code": shape}
 
 
 def naive(rec):
@@ -96,7 +124,8 @@ def naive(rec):
     return "SUCCESS" if ok.get("http") == 200 and ok.get("has_choices") else "FAIL"
 
 
-def _rec(requested, ok_http, ok_model, ok_len, typo_http, prefix_http, finish="stop", has_choices=True):
+def _rec(requested, ok_http, ok_model, ok_len, typo_http, prefix_http, finish="stop", has_choices=True,
+         typo_body=None, prefix_body=None):
     return {
         "requested_model": requested,
         "correct": {
@@ -106,8 +135,8 @@ def _rec(requested, ok_http, ok_model, ok_len, typo_http, prefix_http, finish="s
             "finish_reason": finish,
             "has_choices": has_choices,
         },
-        "typo": {"http": typo_http},
-        "bad_prefix": {"http": prefix_http},
+        "typo": {"http": typo_http, "body": typo_body},
+        "bad_prefix": {"http": prefix_http, "body": prefix_body},
     }
 
 
@@ -180,6 +209,36 @@ ROWS = [
         "rec": _rec("m/x", 200, "m/x", 2, 200, 200),
         "expect": "SILENT_FALLBACK",
     },
+    {
+        "case_id": "RME-DETAIL-MODEL-UNKNOWN",
+        "note": "measured 404 body: unknown model name, body lists what is available; body excerpt, model list truncated with an ellipsis",
+        "rec": _rec(
+            "aggregate/glm-5-3-flash",
+            200,
+            "aggregate/glm-5-3-flash",
+            2,
+            404,
+            404,
+            typo_body='{"error": {"message": "model aggregate/glm-5-3-flas could not be resolved: aggregate: 未知模型「glm-5-3-flas」。当前可用：auto、deepseek-flash、deepseek-v4-1-flash、…", "type": "invalid_request_error", "code": "model_not_found"}}',
+        ),
+        "expect": "REJECTS_AND_ECHO",
+        "expect_detail": "MODEL_UNKNOWN",
+    },
+    {
+        "case_id": "RME-DETAIL-PROVIDER-UNKNOWN",
+        "note": "measured 404 body: no adapter for the provider. Same error code as the row above - only the message separates the two",
+        "rec": _rec(
+            "aggregate/deepseek-flash",
+            200,
+            "aggregate/deepseek-flash",
+            2,
+            404,
+            404,
+            prefix_body='{"error": {"message": "model nosuchvendor/model-x could not be resolved: no adapter registered for provider \"nosuchvendor\"", "type": "invalid_request_error", "code": "model_not_found"}}',
+        ),
+        "expect": "REJECTS_AND_ECHO",
+        "expect_detail": "PROVIDER_UNKNOWN",
+    },
 ]
 
 
@@ -196,6 +255,7 @@ def selftest():
                 "expect": row["expect"],
                 "got": got,
                 "naive": naive_v,
+                "detail_code": judge(row["rec"]).get("detail_code"),
                 "match": got == row["expect"],
                 "naive_false_green": naive_v == "SUCCESS" and got in ("SILENT_FALLBACK", "EMPTY_BODY", "INCONCLUSIVE_TRANSIENT"),
             }
@@ -228,6 +288,20 @@ def selftest():
         (
             "silent fallback never a pass",
             judge(_rec("m/x", 200, "m/x", 2, 200, 404))["verdict"] == "SILENT_FALLBACK",
+        )
+    )
+
+    # 6 the two 404 shapes get distinct detail subcodes without moving the verdict
+    checks.append(
+        (
+            "detail subcodes separate model-unknown from provider-unknown",
+            {r["detail_code"] for r in rows_out if r["case_id"].startswith("RME-DETAIL-")}
+            == {"MODEL_UNKNOWN", "PROVIDER_UNKNOWN"}
+            and all(
+                judge(r["rec"])["verdict"] == r["expect"]
+                for r in ROWS
+                if r["case_id"].startswith("RME-DETAIL-")
+            ),
         )
     )
 

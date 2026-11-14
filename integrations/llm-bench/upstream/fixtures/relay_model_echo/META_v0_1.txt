@@ -9,15 +9,15 @@ provenance: RME-REJECTS-AND-ECHO is the measured local shape; the transient rows
   (429 / 503 / no reply) and MISMATCH_REPORTED are hand_built negative controls -
   labelled as such in each row note. analyze_only; stdlib only.
 run: python3 relay_model_echo_v0_1.py  (exit 0 iff selftest all pass)
-selftest: 12/12 rows + 5/5 checks
-script_sha256: 8275a4deb7d6e2103d4ef347b5fdd4b389b90ac84ff5c155f9e34902a490be88
-run_out_sha256: 86038a89f980a9b23e0017a96a804c3496c483e1187d7682f7f8eedacb7be31b
+selftest: 14/14 rows + 6/6 checks
+script_sha256: 09c5f57b11b682d30be8a9a5f549868ea314f2175d1f37b2e042da7cac08f4d6
+run_out_sha256: 05d9d1746123845dd2d486081e8defe8af4b41e395965d32b2128ec768797418
 hash_norm: run_out_sha256 is sha256 of the exact emitted text - UTF-8, LF, no
   trailing newline - so it equals sha256 of the committed run_out file on any
   platform. integrations/llm-bench/upstream/** is marked -text in .gitattributes,
   so nothing normalizes line endings for you: a hash taken from a file captured
   on a Windows checkout (CRLF) is a different number for the same content.
-rows: 12 (7 must-red / must-fail controls, 5 honest)
+rows: 14 (7 must-red / must-fail controls, 7 honest)
 fields: correct.http, correct.model, correct.content_len, typo.http, bad_prefix.http
 gate:
   correct != 200                      -> REQUEST_FAILED
@@ -29,7 +29,18 @@ gate:
   both non-2xx, model == request      -> REJECTS_AND_ECHO
   both non-2xx, model != request      -> MISMATCH_REPORTED
 naive "http==200 and choices present -> SUCCESS" gives false greens on
-  SILENT_FALLBACK, EMPTY_BODY and INCONCLUSIVE_TRANSIENT (3 of 12 rows).
+  SILENT_FALLBACK, EMPTY_BODY and INCONCLUSIVE_TRANSIENT (3 of 14 rows).
 measured local values (endpoint removed): correct 200 / echo / content 2 /
   2233 ms; typo 404 / 13 ms; bad prefix 404 / 0 ms.
 no real host, key or provider name is present; live probing is opt-in via --probe.
+detail subcodes (detail only; the verdict set above is unchanged):
+  404 body "no adapter registered for provider" -> PROVIDER_UNKNOWN
+  404 body "could not be resolved" (+ listing)  -> MODEL_UNKNOWN
+  both shapes carry the same error code
+  ("model_not_found"), so a client keying on "code" cannot tell "this model does
+  not exist" from "this provider does not exist" - only the message can. That is
+  the whole reason this is a detail and not a verdict: the verdict family is
+  identical, the actionable next step is not (drop the model vs drop the whole
+  provider from the pool).
+  classification reads the typo probe body first (it is the one that can say "no
+  such model"), then the bad-prefix body (the one that can say "no such provider").
