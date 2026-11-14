@@ -1,9 +1,5 @@
 {
-  "fixture": "relay_model_echo",
-  "version": "0.1",
   "all_match": true,
-  "n": 12,
-  "n_match": 12,
   "checks": [
     {
       "name": "rows match expect",
@@ -26,116 +22,120 @@
       "ok": true
     }
   ],
+  "fixture": "relay_model_echo",
+  "n": 12,
   "n_checks": 5,
   "n_checks_ok": 5,
+  "n_match": 12,
   "rows": [
     {
       "case_id": "RME-SILENT-FALLBACK-MUST-RED",
-      "note": "wrong name one char off still 200 -> naive calls it a pass",
       "expect": "SILENT_FALLBACK",
       "got": "SILENT_FALLBACK",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": true
+      "naive": "SUCCESS",
+      "naive_false_green": true,
+      "note": "wrong name one char off still 200 -> naive calls it a pass"
     },
     {
       "case_id": "RME-EMPTY-BODY-MUST-RED",
-      "note": "reasoning model ate max_tokens: 200 + choices + empty content",
       "expect": "EMPTY_BODY",
       "got": "EMPTY_BODY",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": true
+      "naive": "SUCCESS",
+      "naive_false_green": true,
+      "note": "reasoning model ate max_tokens: 200 + choices + empty content"
     },
     {
       "case_id": "RME-TYPO-429-NOT-A-REJECTION-MUST-RED",
-      "note": "429 is transient; counting it as rejection turns unknown into pass",
       "expect": "INCONCLUSIVE_TRANSIENT",
       "got": "INCONCLUSIVE_TRANSIENT",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": true
+      "naive": "SUCCESS",
+      "naive_false_green": true,
+      "note": "429 is transient; counting it as rejection turns unknown into pass"
     },
     {
       "case_id": "RME-TYPO-503-MUST-RED",
-      "note": "",
       "expect": "INCONCLUSIVE_TRANSIENT",
       "got": "INCONCLUSIVE_TRANSIENT",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": true
+      "naive": "SUCCESS",
+      "naive_false_green": true,
+      "note": ""
     },
     {
       "case_id": "RME-TYPO-NO-REPLY-MUST-RED",
-      "note": "",
       "expect": "INCONCLUSIVE_TRANSIENT",
       "got": "INCONCLUSIVE_TRANSIENT",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": true
+      "naive": "SUCCESS",
+      "naive_false_green": true,
+      "note": ""
     },
     {
       "case_id": "RME-REJECTS-AND-ECHO-HONEST",
-      "note": "local gateway measured shape: strong holds, weak carries no information",
       "expect": "REJECTS_AND_ECHO",
       "got": "REJECTS_AND_ECHO",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": false
+      "naive": "SUCCESS",
+      "naive_false_green": false,
+      "note": "local gateway measured shape: strong holds, weak carries no information"
     },
     {
       "case_id": "RME-REJECTS-NO-FIELD",
-      "note": "",
       "expect": "REJECTS_AND_NO_FIELD",
       "got": "REJECTS_AND_NO_FIELD",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": false
+      "naive": "SUCCESS",
+      "naive_false_green": false,
+      "note": ""
     },
     {
       "case_id": "RME-MISMATCH-REPORTED",
-      "note": "backend self-reports a different name: real routing, not echo",
       "expect": "MISMATCH_REPORTED",
       "got": "MISMATCH_REPORTED",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": false
+      "naive": "SUCCESS",
+      "naive_false_green": false,
+      "note": "backend self-reports a different name: real routing, not echo"
     },
     {
       "case_id": "RME-PARTIAL-REJECT",
-      "note": "wrong name rejected but bogus prefix accepted: do not report a clean pass",
       "expect": "PARTIAL_REJECT",
       "got": "PARTIAL_REJECT",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": false
+      "naive": "SUCCESS",
+      "naive_false_green": false,
+      "note": "wrong name rejected but bogus prefix accepted: do not report a clean pass"
     },
     {
       "case_id": "RME-REQUEST-FAILED",
-      "note": "",
       "expect": "REQUEST_FAILED",
       "got": "REQUEST_FAILED",
-      "naive": "FAIL",
       "match": true,
-      "naive_false_green": false
+      "naive": "FAIL",
+      "naive_false_green": false,
+      "note": ""
     },
     {
       "case_id": "RME-EMPTY-BEFORE-TRANSIENT",
-      "note": "precedence: empty body outranks a transient sibling probe",
       "expect": "EMPTY_BODY",
       "got": "EMPTY_BODY",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": true
+      "naive": "SUCCESS",
+      "naive_false_green": true,
+      "note": "precedence: empty body outranks a transient sibling probe"
     },
     {
       "case_id": "RME-SILENT-FALLBACK-BEATS-ECHO",
-      "note": "fallback outranks field state: the field would look fine either way",
       "expect": "SILENT_FALLBACK",
       "got": "SILENT_FALLBACK",
-      "naive": "SUCCESS",
       "match": true,
-      "naive_false_green": true
+      "naive": "SUCCESS",
+      "naive_false_green": true,
+      "note": "fallback outranks field state: the field would look fine either way"
     }
-  ]
+  ],
+  "version": "0.1"
 }

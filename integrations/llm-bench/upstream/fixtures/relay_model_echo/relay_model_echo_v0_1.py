@@ -10,13 +10,13 @@ failure is not a missing criterion and not a truncated receipt: the gate measure
 a different quantity than the one being asked about.
 
 Two quantities, and they are NOT interchangeable:
-  weak   : does the response carry a \`model\` field?
+  weak   : does the response carry a 'model' field?
            An echo satisfies it. Echoing the request name proves nothing.
   strong : does a wrong model name stop being 200?
            This is the one that catches silent fallback.
 
 Measured shapes on the local gateway (endpoint and credentials removed):
-  correct name   -> 200, response \`model\` == request name (pure echo), 2233 ms
+  correct name   -> 200, response 'model' == request name (pure echo), 2233 ms
   one char wrong -> 404, body lists the provider's available model names
   bad prefix     -> 404, "no adapter registered for provider"
 
@@ -40,6 +40,7 @@ Optional live probe (never in selftest): python3 relay_model_echo_v0_1.py --prob
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 
@@ -318,7 +319,19 @@ def main(argv):
         print(json.dumps(live_probe(args.endpoint, key, args.model), ensure_ascii=False, indent=2))
         return 0
     out = selftest()
-    print(json.dumps(out, ensure_ascii=False, indent=2))
+    text = json.dumps(out, ensure_ascii=False, indent=2, sort_keys=True)
+    print(text)
+    with open(__file__, "rb") as f:
+        script_sha = hashlib.sha256(f.read()).hexdigest()
+    meta = {
+        "script_sha256": script_sha,
+        # Hash the emitted text, not a captured file: .gitattributes marks
+        # integrations/llm-bench/upstream/** as -text, so the same logical
+        # output is CRLF on Windows and LF elsewhere. A file hash is not a
+        # reproducible receipt; the text hash is.
+        "run_out_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+    }
+    print("META " + json.dumps(meta, sort_keys=True), file=sys.stderr)
     return 0 if out["all_match"] else 1
 
 

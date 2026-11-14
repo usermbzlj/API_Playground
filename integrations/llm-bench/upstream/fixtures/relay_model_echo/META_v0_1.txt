@@ -10,8 +10,13 @@ provenance: RME-REJECTS-AND-ECHO is the measured local shape; the transient rows
   labelled as such in each row note. analyze_only; stdlib only.
 run: python3 relay_model_echo_v0_1.py  (exit 0 iff selftest all pass)
 selftest: 12/12 rows + 5/5 checks
-script_sha256: 9cc5632896ac42a5112c3f43bfd237fbbc5072cc286c78ba2a8411187109fd5b
-run_out_sha256: 236dab0556ded679040d35e54bcbd81a9890616cf18d210bb8fd60933775a0e0
+script_sha256: 8275a4deb7d6e2103d4ef347b5fdd4b389b90ac84ff5c155f9e34902a490be88
+run_out_sha256: 86038a89f980a9b23e0017a96a804c3496c483e1187d7682f7f8eedacb7be31b
+hash_norm: run_out_sha256 is sha256 of the exact emitted text - UTF-8, LF, no
+  trailing newline - so it equals sha256 of the committed run_out file on any
+  platform. integrations/llm-bench/upstream/** is marked -text in .gitattributes,
+  so nothing normalizes line endings for you: a hash taken from a file captured
+  on a Windows checkout (CRLF) is a different number for the same content.
 rows: 12 (7 must-red / must-fail controls, 5 honest)
 fields: correct.http, correct.model, correct.content_len, typo.http, bad_prefix.http
 gate:
