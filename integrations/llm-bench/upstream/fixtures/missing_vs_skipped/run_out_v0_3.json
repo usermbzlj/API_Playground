@@ -1,0 +1,434 @@
+{
+  "credit": [
+    "Grok Bot (implementation review, probes 1-3 + mutation probe)",
+    "光盘dvd (EigenFlux Agent)"
+  ],
+  "fixture": "MISSING_VS_SKIPPED",
+  "version": "v0_3",
+  "n_cases": 11,
+  "n_pass": 11,
+  "n_fail": 0,
+  "must_fail_shape": "判词 PASSED 即失败形态；非零退出单列 SCRIPT_ERROR，不并入 FAILED",
+  "undetermined_cap": 0.2,
+  "expected_status_enum": [
+    "PASSED",
+    "FAILED",
+    "KEY_MISSING",
+    "UNDETERMINED",
+    "EMPTY_RESULT",
+    "IN_FLIGHT",
+    "SCRIPT_ERROR"
+  ],
+  "policy": "analyze_only REFERENCE_ONLY fictional_desensitized no_secrets",
+  "results": [
+    {
+      "case_id": "mvs-arm-a-forward-missing",
+      "expect_verdict": {
+        "status": "KEY_MISSING",
+        "missing_keys": [
+          "k3"
+        ],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 1,
+          "skipped_count": 0,
+          "extra_count": 0
+        }
+      },
+      "note": null,
+      "got": {
+        "status": "KEY_MISSING",
+        "missing_keys": [
+          "k3"
+        ],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 1,
+          "skipped_count": 0,
+          "extra_count": 0,
+          "declared_expected_count": 3
+        },
+        "undetermined_ratio": 0.0,
+        "undetermined_cap": 0.2,
+        "degraded": false
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-arm-b-reverse-skipped",
+      "expect_verdict": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 1,
+          "extra_count": 0
+        },
+        "degraded": false,
+        "undetermined_ratio": 0.0
+      },
+      "note": null,
+      "got": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 1,
+          "extra_count": 0,
+          "declared_expected_count": 3
+        },
+        "undetermined_ratio": 0.0,
+        "undetermined_cap": 0.2,
+        "degraded": false,
+        "skipped_entries": [
+          {
+            "key": "k3",
+            "skip_reason": "out_of_scope"
+          }
+        ]
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-arm-c-control-normal",
+      "expect_verdict": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 3,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 0
+        }
+      },
+      "note": null,
+      "got": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 3,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 0,
+          "declared_expected_count": 3
+        },
+        "undetermined_ratio": 0.0,
+        "undetermined_cap": 0.2,
+        "degraded": false
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-arm-d-declared-mismatch-undetermined",
+      "expect_verdict": {
+        "status": "UNDETERMINED",
+        "missing_keys": [
+          "k3"
+        ],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 1,
+          "skipped_count": 0,
+          "extra_count": 0
+        }
+      },
+      "note": "Grok probe 1: declared 4 vs batch 3 -> evidence gap beats KEY_MISSING, must not pass",
+      "got": {
+        "status": "UNDETERMINED",
+        "missing_keys": [
+          "k3"
+        ],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 1,
+          "skipped_count": 0,
+          "extra_count": 0,
+          "declared_expected_count": 4
+        },
+        "undetermined_ratio": 0.25,
+        "undetermined_cap": 0.2,
+        "degraded": true,
+        "evidence_gap": [
+          "declared_vs_batch_mismatch:4!=3"
+        ]
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-arm-e-all-skipped-undetermined",
+      "expect_verdict": {
+        "status": "UNDETERMINED",
+        "missing_keys": [],
+        "covered_count": 0,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 2,
+          "extra_count": 0
+        }
+      },
+      "note": "Grok probe 2: covered=0 while skipped>0 is not a pass; aligns with undetermined_cap",
+      "got": {
+        "status": "UNDETERMINED",
+        "missing_keys": [],
+        "covered_count": 0,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 2,
+          "extra_count": 0,
+          "declared_expected_count": 2
+        },
+        "undetermined_ratio": 0.0,
+        "undetermined_cap": 0.2,
+        "degraded": false,
+        "skipped_entries": [
+          {
+            "key": "k1",
+            "skip_reason": "out_of_scope"
+          },
+          {
+            "key": "k2",
+            "skip_reason": "out_of_scope"
+          }
+        ],
+        "evidence_gap": [
+          "all_skipped_zero_coverage"
+        ]
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-arm-f-extra-key-not-skipped",
+      "expect_verdict": {
+        "status": "PASSED",
+        "extra_keys": [
+          "k2x"
+        ],
+        "covered_count": 2,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 1
+        }
+      },
+      "note": "Grok probe 3: typo key goes to extra_keys, never into skipped_count",
+      "got": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 1,
+          "declared_expected_count": 2
+        },
+        "undetermined_ratio": 0.0,
+        "undetermined_cap": 0.2,
+        "degraded": false,
+        "extra_keys": [
+          "k2x"
+        ]
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-negative-empty-batch",
+      "expect_verdict": {
+        "status": "EMPTY_RESULT",
+        "missing_keys": [],
+        "covered_count": 0,
+        "entry_count": 0,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 0
+        }
+      },
+      "note": null,
+      "got": {
+        "status": "EMPTY_RESULT",
+        "missing_keys": [],
+        "covered_count": 0,
+        "entry_count": 0,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 0,
+          "declared_expected_count": 0
+        },
+        "undetermined_ratio": 0.0,
+        "undetermined_cap": 0.2,
+        "degraded": false
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-must-fail-shape-declared-count-ignored",
+      "expect_verdict": {
+        "status": "UNDETERMINED",
+        "missing_keys": [
+          "k3"
+        ],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 1,
+          "skipped_count": 0,
+          "extra_count": 0
+        }
+      },
+      "note": "PASSED on this input is the failure shape Grok probe 1 found in v0.2",
+      "got": {
+        "status": "UNDETERMINED",
+        "missing_keys": [
+          "k3"
+        ],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 1,
+          "skipped_count": 0,
+          "extra_count": 0,
+          "declared_expected_count": 4
+        },
+        "undetermined_ratio": 0.25,
+        "undetermined_cap": 0.2,
+        "degraded": true,
+        "evidence_gap": [
+          "declared_vs_batch_mismatch:4!=3"
+        ]
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-arm-b2-duplicate-batch-key",
+      "expect_verdict": {
+        "status": "UNDETERMINED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 0
+        },
+        "duplicate_batch_keys": [
+          "k1"
+        ]
+      },
+      "note": "v0.3 point 2: duplicate batch key double-counts the denominator -> UNDETERMINED(duplicate_batch_key)",
+      "got": {
+        "status": "UNDETERMINED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 2,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 0,
+          "extra_count": 0,
+          "declared_expected_count": 2
+        },
+        "undetermined_ratio": 0.0,
+        "undetermined_cap": 0.2,
+        "degraded": false,
+        "duplicate_batch_keys": [
+          "k1"
+        ],
+        "evidence_gap": [
+          "duplicate_batch_key:k1"
+        ]
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-mutation-skips-as-missing-detected",
+      "expect_verdict": {
+        "status": "PASSED",
+        "missing_keys": [],
+        "covered_count": 2,
+        "entry_count": 3,
+        "accounting": {
+          "missing_count": 0,
+          "skipped_count": 1,
+          "extra_count": 0
+        }
+      },
+      "note": "mutation probe: the SKIPPED->missing mutant must disagree on arm B",
+      "got": {
+        "honest": {
+          "status": "PASSED",
+          "missing_keys": [],
+          "covered_count": 2,
+          "entry_count": 3,
+          "accounting": {
+            "missing_count": 0,
+            "skipped_count": 1,
+            "extra_count": 0,
+            "declared_expected_count": 3
+          },
+          "undetermined_ratio": 0.0,
+          "undetermined_cap": 0.2,
+          "degraded": false,
+          "skipped_entries": [
+            {
+              "key": "k3",
+              "skip_reason": "out_of_scope"
+            }
+          ]
+        },
+        "mutant": {
+          "status": "KEY_MISSING",
+          "missing_keys": [
+            "k3"
+          ],
+          "covered_count": 2,
+          "entry_count": 3,
+          "accounting": {
+            "missing_count": 1,
+            "skipped_count": 0,
+            "extra_count": 0,
+            "declared_expected_count": 3
+          },
+          "undetermined_ratio": 0.0,
+          "undetermined_cap": 0.2,
+          "degraded": false
+        }
+      },
+      "ok": true
+    },
+    {
+      "case_id": "mvs-must-fail-shape-crash-misjudged-passed",
+      "expect_verdict": {
+        "status": "SCRIPT_ERROR",
+        "exit_code": 2,
+        "accounting": {
+          "missing_count": null,
+          "skipped_count": null
+        }
+      },
+      "note": "crash on the same input must NOT be reported as FAILED nor PASSED",
+      "got": {
+        "status": "SCRIPT_ERROR",
+        "exit_code": 2,
+        "accounting": {
+          "missing_count": null,
+          "skipped_count": null
+        }
+      },
+      "ok": true
+    }
+  ]
+}
