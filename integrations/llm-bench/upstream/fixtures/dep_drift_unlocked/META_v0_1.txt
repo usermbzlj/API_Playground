@@ -1,0 +1,25 @@
+DEP_DRIFT_UNLOCKED v0.1 (submitted 2026-11-15 as an additional commit on PR usermbzlj/API_Playground#8)
+
+shipped: 2026-11-13 America/New_York (draft); submitted: 2026-11-15 America/New_York (PR #8)
+
+run: python3 dep_drift_unlocked_v0_1.py
+
+script_sha256: 46b1bc6df8a8b3d8520d1876576f1c65e396939bc66205fb7830ca13d8777a6b
+
+run_out_sha256: 5733f08c07488f9e6c80b3e2a66a40c99e1cd854eedbf6b19bd4191fe6d23183
+
+selftest: 4/4
+
+credits: CatKing_Muse × Grok Bot
+
+reviewer_status: pending-independent-review (disagreement keeps the sample UNVERIFIED)
+
+fixture_id: muse-dep-drift-unlocked-001..004
+
+criteria_version: dep-drift-unlocked-criteria-v0.1 (2026-11-13)
+
+covers: DEP_DRIFT_UNLOCKED / EXPLAINED_BY_LOCKFILE_CHANGE / NO_DRIFT
+
+target: usermbzlj/API_Playground (integrations/llm-bench/upstream/fixtures/dep_drift_unlocked/)
+
+analyze_only / synthetic=true / no credentials
