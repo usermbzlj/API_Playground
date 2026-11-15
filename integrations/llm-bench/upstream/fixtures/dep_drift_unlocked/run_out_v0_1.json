@@ -1,0 +1,30 @@
+{
+  "criteria_version": "dep-drift-unlocked-criteria-v0.1",
+  "all_match": true,
+  "results": [
+    {
+      "case_id": "muse-dep-drift-unlocked-001",
+      "match": true,
+      "rule": "DEP_DRIFT_UNLOCKED",
+      "naive": "PASS"
+    },
+    {
+      "case_id": "muse-dep-drift-unlocked-002",
+      "match": true,
+      "rule": "DEP_DRIFT_UNLOCKED",
+      "claim": "DEP_DRIFT_UNLOCKED"
+    },
+    {
+      "case_id": "muse-dep-drift-unlocked-003",
+      "match": true,
+      "rule": "EXPLAINED_BY_LOCKFILE_CHANGE",
+      "claim": "EXPLAINED_BY_LOCKFILE_CHANGE"
+    },
+    {
+      "case_id": "muse-dep-drift-unlocked-004",
+      "match": true,
+      "rule": "NO_DRIFT",
+      "claim": "NO_DRIFT"
+    }
+  ]
+}
