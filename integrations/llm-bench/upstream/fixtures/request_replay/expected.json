@@ -1,0 +1,218 @@
+{
+  "fixture": "request_replay",
+  "spec_version": "v0.1",
+  "closed_verdicts": [
+    "PASS",
+    "REQUEST_REPLAY"
+  ],
+  "columns": [
+    "nonce",
+    "seen_before",
+    "expected_verdict"
+  ],
+  "criteria": {
+    "v0.0": {
+      "spec_version": "v0.0",
+      "fixture": "request_replay",
+      "closed_verdicts": [
+        "PASS",
+        "REQUEST_REPLAY"
+      ],
+      "nonce_pattern": "^n-[0-9]{4}$",
+      "rules": [
+        "legacy: a well-formed nonce -> PASS; seen_before and prior nonces are ignored"
+      ]
+    },
+    "v0.1": {
+      "spec_version": "v0.1",
+      "fixture": "request_replay",
+      "closed_verdicts": [
+        "PASS",
+        "REQUEST_REPLAY"
+      ],
+      "nonce_pattern": "^n-[0-9]{4}$",
+      "rules": [
+        "positive: each request in r1..rn carries a nonce absent from prior_nonces and seen_before false -> PASS",
+        "negative: a nonce that appears in prior_nonces (seen_before true) -> REQUEST_REPLAY",
+        "boundary: a well-formed nonce absent from prior_nonces (seen_before false) -> PASS, which is not a replay",
+        "seen_before must be a bool and must equal (nonce in prior_nonces)",
+        "expected_verdict is a dedicated field and is not an input to the judge",
+        "spec_version and criteria_digest are required; criteria_digest is sha256 of the canonical JSON body of that spec_version",
+        "a sample is judged only by the registered body whose digest it stamps; a newer body is not substituted"
+      ]
+    }
+  },
+  "criteria_digest": {
+    "v0.0": "c2c76e1737fe53eff57a4d7f6604084476e6bd1a1b7184bafdb2a9a5e9ab4053",
+    "v0.1": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+  },
+  "unregistered_criteria": {
+    "spec_version": "v0.2",
+    "fixture": "request_replay",
+    "closed_verdicts": [
+      "PASS",
+      "REQUEST_REPLAY"
+    ],
+    "nonce_pattern": "^n-[0-9]{4}$",
+    "rules": [
+      "unregistered draft: a well-formed nonce -> PASS even when it was seen before"
+    ]
+  },
+  "unregistered_criteria_digest": "01630ebbb90f5ccaea427691aae9430df588ae262c1d0e9734b921a870909a3b",
+  "arms": [
+    {
+      "case_id": "r1",
+      "arm": "positive",
+      "nonce": "n-0001",
+      "seen_before": false,
+      "prior_nonces": [],
+      "expected_verdict": "PASS",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+    },
+    {
+      "case_id": "r2",
+      "arm": "positive",
+      "nonce": "n-0002",
+      "seen_before": false,
+      "prior_nonces": [
+        "n-0001"
+      ],
+      "expected_verdict": "PASS",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+    },
+    {
+      "case_id": "r3",
+      "arm": "positive",
+      "nonce": "n-0003",
+      "seen_before": false,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002"
+      ],
+      "expected_verdict": "PASS",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+    },
+    {
+      "case_id": "r4",
+      "arm": "positive",
+      "nonce": "n-0004",
+      "seen_before": false,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002",
+        "n-0003"
+      ],
+      "expected_verdict": "PASS",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+    },
+    {
+      "case_id": "replay",
+      "arm": "negative",
+      "nonce": "n-0002",
+      "seen_before": true,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002",
+        "n-0003",
+        "n-0004"
+      ],
+      "expected_verdict": "REQUEST_REPLAY",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+    },
+    {
+      "case_id": "boundary",
+      "arm": "boundary",
+      "nonce": "n-0005",
+      "seen_before": false,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002",
+        "n-0003",
+        "n-0004"
+      ],
+      "expected_verdict": "PASS",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+    }
+  ],
+  "binding_probes": [
+    {
+      "case_id": "old-sample-v0-0-replay",
+      "arm": "negative",
+      "nonce": "n-0002",
+      "seen_before": true,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002",
+        "n-0003",
+        "n-0004"
+      ],
+      "expected_verdict": "PASS",
+      "must_fail": false,
+      "spec_version": "v0.0",
+      "criteria_digest": "c2c76e1737fe53eff57a4d7f6604084476e6bd1a1b7184bafdb2a9a5e9ab4053",
+      "note": "stamped v0.0; the same nonce under v0.1 is REQUEST_REPLAY"
+    },
+    {
+      "nonce": "n-0005",
+      "seen_before": false,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002",
+        "n-0003",
+        "n-0004"
+      ],
+      "case_id": "probe-missing-spec-version",
+      "criteria_digest": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+    },
+    {
+      "nonce": "n-0005",
+      "seen_before": false,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002",
+        "n-0003",
+        "n-0004"
+      ],
+      "case_id": "probe-missing-criteria-digest",
+      "spec_version": "v0.1"
+    },
+    {
+      "nonce": "n-0005",
+      "seen_before": false,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002",
+        "n-0003",
+        "n-0004"
+      ],
+      "case_id": "probe-digest-of-other-body",
+      "spec_version": "v0.1",
+      "criteria_digest": "01630ebbb90f5ccaea427691aae9430df588ae262c1d0e9734b921a870909a3b"
+    },
+    {
+      "nonce": "n-0005",
+      "seen_before": false,
+      "prior_nonces": [
+        "n-0001",
+        "n-0002",
+        "n-0003",
+        "n-0004"
+      ],
+      "case_id": "probe-unregistered-spec",
+      "spec_version": "v0.2",
+      "criteria_digest": "01630ebbb90f5ccaea427691aae9430df588ae262c1d0e9734b921a870909a3b"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+REQUEST_REPLAY v0.1
+run: python3 request_replay_v0_1.py  (exit 0 iff selftest all pass)
+script_sha256: 39b5329f833838d50d95dad3830eec7dee78f46aa4e79c188c71193445e89fae
+run_out_sha256: b1f07a47a6bdfdf5c2731132a9a6d4d699b306bb96fefd496ef617e01063aaf2
+hash_norm: raw on-disk bytes of run_out_v0_1.json (sha256 of the file exactly as written, including the trailing LF; the artifact does not carry this digest)
+selftest: 16/16
+naive_wrong_caught: 1 (replayed nonce: naive well-formed->PASS, honest REQUEST_REPLAY)
+closed_verdicts: PASS | REQUEST_REPLAY
+columns: nonce, seen_before, expected_verdict
+arms:
+  positive  r1..r4 each with a unique nonce, seen_before false -> expected_verdict PASS
+  negative  nonce n-0002 replayed after r1..r4, seen_before true -> expected_verdict REQUEST_REPLAY (must-fail for the naive baseline)
+  boundary  well-formed nonce n-0005 never seen before, seen_before false -> expected_verdict PASS
+spec_version and criteria_digest are required. criteria_digest is sha256 of the canonical JSON body of that spec_version (sort_keys, compact separators). A row is judged only by the registered body it stamps. Missing either field, a digest from another body, or an unregistered spec_version is not judged and is not PASS. An older sample keeps the verdict of its own stamp and does not inherit a newer body.
+analyze_only. synthetic. stdlib only. no credentials.

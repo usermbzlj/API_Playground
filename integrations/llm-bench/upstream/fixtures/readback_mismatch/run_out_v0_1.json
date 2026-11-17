@@ -1,0 +1,138 @@
+{
+  "all_match": true,
+  "checks": [
+    {
+      "detail": "",
+      "name": "expected_json_matches_materialized_rows",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "criteria_digest_changes_with_spec_version",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "unregistered_body_not_in_registry",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS naive=PASS",
+      "name": "arm-positive-w-equals-r",
+      "ok": true
+    },
+    {
+      "detail": "verdict=READBACK_MISMATCH naive=PASS",
+      "name": "arm-negative-truncated-hash",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "positive-live-readback-equal",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "negative-truncated-and-hashes-differ",
+      "ok": true
+    },
+    {
+      "detail": "stamped=PASS v0.1_would=READBACK_MISMATCH",
+      "name": "old-sample-v0-0-truncated",
+      "ok": true
+    },
+    {
+      "detail": "unbound",
+      "name": "probe-missing-spec-version",
+      "ok": true
+    },
+    {
+      "detail": "unbound",
+      "name": "probe-missing-criteria-digest",
+      "ok": true
+    },
+    {
+      "detail": "unbound",
+      "name": "probe-digest-of-other-body",
+      "ok": true
+    },
+    {
+      "detail": "unbound",
+      "name": "probe-unregistered-spec",
+      "ok": true
+    }
+  ],
+  "closed_verdicts": [
+    "PASS",
+    "READBACK_MISMATCH"
+  ],
+  "criteria_digest": {
+    "v0.0": "dcf8f058cc3cd95c34f46a0bcc99fd7ce81081d856d2e4c6f05bdb758ddfae8d",
+    "v0.1": "0509cf4e9f70e3411c2819756d23bdd4eb3cd088b840b50f2a6e66ac503f8351"
+  },
+  "fixture": "readback_mismatch",
+  "naive_wrong_caught": 1,
+  "rows": [
+    {
+      "arm": "positive",
+      "bound_spec_version": "v0.1",
+      "case_id": "positive-w-equals-r",
+      "criteria_bound": true,
+      "expected_verdict": "PASS",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "verdict": "PASS"
+    },
+    {
+      "arm": "negative",
+      "bound_spec_version": "v0.1",
+      "case_id": "negative-truncated-hash",
+      "criteria_bound": true,
+      "expected_verdict": "READBACK_MISMATCH",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "verdict": "READBACK_MISMATCH"
+    },
+    {
+      "bound_spec_version": "v0.0",
+      "case_id": "old-sample-v0-0-truncated",
+      "criteria_bound": true,
+      "ok": true,
+      "verdict": "PASS"
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-missing-spec-version",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-missing-criteria-digest",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-digest-of-other-body",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-unregistered-spec",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    }
+  ],
+  "selftest": "12/12",
+  "version": "v0.1"
+}
