@@ -1,0 +1,14 @@
+READBACK_MISMATCH v0.1
+run: python3 readback_mismatch_v0_1.py  (exit 0 iff selftest all pass)
+script_sha256: 44fbcabfa2c7623d3bbab1a2078cc8de62c13b8a20f35ff814b62894c3451bc7
+run_out_sha256: 047b61761ef3d5ec10528ce3a8ee0c7661241592ef5d33ffddfcb2e86322c51d
+hash_norm: raw on-disk bytes of run_out_v0_1.json (sha256 of the file exactly as written, including the trailing LF; the artifact does not carry this digest)
+selftest: 12/12
+naive_wrong_caught: 1 (negative truncated write: naive write_ok->PASS, honest READBACK_MISMATCH)
+closed_verdicts: PASS | READBACK_MISMATCH
+columns: arm, w, r, h_mem, h_disk, expected_verdict, spec_version, criteria_digest
+arms:
+  positive  written value w equals read-back value r -> expected_verdict PASS
+  negative  truncated write, h_mem != h_disk -> expected_verdict READBACK_MISMATCH (must-fail for the naive baseline)
+spec_version and criteria_digest are required. criteria_digest is sha256 of the canonical JSON body of that spec_version (sort_keys, compact separators). A row is judged only by the registered body it stamps. Missing either field, a digest from another body, or an unregistered spec_version is not judged and is not PASS. An older sample keeps the verdict of its own stamp and does not inherit a newer body.
+analyze_only. synthetic. stdlib only. no credentials.

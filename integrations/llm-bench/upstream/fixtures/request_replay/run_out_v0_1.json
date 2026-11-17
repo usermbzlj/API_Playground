@@ -1,0 +1,218 @@
+{
+  "all_match": true,
+  "checks": [
+    {
+      "detail": "",
+      "name": "expected_json_matches_materialized_rows",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "criteria_digest_changes_with_spec_version",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "unregistered_body_not_in_registry",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "positive-nonces-unique",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS naive=PASS seen_before=False",
+      "name": "arm-r1",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS naive=PASS seen_before=False",
+      "name": "arm-r2",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS naive=PASS seen_before=False",
+      "name": "arm-r3",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS naive=PASS seen_before=False",
+      "name": "arm-r4",
+      "ok": true
+    },
+    {
+      "detail": "verdict=REQUEST_REPLAY naive=PASS seen_before=True",
+      "name": "arm-replay",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS naive=PASS seen_before=False",
+      "name": "arm-boundary",
+      "ok": true
+    },
+    {
+      "detail": "verdict=REQUEST_REPLAY",
+      "name": "mutation-in-sequence-replay-must-fail",
+      "ok": true
+    },
+    {
+      "detail": "stamped=PASS v0.1_would=REQUEST_REPLAY",
+      "name": "old-sample-v0-0-replay",
+      "ok": true
+    },
+    {
+      "detail": "unbound",
+      "name": "probe-missing-spec-version",
+      "ok": true
+    },
+    {
+      "detail": "unbound",
+      "name": "probe-missing-criteria-digest",
+      "ok": true
+    },
+    {
+      "detail": "unbound",
+      "name": "probe-digest-of-other-body",
+      "ok": true
+    },
+    {
+      "detail": "unbound",
+      "name": "probe-unregistered-spec",
+      "ok": true
+    }
+  ],
+  "closed_verdicts": [
+    "PASS",
+    "REQUEST_REPLAY"
+  ],
+  "criteria_digest": {
+    "v0.0": "c2c76e1737fe53eff57a4d7f6604084476e6bd1a1b7184bafdb2a9a5e9ab4053",
+    "v0.1": "05457af024d4f73f8e86eb94fa35615afcbc1e71f14fd4e5a081463a48cb2601"
+  },
+  "fixture": "request_replay",
+  "naive_wrong_caught": 1,
+  "rows": [
+    {
+      "arm": "positive",
+      "bound_spec_version": "v0.1",
+      "case_id": "r1",
+      "criteria_bound": true,
+      "expected_verdict": "PASS",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "nonce": "n-0001",
+      "ok": true,
+      "seen_before": false,
+      "verdict": "PASS"
+    },
+    {
+      "arm": "positive",
+      "bound_spec_version": "v0.1",
+      "case_id": "r2",
+      "criteria_bound": true,
+      "expected_verdict": "PASS",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "nonce": "n-0002",
+      "ok": true,
+      "seen_before": false,
+      "verdict": "PASS"
+    },
+    {
+      "arm": "positive",
+      "bound_spec_version": "v0.1",
+      "case_id": "r3",
+      "criteria_bound": true,
+      "expected_verdict": "PASS",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "nonce": "n-0003",
+      "ok": true,
+      "seen_before": false,
+      "verdict": "PASS"
+    },
+    {
+      "arm": "positive",
+      "bound_spec_version": "v0.1",
+      "case_id": "r4",
+      "criteria_bound": true,
+      "expected_verdict": "PASS",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "nonce": "n-0004",
+      "ok": true,
+      "seen_before": false,
+      "verdict": "PASS"
+    },
+    {
+      "arm": "negative",
+      "bound_spec_version": "v0.1",
+      "case_id": "replay",
+      "criteria_bound": true,
+      "expected_verdict": "REQUEST_REPLAY",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "nonce": "n-0002",
+      "ok": true,
+      "seen_before": true,
+      "verdict": "REQUEST_REPLAY"
+    },
+    {
+      "arm": "boundary",
+      "bound_spec_version": "v0.1",
+      "case_id": "boundary",
+      "criteria_bound": true,
+      "expected_verdict": "PASS",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "nonce": "n-0005",
+      "ok": true,
+      "seen_before": false,
+      "verdict": "PASS"
+    },
+    {
+      "bound_spec_version": "v0.0",
+      "case_id": "old-sample-v0-0-replay",
+      "criteria_bound": true,
+      "ok": true,
+      "verdict": "PASS"
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-missing-spec-version",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-missing-criteria-digest",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-digest-of-other-body",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-unregistered-spec",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    }
+  ],
+  "selftest": "16/16",
+  "version": "v0.1"
+}

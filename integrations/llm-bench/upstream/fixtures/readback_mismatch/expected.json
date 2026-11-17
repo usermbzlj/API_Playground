@@ -1,0 +1,143 @@
+{
+  "fixture": "readback_mismatch",
+  "spec_version": "v0.1",
+  "closed_verdicts": [
+    "PASS",
+    "READBACK_MISMATCH"
+  ],
+  "columns": [
+    "arm",
+    "w",
+    "r",
+    "h_mem",
+    "h_disk",
+    "expected_verdict",
+    "spec_version",
+    "criteria_digest"
+  ],
+  "criteria": {
+    "v0.0": {
+      "spec_version": "v0.0",
+      "fixture": "readback_mismatch",
+      "closed_verdicts": [
+        "PASS",
+        "READBACK_MISMATCH"
+      ],
+      "rules": [
+        "legacy: write_ok true -> PASS; the read-back is not compared"
+      ]
+    },
+    "v0.1": {
+      "spec_version": "v0.1",
+      "fixture": "readback_mismatch",
+      "closed_verdicts": [
+        "PASS",
+        "READBACK_MISMATCH"
+      ],
+      "rules": [
+        "positive control: written value w equals read-back value r -> PASS; otherwise READBACK_MISMATCH",
+        "negative control: in-memory hash h_mem differs from on-disk hash h_disk after a truncated write -> READBACK_MISMATCH; equal hashes -> PASS",
+        "expected_verdict is a dedicated field and is not an input to the judge",
+        "spec_version and criteria_digest are required; criteria_digest is sha256 of the canonical JSON body of that spec_version",
+        "a sample is judged only by the registered body whose digest it stamps; a newer body is not substituted"
+      ]
+    }
+  },
+  "criteria_digest": {
+    "v0.0": "dcf8f058cc3cd95c34f46a0bcc99fd7ce81081d856d2e4c6f05bdb758ddfae8d",
+    "v0.1": "0509cf4e9f70e3411c2819756d23bdd4eb3cd088b840b50f2a6e66ac503f8351"
+  },
+  "unregistered_criteria": {
+    "spec_version": "v0.2",
+    "fixture": "readback_mismatch",
+    "closed_verdicts": [
+      "PASS",
+      "READBACK_MISMATCH"
+    ],
+    "rules": [
+      "unregistered draft: write_ok true -> PASS even when h_mem != h_disk"
+    ]
+  },
+  "unregistered_criteria_digest": "2d8c6f00f074697b3292d51e24c77997d9b5747ef9665352315670174dad5ac0",
+  "arms": [
+    {
+      "arm": "positive",
+      "case_id": "positive-w-equals-r",
+      "w": "synthetic-w",
+      "r": "synthetic-w",
+      "write_ok": true,
+      "expected_verdict": "PASS",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "0509cf4e9f70e3411c2819756d23bdd4eb3cd088b840b50f2a6e66ac503f8351"
+    },
+    {
+      "arm": "negative",
+      "case_id": "negative-truncated-hash",
+      "w": null,
+      "r": null,
+      "payload_len": 39,
+      "written_len": 8,
+      "truncated": true,
+      "h_mem": "54cea852d174f82b871c0a34b7d95fef5403a7941481330649dd2d7a61297485",
+      "h_disk": "65c3bb15cd47fb62e4a29d549d7ccb7969c4bc80eb0ac42b7368914e8ec55061",
+      "write_ok": true,
+      "expected_verdict": "READBACK_MISMATCH",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "0509cf4e9f70e3411c2819756d23bdd4eb3cd088b840b50f2a6e66ac503f8351"
+    }
+  ],
+  "binding_probes": [
+    {
+      "arm": "negative",
+      "case_id": "old-sample-v0-0-truncated",
+      "w": null,
+      "r": null,
+      "payload_len": 39,
+      "written_len": 8,
+      "truncated": true,
+      "h_mem": "54cea852d174f82b871c0a34b7d95fef5403a7941481330649dd2d7a61297485",
+      "h_disk": "65c3bb15cd47fb62e4a29d549d7ccb7969c4bc80eb0ac42b7368914e8ec55061",
+      "write_ok": true,
+      "expected_verdict": "PASS",
+      "note": "stamped v0.0; the same bytes under v0.1 are READBACK_MISMATCH",
+      "spec_version": "v0.0",
+      "criteria_digest": "dcf8f058cc3cd95c34f46a0bcc99fd7ce81081d856d2e4c6f05bdb758ddfae8d"
+    },
+    {
+      "arm": "positive",
+      "w": "synthetic-w",
+      "r": "synthetic-w",
+      "write_ok": true,
+      "case_id": "probe-missing-spec-version",
+      "criteria_digest": "0509cf4e9f70e3411c2819756d23bdd4eb3cd088b840b50f2a6e66ac503f8351"
+    },
+    {
+      "arm": "positive",
+      "w": "synthetic-w",
+      "r": "synthetic-w",
+      "write_ok": true,
+      "case_id": "probe-missing-criteria-digest",
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "positive",
+      "w": "synthetic-w",
+      "r": "synthetic-w",
+      "write_ok": true,
+      "case_id": "probe-digest-of-other-body",
+      "spec_version": "v0.1",
+      "criteria_digest": "2d8c6f00f074697b3292d51e24c77997d9b5747ef9665352315670174dad5ac0"
+    },
+    {
+      "arm": "positive",
+      "w": "synthetic-w",
+      "r": "synthetic-w",
+      "write_ok": true,
+      "case_id": "probe-unregistered-spec",
+      "spec_version": "v0.2",
+      "criteria_digest": "2d8c6f00f074697b3292d51e24c77997d9b5747ef9665352315670174dad5ac0"
+    }
+  ]
+}
