@@ -1,0 +1,279 @@
+{
+  "all_match": true,
+  "checks": [
+    {
+      "detail": "",
+      "name": "expected_json_matches_materialized_rows",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "criteria_digest_matches_readme_section",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "criteria_digest_tracks_section_bytes",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "real_sample_todo_slots_open",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS reason=COMPLETE naive=PASS",
+      "name": "arm-positive-single-shard",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS reason=COMPLETE naive=PASS",
+      "name": "arm-positive-multi-shard",
+      "ok": true
+    },
+    {
+      "detail": "verdict=TRUNCATED reason=CUT_BEFORE_SENTINEL naive=PASS",
+      "name": "arm-cut-before-sentinel",
+      "ok": true
+    },
+    {
+      "detail": "verdict=TRUNCATED reason=SHA_MISMATCH naive=PASS",
+      "name": "arm-sha-mismatch",
+      "ok": true
+    },
+    {
+      "detail": "verdict=TRUNCATED reason=CUT_MID_LINE naive=PASS",
+      "name": "arm-cut-mid-line",
+      "ok": true
+    },
+    {
+      "detail": "verdict=TRUNCATED reason=SENTINEL_IN_FIRST_SHARD naive=PASS",
+      "name": "arm-sentinel-in-first-shard",
+      "ok": true
+    },
+    {
+      "detail": "verdict=TRUNCATED reason=CUT_BEFORE_SENTINEL naive=PASS",
+      "name": "arm-neg-parseable-json-prefix",
+      "ok": true
+    },
+    {
+      "detail": "verdict=TRUNCATED reason=COUNT_MISMATCH naive=PASS",
+      "name": "arm-count-mismatch",
+      "ok": true
+    },
+    {
+      "detail": "verdict=FAIL reason=DECLARATION_ABSENT naive=PASS",
+      "name": "arm-fail-declaration-absent",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "at_least_two_positive_controls",
+      "ok": true
+    },
+    {
+      "detail": "prefix_sha8=1f2fcb2a",
+      "name": "sentinel_in_first_shard_never_pass",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "parseable_prefix_is_not_pass",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "comparison-alone-cut-mid-line",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "comparison-alone-cut-before-sentinel",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "comparison-alone-count-mismatch",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "comparison-alone-sha-mismatch",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "multi_shard_sentinel_only_on_last",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "probe-missing-spec-version",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "probe-missing-criteria-digest",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "probe-digest-of-other-body",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "probe-unregistered-spec",
+      "ok": true
+    }
+  ],
+  "closed_verdicts": [
+    "PASS",
+    "FAIL",
+    "TRUNCATED"
+  ],
+  "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729",
+  "fixture": "truncation_sentinel",
+  "naive_wrong_caught": 7,
+  "real_sample_todo": [
+    {
+      "arm": "cut-before-sentinel",
+      "owner": "真虾",
+      "payload": null,
+      "status": "TODO"
+    },
+    {
+      "arm": "sha-mismatch",
+      "owner": "真虾",
+      "payload": null,
+      "status": "TODO"
+    }
+  ],
+  "rows": [
+    {
+      "case_id": "positive-single-shard",
+      "criteria_bound": true,
+      "expected_verdict": "PASS",
+      "got_reason": "COMPLETE",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "COMPLETE",
+      "verdict": "PASS"
+    },
+    {
+      "case_id": "positive-multi-shard",
+      "criteria_bound": true,
+      "expected_verdict": "PASS",
+      "got_reason": "COMPLETE",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "COMPLETE",
+      "verdict": "PASS"
+    },
+    {
+      "case_id": "cut-before-sentinel",
+      "criteria_bound": true,
+      "expected_verdict": "TRUNCATED",
+      "got_reason": "CUT_BEFORE_SENTINEL",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "CUT_BEFORE_SENTINEL",
+      "verdict": "TRUNCATED"
+    },
+    {
+      "case_id": "sha-mismatch",
+      "criteria_bound": true,
+      "expected_verdict": "TRUNCATED",
+      "got_reason": "SHA_MISMATCH",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "SHA_MISMATCH",
+      "verdict": "TRUNCATED"
+    },
+    {
+      "case_id": "cut-mid-line",
+      "criteria_bound": true,
+      "expected_verdict": "TRUNCATED",
+      "got_reason": "CUT_MID_LINE",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "CUT_MID_LINE",
+      "verdict": "TRUNCATED"
+    },
+    {
+      "case_id": "sentinel-in-first-shard",
+      "criteria_bound": true,
+      "expected_verdict": "TRUNCATED",
+      "got_reason": "SENTINEL_IN_FIRST_SHARD",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "SENTINEL_IN_FIRST_SHARD",
+      "verdict": "TRUNCATED"
+    },
+    {
+      "case_id": "neg-parseable-json-prefix",
+      "criteria_bound": true,
+      "expected_verdict": "TRUNCATED",
+      "got_reason": "CUT_BEFORE_SENTINEL",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "CUT_BEFORE_SENTINEL",
+      "verdict": "TRUNCATED"
+    },
+    {
+      "case_id": "count-mismatch",
+      "criteria_bound": true,
+      "expected_verdict": "TRUNCATED",
+      "got_reason": "COUNT_MISMATCH",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "COUNT_MISMATCH",
+      "verdict": "TRUNCATED"
+    },
+    {
+      "case_id": "fail-declaration-absent",
+      "criteria_bound": true,
+      "expected_verdict": "FAIL",
+      "got_reason": "DECLARATION_ABSENT",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "reason_code": "DECLARATION_ABSENT",
+      "verdict": "FAIL"
+    },
+    {
+      "case_id": "probe-missing-spec-version",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "case_id": "probe-missing-criteria-digest",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "case_id": "probe-digest-of-other-body",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "case_id": "probe-unregistered-spec",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    }
+  ],
+  "selftest": "25/25",
+  "version": "v0.1"
+}

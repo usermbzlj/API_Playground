@@ -1,0 +1,146 @@
+{
+  "fixture": "pagination_end",
+  "spec_version": "v0.1",
+  "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f",
+  "cases": {
+    "positive-short-page": {
+      "case_id": "positive-short-page",
+      "page": {
+        "items": 2,
+        "page_size": 10,
+        "has_more": false,
+        "next_cursor": null
+      },
+      "probe": null,
+      "expected_verdict": "GREEN",
+      "reason_code": "END_CONFIRMED",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    },
+    "positive-empty-page": {
+      "case_id": "positive-empty-page",
+      "page": {
+        "items": 0,
+        "page_size": 10,
+        "has_more": false,
+        "next_cursor": null
+      },
+      "probe": null,
+      "expected_verdict": "GREEN",
+      "reason_code": "END_CONFIRMED",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    },
+    "positive-full-page-with-empty-probe": {
+      "case_id": "positive-full-page-with-empty-probe",
+      "page": {
+        "items": 10,
+        "page_size": 10,
+        "has_more": false,
+        "next_cursor": null
+      },
+      "probe": {
+        "items": 0,
+        "page_size": 10,
+        "has_more": false,
+        "next_cursor": null
+      },
+      "expected_verdict": "GREEN",
+      "reason_code": "END_CONFIRMED",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    },
+    "red-pagination-end-contradiction": {
+      "case_id": "red-pagination-end-contradiction",
+      "page": {
+        "items": 3,
+        "page_size": 10,
+        "has_more": false,
+        "next_cursor": "cur-9"
+      },
+      "probe": null,
+      "expected_verdict": "RED",
+      "reason_code": "PAGINATION_END_CONTRADICTION",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    },
+    "red-full-page-not-probed": {
+      "case_id": "red-full-page-not-probed",
+      "page": {
+        "items": 10,
+        "page_size": 10,
+        "has_more": false,
+        "next_cursor": null
+      },
+      "probe": null,
+      "expected_verdict": "RED",
+      "reason_code": "FULL_PAGE_NOT_PROBED",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    },
+    "red-full-page-still-open": {
+      "case_id": "red-full-page-still-open",
+      "page": {
+        "items": 10,
+        "page_size": 10,
+        "has_more": true,
+        "next_cursor": "cur-2"
+      },
+      "probe": null,
+      "expected_verdict": "RED",
+      "reason_code": "FULL_PAGE_NOT_PROBED",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    },
+    "red-empty-string-cursor": {
+      "case_id": "red-empty-string-cursor",
+      "page": {
+        "items": 1,
+        "page_size": 10,
+        "has_more": false,
+        "next_cursor": ""
+      },
+      "probe": null,
+      "expected_verdict": "RED",
+      "reason_code": "EMPTY_STRING_CURSOR",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    },
+    "red-contract-field-missing": {
+      "case_id": "red-contract-field-missing",
+      "page": {
+        "items": 1,
+        "page_size": 10,
+        "has_more": false
+      },
+      "probe": null,
+      "expected_verdict": "RED",
+      "reason_code": "CONTRACT_FIELD_MISSING",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    },
+    "red-has-more-true-null-cursor": {
+      "case_id": "red-has-more-true-null-cursor",
+      "page": {
+        "items": 4,
+        "page_size": 10,
+        "has_more": true,
+        "next_cursor": null
+      },
+      "probe": null,
+      "expected_verdict": "RED",
+      "reason_code": "HAS_MORE_TRUE_WITH_NULL_CURSOR",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f"
+    }
+  }
+}

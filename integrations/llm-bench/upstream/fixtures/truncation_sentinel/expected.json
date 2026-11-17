@@ -1,0 +1,140 @@
+{
+  "fixture": "truncation_sentinel",
+  "spec_version": "v0.1",
+  "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729",
+  "real_sample_todo": [
+    {
+      "arm": "cut-before-sentinel",
+      "status": "TODO",
+      "owner": "真虾",
+      "payload": null
+    },
+    {
+      "arm": "sha-mismatch",
+      "status": "TODO",
+      "owner": "真虾",
+      "payload": null
+    }
+  ],
+  "cases": {
+    "positive-single-shard": {
+      "case_id": "positive-single-shard",
+      "shards": [
+        "r0001\nr0002\n#sha8:9ce98650\n"
+      ],
+      "declared_bytes": 12,
+      "declared_records": 2,
+      "expected_verdict": "PASS",
+      "reason_code": "COMPLETE",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    },
+    "positive-multi-shard": {
+      "case_id": "positive-multi-shard",
+      "shards": [
+        "r0001\nr0002\n",
+        "r0003\n#sha8:ff613e8c\n"
+      ],
+      "declared_bytes": 18,
+      "declared_records": 3,
+      "expected_verdict": "PASS",
+      "reason_code": "COMPLETE",
+      "must_fail": false,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    },
+    "cut-before-sentinel": {
+      "case_id": "cut-before-sentinel",
+      "shards": [
+        "r0001\nr0002\n"
+      ],
+      "declared_bytes": 12,
+      "declared_records": 2,
+      "expected_verdict": "TRUNCATED",
+      "reason_code": "CUT_BEFORE_SENTINEL",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    },
+    "sha-mismatch": {
+      "case_id": "sha-mismatch",
+      "shards": [
+        "r0001\nr0002\n#sha8:00000000\n"
+      ],
+      "declared_bytes": 12,
+      "declared_records": 2,
+      "expected_verdict": "TRUNCATED",
+      "reason_code": "SHA_MISMATCH",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    },
+    "cut-mid-line": {
+      "case_id": "cut-mid-line",
+      "shards": [
+        "r0001\nr0"
+      ],
+      "declared_bytes": 12,
+      "declared_records": 2,
+      "expected_verdict": "TRUNCATED",
+      "reason_code": "CUT_MID_LINE",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    },
+    "sentinel-in-first-shard": {
+      "case_id": "sentinel-in-first-shard",
+      "shards": [
+        "r0001\n#sha8:1f2fcb2a\n",
+        null
+      ],
+      "declared_bytes": 12,
+      "declared_records": 2,
+      "expected_verdict": "TRUNCATED",
+      "reason_code": "SENTINEL_IN_FIRST_SHARD",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    },
+    "neg-parseable-json-prefix": {
+      "case_id": "neg-parseable-json-prefix",
+      "shards": [
+        "[{\"id\":1},{\"id\":2}]\n"
+      ],
+      "declared_bytes": 29,
+      "declared_records": 1,
+      "expected_verdict": "TRUNCATED",
+      "reason_code": "CUT_BEFORE_SENTINEL",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    },
+    "count-mismatch": {
+      "case_id": "count-mismatch",
+      "shards": [
+        "r0001\nr0002\n#sha8:9ce98650\n"
+      ],
+      "declared_bytes": 12,
+      "declared_records": 3,
+      "expected_verdict": "TRUNCATED",
+      "reason_code": "COUNT_MISMATCH",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    },
+    "fail-declaration-absent": {
+      "case_id": "fail-declaration-absent",
+      "shards": [
+        "r0001\n"
+      ],
+      "declared_bytes": null,
+      "declared_records": null,
+      "expected_verdict": "FAIL",
+      "reason_code": "DECLARATION_ABSENT",
+      "must_fail": true,
+      "spec_version": "v0.1",
+      "criteria_digest": "751caa45a5a4f7ed82f2ae21d53cb957a366ddf79cfe1131f3b0116cd5daf729"
+    }
+  }
+}

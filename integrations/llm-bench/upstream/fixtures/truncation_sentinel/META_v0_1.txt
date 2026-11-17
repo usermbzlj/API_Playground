@@ -1,0 +1,25 @@
+TRUNCATION_SENTINEL v0.1
+run: python3 truncation_sentinel_v0_1.py  (exit 0 iff selftest all pass)
+script_sha256: 4deaa4a8b135e6bc0471298c34c3be409bad9dec786ff397a74266a6b03e76af
+run_out_sha256: b4c84218ca7d1428a933bc6b347c8bb9c8cf3b83176e7ee752fa5ededfaf28d0
+hash_norm: raw on-disk bytes of run_out_v0_1.json (sha256 of the file exactly as written, including the trailing LF; the artifact does not carry this digest)
+script_hash_norm: raw on-disk bytes of truncation_sentinel_v0_1.py (sha256 of the file exactly as written, no trailing-newline stripping)
+criteria_digest: sha256 of the raw README bytes between <!-- BEGIN CRITERIA --> and <!-- END CRITERIA -->, including the section's trailing LF
+selftest: 25/25
+naive_wrong_caught: 7 (cut-before-sentinel, sha-mismatch, cut-mid-line, sentinel-in-first-shard, parseable JSON prefix, count-mismatch, declaration absent)
+closed_verdicts: PASS | FAIL | TRUNCATED
+columns: case_id, expected_verdict, reason_code, shards, declared_bytes, declared_records, spec_version, criteria_digest
+arms:
+  positive-single-shard  body plus matching last-line sha8 -> PASS COMPLETE
+  positive-multi-shard  body split across two shards, sentinel only on the last shard -> PASS COMPLETE
+  cut-before-sentinel  records complete, LF present, sentinel line absent -> TRUNCATED (must-fail)
+  sha-mismatch  sentinel present, sha8 is 00000000 -> TRUNCATED (must-fail)
+  cut-mid-line  stream cut inside the last record, no closing LF -> TRUNCATED (must-fail)
+  sentinel-in-first-shard  sentinel on shard 0 matches that prefix, shard 1 is null -> TRUNCATED never PASS (must-fail)
+  neg-parseable-json-prefix  [{"id":1},{"id":2}] parses, declared bytes are the 3-element document, no sentinel -> TRUNCATED not PASS (must-fail)
+  count-mismatch  sha8 and LF match the bytes present, declared_records is 3 -> TRUNCATED (must-fail)
+  fail-declaration-absent  declared_bytes and declared_records are null -> FAIL, which is not TRUNCATED (must-fail)
+real_sample_todo: cut-before-sentinel and sha-mismatch from EigenFlux agent 真虾 are not attached yet (status TODO, payload null).
+spec_version and criteria_digest are required on each judged row. criteria_digest is sha256 of the README criteria section, not a re-serialized JSON body. A row is judged only when its stamp matches that section. Missing either field, a digest from another body, or an unregistered spec_version is not judged and is not PASS.
+credits: 与 EigenFlux agent 真虾共同设计；真机样本槽位留空。
+analyze_only. synthetic. stdlib only. no credentials. no network.

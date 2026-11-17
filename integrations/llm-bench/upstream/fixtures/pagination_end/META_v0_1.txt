@@ -1,0 +1,24 @@
+PAGINATION_END v0.1
+run: python3 pagination_end_v0_1.py  (exit 0 iff selftest all pass)
+script_sha256: 1e5301bbd1f330dca932802c5da166d5bf92c7dda6013b1e78d9ea53891da690
+run_out_sha256: 468472fdda8c9acb7ea52b73038f0526fbf297631cbe656b0a6716e541bc9e3d
+hash_norm: raw on-disk bytes of run_out_v0_1.json (sha256 of the file exactly as written, including the trailing LF; the artifact does not carry this digest)
+script_hash_norm: raw on-disk bytes of pagination_end_v0_1.py (sha256 of the file exactly as written, no trailing-newline stripping)
+criteria_digest: sha256 of the raw README bytes between <!-- BEGIN CRITERIA --> and <!-- END CRITERIA -->, including the section's trailing LF
+selftest: 24/24
+naive_wrong_caught: 5 (PAGINATION_END_CONTRADICTION, FULL_PAGE_NOT_PROBED, EMPTY_STRING_CURSOR, CONTRACT_FIELD_MISSING, HAS_MORE_TRUE_WITH_NULL_CURSOR)
+closed_verdicts: GREEN | RED
+columns: case_id, expected_verdict, reason_code, page, probe, spec_version, criteria_digest
+arms:
+  positive-short-page  items < page_size, has_more false, next_cursor null -> GREEN END_CONFIRMED
+  positive-empty-page  items 0, has_more false, next_cursor null -> GREEN END_CONFIRMED
+  positive-full-page-with-empty-probe  full page plus a consistent empty probe -> GREEN END_CONFIRMED
+  red-pagination-end-contradiction  has_more false and non-empty next_cursor -> RED (must-fail)
+  red-full-page-not-probed  full page, next_cursor null, no empty probe -> RED (must-fail)
+  red-full-page-still-open  full page, has_more true, cursor present, no empty probe -> RED FULL_PAGE_NOT_PROBED
+  red-empty-string-cursor  next_cursor "" -> RED EMPTY_STRING_CURSOR (must-fail, not folded into the contradiction rule)
+  red-contract-field-missing  next_cursor key absent -> RED (must-fail, not green)
+  red-has-more-true-null-cursor  has_more true and next_cursor null -> RED (must-fail)
+spec_version and criteria_digest are required on each judged row. criteria_digest is sha256 of the README criteria section, not a re-serialized JSON body. A row is judged only when its stamp matches that section. Missing either field, a digest from another body, or an unregistered spec_version is not judged and is not GREEN.
+credits: 规则与 EigenFlux agent 洋洋的workbuddy 共同设计，对方会独立复算。
+analyze_only. synthetic. stdlib only. no credentials.
