@@ -1,0 +1,259 @@
+{
+  "all_match": true,
+  "checks": [
+    {
+      "detail": "",
+      "name": "expected_json_matches_materialized_rows",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "criteria_digest_matches_readme_section",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "criteria_digest_tracks_section_bytes",
+      "ok": true
+    },
+    {
+      "detail": "verdict=GREEN reason=END_CONFIRMED naive=GREEN",
+      "name": "arm-positive-short-page",
+      "ok": true
+    },
+    {
+      "detail": "verdict=GREEN reason=END_CONFIRMED naive=GREEN",
+      "name": "arm-positive-empty-page",
+      "ok": true
+    },
+    {
+      "detail": "verdict=GREEN reason=END_CONFIRMED naive=GREEN",
+      "name": "arm-positive-full-page-with-empty-probe",
+      "ok": true
+    },
+    {
+      "detail": "verdict=RED reason=PAGINATION_END_CONTRADICTION naive=GREEN",
+      "name": "arm-red-pagination-end-contradiction",
+      "ok": true
+    },
+    {
+      "detail": "verdict=RED reason=FULL_PAGE_NOT_PROBED naive=GREEN",
+      "name": "arm-red-full-page-not-probed",
+      "ok": true
+    },
+    {
+      "detail": "verdict=RED reason=FULL_PAGE_NOT_PROBED naive=RED",
+      "name": "arm-red-full-page-still-open",
+      "ok": true
+    },
+    {
+      "detail": "verdict=RED reason=EMPTY_STRING_CURSOR naive=GREEN",
+      "name": "arm-red-empty-string-cursor",
+      "ok": true
+    },
+    {
+      "detail": "verdict=RED reason=CONTRACT_FIELD_MISSING naive=GREEN",
+      "name": "arm-red-contract-field-missing",
+      "ok": true
+    },
+    {
+      "detail": "verdict=RED reason=HAS_MORE_TRUE_WITH_NULL_CURSOR naive=GREEN",
+      "name": "arm-red-has-more-true-null-cursor",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "at_least_two_positive_cases",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "must_fail_covers_each_red_rule",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "positive_full_page_paired_with_consistent_empty_page",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "empty_string_listed_separately",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "missing_cursor_is_not_green",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "whitespace_cursor_is_contradiction",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "inconsistent_empty_probe_stays_red",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "short_continuation_is_not_green",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "probe-missing-spec-version",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "probe-missing-criteria-digest",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "probe-digest-of-other-body",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "probe-unregistered-spec",
+      "ok": true
+    }
+  ],
+  "closed_verdicts": [
+    "GREEN",
+    "RED"
+  ],
+  "criteria_digest": "43f9b83657d332e2c42d0b0b383ba588fcc5790d0c2ae1ad4271e5062ac0612f",
+  "fixture": "pagination_end",
+  "naive_wrong_caught": 5,
+  "rows": [
+    {
+      "case_id": "positive-short-page",
+      "criteria_bound": true,
+      "expected_verdict": "GREEN",
+      "got_reason": "END_CONFIRMED",
+      "must_fail": false,
+      "naive_verdict": "GREEN",
+      "ok": true,
+      "reason_code": "END_CONFIRMED",
+      "verdict": "GREEN"
+    },
+    {
+      "case_id": "positive-empty-page",
+      "criteria_bound": true,
+      "expected_verdict": "GREEN",
+      "got_reason": "END_CONFIRMED",
+      "must_fail": false,
+      "naive_verdict": "GREEN",
+      "ok": true,
+      "reason_code": "END_CONFIRMED",
+      "verdict": "GREEN"
+    },
+    {
+      "case_id": "positive-full-page-with-empty-probe",
+      "criteria_bound": true,
+      "expected_verdict": "GREEN",
+      "got_reason": "END_CONFIRMED",
+      "must_fail": false,
+      "naive_verdict": "GREEN",
+      "ok": true,
+      "reason_code": "END_CONFIRMED",
+      "verdict": "GREEN"
+    },
+    {
+      "case_id": "red-pagination-end-contradiction",
+      "criteria_bound": true,
+      "expected_verdict": "RED",
+      "got_reason": "PAGINATION_END_CONTRADICTION",
+      "must_fail": true,
+      "naive_verdict": "GREEN",
+      "ok": true,
+      "reason_code": "PAGINATION_END_CONTRADICTION",
+      "verdict": "RED"
+    },
+    {
+      "case_id": "red-full-page-not-probed",
+      "criteria_bound": true,
+      "expected_verdict": "RED",
+      "got_reason": "FULL_PAGE_NOT_PROBED",
+      "must_fail": true,
+      "naive_verdict": "GREEN",
+      "ok": true,
+      "reason_code": "FULL_PAGE_NOT_PROBED",
+      "verdict": "RED"
+    },
+    {
+      "case_id": "red-full-page-still-open",
+      "criteria_bound": true,
+      "expected_verdict": "RED",
+      "got_reason": "FULL_PAGE_NOT_PROBED",
+      "must_fail": false,
+      "naive_verdict": "RED",
+      "ok": true,
+      "reason_code": "FULL_PAGE_NOT_PROBED",
+      "verdict": "RED"
+    },
+    {
+      "case_id": "red-empty-string-cursor",
+      "criteria_bound": true,
+      "expected_verdict": "RED",
+      "got_reason": "EMPTY_STRING_CURSOR",
+      "must_fail": true,
+      "naive_verdict": "GREEN",
+      "ok": true,
+      "reason_code": "EMPTY_STRING_CURSOR",
+      "verdict": "RED"
+    },
+    {
+      "case_id": "red-contract-field-missing",
+      "criteria_bound": true,
+      "expected_verdict": "RED",
+      "got_reason": "CONTRACT_FIELD_MISSING",
+      "must_fail": true,
+      "naive_verdict": "GREEN",
+      "ok": true,
+      "reason_code": "CONTRACT_FIELD_MISSING",
+      "verdict": "RED"
+    },
+    {
+      "case_id": "red-has-more-true-null-cursor",
+      "criteria_bound": true,
+      "expected_verdict": "RED",
+      "got_reason": "HAS_MORE_TRUE_WITH_NULL_CURSOR",
+      "must_fail": true,
+      "naive_verdict": "GREEN",
+      "ok": true,
+      "reason_code": "HAS_MORE_TRUE_WITH_NULL_CURSOR",
+      "verdict": "RED"
+    },
+    {
+      "case_id": "probe-missing-spec-version",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "case_id": "probe-missing-criteria-digest",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "case_id": "probe-digest-of-other-body",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    },
+    {
+      "case_id": "probe-unregistered-spec",
+      "criteria_bound": false,
+      "ok": true,
+      "verdict": null
+    }
+  ],
+  "selftest": "24/24",
+  "version": "v0.1"
+}
