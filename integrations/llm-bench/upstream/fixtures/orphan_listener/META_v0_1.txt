@@ -1,0 +1,22 @@
+ORPHAN_LISTENER v0.1
+run: python3 orphan_listener_v0_1.py  (exit 0 iff selftest all pass)
+script_sha256: 1a8ad577ab36730060cf02c3effd61a84ca4b3bc71427f06e5ef9a847766dfe7
+run_out_sha256: 2f07a6abe0ac4a980dae93c12394d54a4050bcca29b663794980662cc392f5e0
+script_hash_norm: raw on-disk bytes of orphan_listener_v0_1.py (sha256 of the file exactly as written, no trailing-newline stripping)
+hash_norm: raw on-disk bytes of run_out_v0_1.json (sha256 of the file exactly as written, including the trailing LF; the artifact does not carry this digest)
+selftest: 21/21
+naive_wrong_caught: 4 (arms where the pinned connect_ok->PASS baseline is wrong: lingering LISTEN, orphan accepted, connect-only, body without price_version)
+closed_verdicts: PASS | UNKNOWN | ORPHAN_LISTENER_ACCEPTED | CONNECTED_ONLY | CONNECT_FAILED
+reasons: LISTEN_NO_ANSWER | BODY_INVALID_PRICE_VERSION
+columns: arm, case_id, listen_state, owner_alive, connect_ok, request_answered, probe_mode, response_body, expected_verdict, expected_reason, must_fail, injection_receipt, spec_version, criteria_digest
+arms:
+  positive  live owner, request answered, body carries price_version -> PASS
+  negative  owner dead, socket still LISTEN, connect_ok, no answer -> UNKNOWN (LISTEN_NO_ANSWER); must-fail for the naive baseline
+  negative  owner dead, inherited socket answers a valid body -> ORPHAN_LISTENER_ACCEPTED; must-fail
+  negative  connect-only probe, request never sent -> CONNECTED_ONLY; must-fail
+  negative  answered 200 but body omits price_version -> UNKNOWN (BODY_INVALID_PRICE_VERSION); must-fail
+  positive  port closed, connect refused -> CONNECT_FAILED
+spec_version and criteria_digest are required. criteria_digest is sha256 of the canonical JSON body of that spec_version (sort_keys, compact separators). A row is judged only by the registered body it stamps. Missing either field, a digest from another body, or an unregistered spec_version is not judged and is not PASS. An older sample keeps the verdict of its own stamp and does not inherit a newer body.
+injection_receipt {action, effect_evidence, expected_code} is required on every arm; missing any field makes the row unjudged with reason INJECTION_RECEIPT_INCOMPLETE, counted as a gap rather than as a pass.
+credits: 判据与期望码由 EigenFlux agent Grok Bot 定稿（connect_ok 与 request_answered 分列、LISTEN 无应答记 UNKNOWN、负对照用「进程已死+端口残留 LISTEN」）；夹具结构与朴素基线口径对齐已合并的 readback_mismatch。
+analyze_only. synthetic. stdlib only. no credentials, no network I/O.

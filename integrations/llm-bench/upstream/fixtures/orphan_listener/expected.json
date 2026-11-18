@@ -1,0 +1,350 @@
+{
+  "arms": [
+    {
+      "arm": "positive",
+      "case_id": "healthy-live-listener",
+      "connect_ok": true,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": null,
+      "expected_verdict": "PASS",
+      "injection_receipt": {
+        "action": "start listener with a live owner",
+        "effect_evidence": "request answered and body carries price_version",
+        "expected_code": "PASS"
+      },
+      "listen_state": "LISTEN",
+      "must_fail": false,
+      "owner_alive": true,
+      "probe_mode": "request",
+      "request_answered": true,
+      "response_body": {
+        "price_version": "pv-2026-11-01"
+      },
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "negative",
+      "case_id": "negative-lingering-listen-dead-owner",
+      "connect_ok": true,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": "LISTEN_NO_ANSWER",
+      "expected_verdict": "UNKNOWN",
+      "injection_receipt": {
+        "action": "kill the owner process, leave the inherited listening socket in place",
+        "effect_evidence": "connect_ok true, no request answer before the probe timeout, port still LISTEN",
+        "expected_code": "UNKNOWN_LISTEN_NO_ANSWER"
+      },
+      "listen_state": "LISTEN",
+      "must_fail": true,
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null,
+      "socket_held_by": "inherited_fd",
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "negative",
+      "case_id": "orphan-accepts-valid-response",
+      "connect_ok": true,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": null,
+      "expected_verdict": "ORPHAN_LISTENER_ACCEPTED",
+      "injection_receipt": {
+        "action": "keep the inherited listening socket open after the owner exits",
+        "effect_evidence": "request answered with a valid price_version while the owner pid is gone",
+        "expected_code": "ORPHAN_LISTENER_ACCEPTED"
+      },
+      "listen_state": "LISTEN",
+      "must_fail": true,
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": true,
+      "response_body": {
+        "price_version": "pv-2026-11-01"
+      },
+      "socket_held_by": "inherited_fd",
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "negative",
+      "case_id": "connect-only-probe",
+      "connect_ok": true,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": null,
+      "expected_verdict": "CONNECTED_ONLY",
+      "injection_receipt": {
+        "action": "probe performs connect() only and closes",
+        "effect_evidence": "connect_ok true, request never sent, no response body observed",
+        "expected_code": "CONNECTED_ONLY"
+      },
+      "listen_state": "LISTEN",
+      "must_fail": true,
+      "owner_alive": false,
+      "probe_mode": "connect_only",
+      "request_answered": null,
+      "response_body": null,
+      "socket_held_by": "inherited_fd",
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "negative",
+      "case_id": "answered-without-price-version",
+      "connect_ok": true,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": "BODY_INVALID_PRICE_VERSION",
+      "expected_verdict": "UNKNOWN",
+      "injection_receipt": {
+        "action": "listener answers 200 with a body that omits price_version",
+        "effect_evidence": "request answered but the required field is absent from the body",
+        "expected_code": "UNKNOWN_BODY_INVALID_PRICE_VERSION"
+      },
+      "listen_state": "LISTEN",
+      "must_fail": true,
+      "owner_alive": true,
+      "probe_mode": "request",
+      "request_answered": true,
+      "response_body": {
+        "status": "ok"
+      },
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "positive",
+      "case_id": "no-listener",
+      "connect_ok": false,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": null,
+      "expected_verdict": "CONNECT_FAILED",
+      "injection_receipt": {
+        "action": "close the port and stop the process",
+        "effect_evidence": "connect() refused",
+        "expected_code": "CONNECT_FAILED"
+      },
+      "listen_state": "CLOSED",
+      "must_fail": false,
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null,
+      "spec_version": "v0.1"
+    }
+  ],
+  "binding_probes": [
+    {
+      "arm": "negative",
+      "case_id": "old-sample-v0-0-lingering-listen",
+      "connect_ok": true,
+      "criteria_digest": "31f9b7cfd4b23e9157d57dd58f932d31692e72e648b8d928d6c8c150d48a6c97",
+      "expected_reason": null,
+      "expected_verdict": "PASS",
+      "injection_receipt": {
+        "action": "kill the owner process, leave the inherited listening socket in place",
+        "effect_evidence": "connect_ok true, no request answer",
+        "expected_code": "PASS"
+      },
+      "listen_state": "LISTEN",
+      "must_fail": false,
+      "note": "stamped v0.0; the same row under v0.1 is UNKNOWN(LISTEN_NO_ANSWER)",
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null,
+      "socket_held_by": "inherited_fd",
+      "spec_version": "v0.0"
+    },
+    {
+      "arm": "negative",
+      "case_id": "probe-missing-spec-version",
+      "connect_ok": true,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": "LISTEN_NO_ANSWER",
+      "expected_verdict": "UNKNOWN",
+      "injection_receipt": {
+        "action": "synthetic",
+        "effect_evidence": "synthetic",
+        "expected_code": "UNKNOWN_LISTEN_NO_ANSWER"
+      },
+      "listen_state": "LISTEN",
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null
+    },
+    {
+      "arm": "negative",
+      "case_id": "probe-missing-criteria-digest",
+      "connect_ok": true,
+      "expected_reason": "LISTEN_NO_ANSWER",
+      "expected_verdict": "UNKNOWN",
+      "injection_receipt": {
+        "action": "synthetic",
+        "effect_evidence": "synthetic",
+        "expected_code": "UNKNOWN_LISTEN_NO_ANSWER"
+      },
+      "listen_state": "LISTEN",
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null,
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "negative",
+      "case_id": "probe-digest-of-other-body",
+      "connect_ok": true,
+      "criteria_digest": "754ffc3184882dbf2011be66c1a7c4186833bf235ed1287ccd0ab5b70904c730",
+      "expected_reason": "LISTEN_NO_ANSWER",
+      "expected_verdict": "UNKNOWN",
+      "injection_receipt": {
+        "action": "synthetic",
+        "effect_evidence": "synthetic",
+        "expected_code": "UNKNOWN_LISTEN_NO_ANSWER"
+      },
+      "listen_state": "LISTEN",
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null,
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "negative",
+      "case_id": "probe-unregistered-spec",
+      "connect_ok": true,
+      "criteria_digest": "754ffc3184882dbf2011be66c1a7c4186833bf235ed1287ccd0ab5b70904c730",
+      "expected_reason": "LISTEN_NO_ANSWER",
+      "expected_verdict": "UNKNOWN",
+      "injection_receipt": {
+        "action": "synthetic",
+        "effect_evidence": "synthetic",
+        "expected_code": "UNKNOWN_LISTEN_NO_ANSWER"
+      },
+      "listen_state": "LISTEN",
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null,
+      "spec_version": "v0.2"
+    },
+    {
+      "arm": "negative",
+      "case_id": "probe-injection-receipt-missing",
+      "connect_ok": true,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": "LISTEN_NO_ANSWER",
+      "expected_verdict": "UNKNOWN",
+      "listen_state": "LISTEN",
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null,
+      "spec_version": "v0.1"
+    },
+    {
+      "arm": "negative",
+      "case_id": "probe-injection-receipt-incomplete",
+      "connect_ok": true,
+      "criteria_digest": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0",
+      "expected_reason": "LISTEN_NO_ANSWER",
+      "expected_verdict": "UNKNOWN",
+      "injection_receipt": {
+        "action": "synthetic",
+        "expected_code": "UNKNOWN"
+      },
+      "listen_state": "LISTEN",
+      "owner_alive": false,
+      "probe_mode": "request",
+      "request_answered": false,
+      "response_body": null,
+      "spec_version": "v0.1"
+    }
+  ],
+  "closed_verdicts": [
+    "PASS",
+    "UNKNOWN",
+    "ORPHAN_LISTENER_ACCEPTED",
+    "CONNECTED_ONLY",
+    "CONNECT_FAILED"
+  ],
+  "columns": [
+    "arm",
+    "case_id",
+    "listen_state",
+    "owner_alive",
+    "connect_ok",
+    "request_answered",
+    "probe_mode",
+    "response_body",
+    "expected_verdict",
+    "expected_reason",
+    "must_fail",
+    "injection_receipt",
+    "spec_version",
+    "criteria_digest"
+  ],
+  "criteria": {
+    "v0.0": {
+      "closed_verdicts": [
+        "PASS",
+        "UNKNOWN",
+        "ORPHAN_LISTENER_ACCEPTED",
+        "CONNECTED_ONLY",
+        "CONNECT_FAILED"
+      ],
+      "fixture": "orphan_listener",
+      "rules": [
+        "legacy: connect_ok true -> PASS; the request is never sent and the response body is never read"
+      ],
+      "spec_version": "v0.0"
+    },
+    "v0.1": {
+      "closed_verdicts": [
+        "PASS",
+        "UNKNOWN",
+        "ORPHAN_LISTENER_ACCEPTED",
+        "CONNECTED_ONLY",
+        "CONNECT_FAILED"
+      ],
+      "fixture": "orphan_listener",
+      "rules": [
+        "PASS requires a real request answered with a body carrying price_version, and a live owner pid",
+        "connect_ok true but request_answered not true -> UNKNOWN with reason LISTEN_NO_ANSWER; a listener that accepts but never answers is never PASS",
+        "request answered without price_version in the body -> UNKNOWN with reason BODY_INVALID_PRICE_VERSION",
+        "request answered with a valid body but owner_alive false (socket inherited or left behind) -> ORPHAN_LISTENER_ACCEPTED, never PASS: answering is not the same as having a process that maintains state",
+        "connect_ok not true -> CONNECT_FAILED",
+        "probe_mode connect_only caps the verdict at CONNECTED_ONLY and never yields PASS",
+        "expected_verdict is a dedicated field and is not an input to the judge",
+        "spec_version and criteria_digest are required; criteria_digest is sha256 of the canonical JSON body of that spec_version",
+        "a row is judged only by the registered body whose digest it stamps; a newer body is not substituted",
+        "injection_receipt {action, effect_evidence, expected_code} is required; missing any field makes the row unjudged, not PASS"
+      ],
+      "spec_version": "v0.1"
+    }
+  },
+  "criteria_digest": {
+    "v0.0": "31f9b7cfd4b23e9157d57dd58f932d31692e72e648b8d928d6c8c150d48a6c97",
+    "v0.1": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0"
+  },
+  "fixture": "orphan_listener",
+  "reasons": [
+    "LISTEN_NO_ANSWER",
+    "BODY_INVALID_PRICE_VERSION"
+  ],
+  "spec_version": "v0.1",
+  "unregistered_criteria": {
+    "closed_verdicts": [
+      "PASS",
+      "UNKNOWN",
+      "ORPHAN_LISTENER_ACCEPTED",
+      "CONNECTED_ONLY",
+      "CONNECT_FAILED"
+    ],
+    "fixture": "orphan_listener",
+    "rules": [
+      "unregistered draft: connect_ok true -> PASS even when nothing answers"
+    ],
+    "spec_version": "v0.2"
+  },
+  "unregistered_criteria_digest": "754ffc3184882dbf2011be66c1a7c4186833bf235ed1287ccd0ab5b70904c730"
+}
