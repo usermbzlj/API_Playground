@@ -1,0 +1,261 @@
+{
+  "all_match": true,
+  "checks": [
+    {
+      "detail": "",
+      "name": "expected_json_matches_materialized_rows",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "criteria_digest_changes_with_spec_version",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "unregistered_body_not_in_registry",
+      "ok": true
+    },
+    {
+      "detail": "verdict=PASS naive=PASS",
+      "name": "arm-healthy-live-listener",
+      "ok": true
+    },
+    {
+      "detail": "verdict=UNKNOWN naive=PASS",
+      "name": "arm-negative-lingering-listen-dead-owner",
+      "ok": true
+    },
+    {
+      "detail": "verdict=ORPHAN_LISTENER_ACCEPTED naive=PASS",
+      "name": "arm-orphan-accepts-valid-response",
+      "ok": true
+    },
+    {
+      "detail": "verdict=CONNECTED_ONLY naive=PASS",
+      "name": "arm-connect-only-probe",
+      "ok": true
+    },
+    {
+      "detail": "verdict=UNKNOWN naive=PASS",
+      "name": "arm-answered-without-price-version",
+      "ok": true
+    },
+    {
+      "detail": "verdict=CONNECT_FAILED naive=CONNECT_FAILED",
+      "name": "arm-no-listener",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "lingering-listen-shape",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "orphan-accepted-shape",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "connect-only-never-answers",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "no-arm-with-accept-but-no-answer-is-PASS",
+      "ok": true
+    },
+    {
+      "detail": "",
+      "name": "every-arm-has-three-field-receipt",
+      "ok": true
+    },
+    {
+      "detail": "stamped=PASS v0.1_would=UNKNOWN",
+      "name": "old-sample-v0-0-lingering-listen",
+      "ok": true
+    },
+    {
+      "detail": "unjudged reason=MISSING_SPEC_VERSION",
+      "name": "probe-missing-spec-version",
+      "ok": true
+    },
+    {
+      "detail": "unjudged reason=MISSING_CRITERIA_DIGEST",
+      "name": "probe-missing-criteria-digest",
+      "ok": true
+    },
+    {
+      "detail": "unjudged reason=DIGEST_MISMATCH",
+      "name": "probe-digest-of-other-body",
+      "ok": true
+    },
+    {
+      "detail": "unjudged reason=UNREGISTERED_SPEC",
+      "name": "probe-unregistered-spec",
+      "ok": true
+    },
+    {
+      "detail": "unjudged reason=INJECTION_RECEIPT_MISSING",
+      "name": "probe-injection-receipt-missing",
+      "ok": true
+    },
+    {
+      "detail": "unjudged reason=INJECTION_RECEIPT_INCOMPLETE",
+      "name": "probe-injection-receipt-incomplete",
+      "ok": true
+    }
+  ],
+  "closed_verdicts": [
+    "PASS",
+    "UNKNOWN",
+    "ORPHAN_LISTENER_ACCEPTED",
+    "CONNECTED_ONLY",
+    "CONNECT_FAILED"
+  ],
+  "criteria_digest": {
+    "v0.0": "31f9b7cfd4b23e9157d57dd58f932d31692e72e648b8d928d6c8c150d48a6c97",
+    "v0.1": "053ac43dd8e32302fd0898072fc45fa920ece10b208a2f36bce83ca5177f7bb0"
+  },
+  "fixture": "orphan_listener",
+  "naive_wrong_caught": 4,
+  "rows": [
+    {
+      "arm": "positive",
+      "bound_spec_version": "v0.1",
+      "case_id": "healthy-live-listener",
+      "criteria_bound": true,
+      "expected_reason": null,
+      "expected_verdict": "PASS",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": false,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "verdict": "PASS"
+    },
+    {
+      "arm": "negative",
+      "bound_spec_version": "v0.1",
+      "case_id": "negative-lingering-listen-dead-owner",
+      "criteria_bound": true,
+      "expected_reason": "LISTEN_NO_ANSWER",
+      "expected_verdict": "UNKNOWN",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "verdict": "UNKNOWN"
+    },
+    {
+      "arm": "negative",
+      "bound_spec_version": "v0.1",
+      "case_id": "orphan-accepts-valid-response",
+      "criteria_bound": true,
+      "expected_reason": null,
+      "expected_verdict": "ORPHAN_LISTENER_ACCEPTED",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "verdict": "ORPHAN_LISTENER_ACCEPTED"
+    },
+    {
+      "arm": "negative",
+      "bound_spec_version": "v0.1",
+      "case_id": "connect-only-probe",
+      "criteria_bound": true,
+      "expected_reason": null,
+      "expected_verdict": "CONNECTED_ONLY",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "verdict": "CONNECTED_ONLY"
+    },
+    {
+      "arm": "negative",
+      "bound_spec_version": "v0.1",
+      "case_id": "answered-without-price-version",
+      "criteria_bound": true,
+      "expected_reason": "BODY_INVALID_PRICE_VERSION",
+      "expected_verdict": "UNKNOWN",
+      "ignoring_stamp_verdict": "PASS",
+      "must_fail": true,
+      "naive_verdict": "PASS",
+      "ok": true,
+      "verdict": "UNKNOWN"
+    },
+    {
+      "arm": "positive",
+      "bound_spec_version": "v0.1",
+      "case_id": "no-listener",
+      "criteria_bound": true,
+      "expected_reason": null,
+      "expected_verdict": "CONNECT_FAILED",
+      "ignoring_stamp_verdict": "CONNECT_FAILED",
+      "must_fail": false,
+      "naive_verdict": "CONNECT_FAILED",
+      "ok": true,
+      "verdict": "CONNECT_FAILED"
+    },
+    {
+      "bound_spec_version": "v0.0",
+      "case_id": "old-sample-v0-0-lingering-listen",
+      "criteria_bound": true,
+      "ok": true,
+      "unjudged_reason": null,
+      "verdict": "PASS"
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-missing-spec-version",
+      "criteria_bound": false,
+      "ok": true,
+      "unjudged_reason": "MISSING_SPEC_VERSION",
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-missing-criteria-digest",
+      "criteria_bound": false,
+      "ok": true,
+      "unjudged_reason": "MISSING_CRITERIA_DIGEST",
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-digest-of-other-body",
+      "criteria_bound": false,
+      "ok": true,
+      "unjudged_reason": "DIGEST_MISMATCH",
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-unregistered-spec",
+      "criteria_bound": false,
+      "ok": true,
+      "unjudged_reason": "UNREGISTERED_SPEC",
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-injection-receipt-missing",
+      "criteria_bound": false,
+      "ok": true,
+      "unjudged_reason": "INJECTION_RECEIPT_MISSING",
+      "verdict": null
+    },
+    {
+      "bound_spec_version": null,
+      "case_id": "probe-injection-receipt-incomplete",
+      "criteria_bound": false,
+      "ok": true,
+      "unjudged_reason": "INJECTION_RECEIPT_INCOMPLETE",
+      "verdict": null
+    }
+  ],
+  "selftest": "21/21",
+  "version": "v0.1"
+}
