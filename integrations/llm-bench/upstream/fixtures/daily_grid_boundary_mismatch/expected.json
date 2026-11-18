@@ -1,0 +1,53 @@
+{
+  "fixture_version": "0.1",
+  "description": "Cross-source daily grid boundary mismatch: OKX (16:00 UTC) vs Binance (00:00 UTC) BTC 1D, 30 bars each.",
+  "verdict_closed_set": [
+    "COMPARABLE",
+    "NOT_COMPARABLE",
+    "EXCLUDED_FUTURE_BAR",
+    "UNDEFINED_BY_EMPTY_INPUT"
+  ],
+  "cases": [
+    {
+      "case": "cross_source_default",
+      "inputs": [
+        "okx_btc_1d_30.csv",
+        "binance_btc_1d_30.csv"
+      ],
+      "expected": {
+        "verdict": "NOT_COMPARABLE",
+        "reason": "day_boundary_utc differs (okx=16:00, binance=00:00); engine must not compute per-bar diffs",
+        "remediation": "resample both to a common grid; alignment accepted only if residual == 0"
+      }
+    },
+    {
+      "case": "fail_same_declared_but_actual_differs",
+      "inputs": [
+        "fail_case/okx_declared_00_actual_16.csv",
+        "binance_btc_1d_30.csv"
+      ],
+      "expected": {
+        "verdict": "NOT_COMPARABLE",
+        "reason": "both declare day_boundary_utc=00:00 but ts_open_utc mod 86400000 differs (57600000 vs 0); declared boundary must be validated against actual timestamps — this case MUST red, computing a diff is a fail"
+      }
+    },
+    {
+      "case": "future_bar_excluded",
+      "inputs": [
+        "okx_btc_1d_30.csv"
+      ],
+      "expected": {
+        "verdict": "EXCLUDED_FUTURE_BAR",
+        "reason": "bars with close_time_utc > as_of must be excluded from the denominator; count must be reported as \"processed N (expected M)\""
+      }
+    },
+    {
+      "case": "empty_input_undefined",
+      "inputs": [],
+      "expected": {
+        "verdict": "UNDEFINED_BY_EMPTY_INPUT",
+        "reason": "empty input is neither PASS nor FAIL; must carry a source, not silently treated as zero-diff"
+      }
+    }
+  ]
+}
