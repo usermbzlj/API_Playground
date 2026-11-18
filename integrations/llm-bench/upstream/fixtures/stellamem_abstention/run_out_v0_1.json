@@ -1,0 +1,356 @@
+{
+ "fixture": "STELLAMEM_ABSTENTION",
+ "version": "0.1",
+ "format": {
+  "layers": "header (fixture_id, criteria_version) + body (输入 / 期望判词 / 必败形态 / 正控对照)",
+  "mapping": "expected_verdict -> 期望判词, naive_wrong -> 必败形态; fixture_id and criteria_version are header metadata, not body columns (Grok Bot 2026-11-10 10:01, msg 378363590492553216)"
+ },
+ "selftest": "18/18",
+ "rows": 17,
+ "must_fail_arms": 9,
+ "naive_wrong_rows": 9,
+ "aggregate_must_fail_expected_ne_naive": true,
+ "observation_rows": 8,
+ "rows_out": [
+  {
+   "header": {
+    "fixture_id": "neg.reader.three-arm.v1",
+    "criteria_version": "neg-reader-v1"
+   },
+   "body": {
+    "输入": "record{valid_to=past, status=expired}",
+    "期望判词": "REFUSE",
+    "必败形态": "ANSWER",
+    "正控对照": "neg.reader.three-arm.gt.v1"
+   },
+   "reason_code": "VALIDITY_METADATA_MISSING",
+   "receipt_present": true,
+   "struct": "REFUSE",
+   "naive": "ANSWER",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem abstain_validation.md, negative-sample reader cases (PR #84, v1 pool, 7 cases, three arms 4/7)",
+   "source_llm_bench": "llm-bench S22 ROUND_CLEARED_BACKLOG_REMAINS + S21 receipt trio, same shape"
+  },
+  {
+   "header": {
+    "fixture_id": "neg.reader.three-arm.gt.v1",
+    "criteria_version": "neg-reader-v1"
+   },
+   "body": {
+    "输入": "record{valid_to=future, status=active}",
+    "期望判词": "ANSWER",
+    "必败形态": null,
+    "正控对照": "neg.reader.three-arm.gt.v1"
+   },
+   "reason_code": "",
+   "receipt_present": true,
+   "struct": "ANSWER",
+   "naive": "ANSWER",
+   "must_fail_arm": false,
+   "pass": true,
+   "source_stellamem": "Stellamem abstain_validation.md, negative-sample reader cases (green twin: valid record)",
+   "source_llm_bench": "llm-bench S22, same shape"
+  },
+  {
+   "header": {
+    "fixture_id": "neg-expired-01",
+    "criteria_version": "neg-reader-v1"
+   },
+   "body": {
+    "输入": "record{valid_to=past, status=active}",
+    "期望判词": "REFUSE",
+    "必败形态": "ANSWER",
+    "正控对照": "neg-valid-coupon.gt.v1"
+   },
+   "reason_code": "EXPIRED",
+   "receipt_present": true,
+   "struct": "REFUSE",
+   "naive": "ANSWER",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem negative_samples.md, neg-expired-01 (valid_to past); pool now v2",
+   "source_llm_bench": "llm-bench S22, same shape (validity metadata missing)"
+  },
+  {
+   "header": {
+    "fixture_id": "neg-status-01",
+    "criteria_version": "neg-reader-v1"
+   },
+   "body": {
+    "输入": "record{valid_to=future, status=archived}",
+    "期望判词": "REFUSE",
+    "必败形态": "ANSWER",
+    "正控对照": "neg-valid-coupon.gt.v1"
+   },
+   "reason_code": "STATUS_NOT_ACTIVE",
+   "receipt_present": true,
+   "struct": "REFUSE",
+   "naive": "ANSWER",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem negative_samples.md, neg-status-01 (status not active); pool now v2",
+   "source_llm_bench": "llm-bench S22, same shape (validity metadata missing)"
+  },
+  {
+   "header": {
+    "fixture_id": "neg-valid-coupon.gt.v1",
+    "criteria_version": "neg-reader-v1"
+   },
+   "body": {
+    "输入": "record{valid_to=future, status=active}",
+    "期望判词": "ANSWER",
+    "必败形态": null,
+    "正控对照": "neg-valid-coupon.gt.v1"
+   },
+   "reason_code": "",
+   "receipt_present": true,
+   "struct": "ANSWER",
+   "naive": "ANSWER",
+   "must_fail_arm": false,
+   "pass": true,
+   "source_stellamem": "Stellamem negative_samples.md (green twin: valid record)",
+   "source_llm_bench": "llm-bench S22, same shape"
+  },
+  {
+   "header": {
+    "fixture_id": "0ddfec37_abs",
+    "criteria_version": "abstain-1b-v1"
+   },
+   "body": {
+    "输入": "question_tokens=[收藏, 头三个月, 新增], evidence_text='三个月内已收集15个；近几个月新增20个', answer=15, reasoning_tokens=[橄榄球]",
+    "期望判词": "UNSUPPORTED",
+    "必败形态": "SUPPORTED",
+    "正控对照": "0ddfec37.grounded.gt.v1"
+   },
+   "reason_code": "FABRICATED_REASONING",
+   "receipt_present": true,
+   "struct": "UNSUPPORTED",
+   "naive": "SUPPORTED",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem abstain_validation.md, 1b judge section + '0ddfec37 的数' (sidecar 6817efa4a19118c0.json: projected 7, candidates 18, cited 1/7)",
+   "source_llm_bench": "llm-bench S21 TOOL_DONE_PRE_RECEIPT, counterpart (PR #86 receipt trio)"
+  },
+  {
+   "header": {
+    "fixture_id": "0ddfec37.grounded.gt.v1",
+    "criteria_version": "abstain-1b-v1"
+   },
+   "body": {
+    "输入": "question_tokens=[收藏, 头三个月, 新增], evidence_text='三个月内已收集15个；近几个月新增20个', answer=15, reasoning_tokens=[三个月内, 15]",
+    "期望判词": "SUPPORTED",
+    "必败形态": null,
+    "正控对照": "0ddfec37.grounded.gt.v1"
+   },
+   "reason_code": "",
+   "receipt_present": true,
+   "struct": "SUPPORTED",
+   "naive": "SUPPORTED",
+   "must_fail_arm": false,
+   "pass": true,
+   "source_stellamem": "Stellamem abstain_validation.md, 1b judge section (green twin: grounded reasoning)",
+   "source_llm_bench": "llm-bench S21, counterpart"
+  },
+  {
+   "header": {
+    "fixture_id": "must.judge.unknown.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "evidence=none",
+    "期望判词": "UNKNOWN",
+    "必败形态": "ANSWER",
+    "正控对照": "must.judge.unknown.gt.v1"
+   },
+   "reason_code": "INSUFFICIENT_EVIDENCE",
+   "receipt_present": true,
+   "struct": "UNKNOWN",
+   "naive": "ANSWER",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem LongMemEval round 4 (0.354 / 0.857 / 0.800); abstention controls 30/30, 29/29, 24/29",
+   "source_llm_bench": "llm-bench MUST_JUDGE_UNKNOWN slot (Grok Bot 2026-11-09, EigenFlux item 378154720675495936)"
+  },
+  {
+   "header": {
+    "fixture_id": "must.judge.unknown.gt.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "evidence=sufficient",
+    "期望判词": "ANSWER",
+    "必败形态": null,
+    "正控对照": "must.judge.unknown.gt.v1"
+   },
+   "reason_code": "",
+   "receipt_present": true,
+   "struct": "ANSWER",
+   "naive": "ANSWER",
+   "must_fail_arm": false,
+   "pass": true,
+   "source_stellamem": "Stellamem LongMemEval round 4 (green twin: sufficient evidence)",
+   "source_llm_bench": "llm-bench MUST_JUDGE_UNKNOWN slot, same item"
+  },
+  {
+   "header": {
+    "fixture_id": "completion.from.ledger.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "exit_code=0, log_present=true, ledger_completed=false",
+    "期望判词": "NOT_COMPLETED",
+    "必败形态": "COMPLETED",
+    "正控对照": "completion.from.ledger.gt.v1"
+   },
+   "reason_code": "NO_COMPLETED_ATTEMPT_IN_LEDGER",
+   "receipt_present": true,
+   "struct": "NOT_COMPLETED",
+   "naive": "COMPLETED",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem PR #86 receipt trio + run_id binding; S22 settlement denominator; EigenFlux heartbeat log",
+   "source_llm_bench": "llm-bench COMPLETION_STATUS slot, same item"
+  },
+  {
+   "header": {
+    "fixture_id": "completion.from.ledger.gt.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "exit_code=0, log_present=true, ledger_completed=true",
+    "期望判词": "COMPLETED",
+    "必败形态": null,
+    "正控对照": "completion.from.ledger.gt.v1"
+   },
+   "reason_code": "",
+   "receipt_present": true,
+   "struct": "COMPLETED",
+   "naive": "COMPLETED",
+   "must_fail_arm": false,
+   "pass": true,
+   "source_stellamem": "Stellamem PR #86 receipt trio (green twin: completed attempt in ledger)",
+   "source_llm_bench": "llm-bench COMPLETION_STATUS slot, same item"
+  },
+  {
+   "header": {
+    "fixture_id": "negctrl.single.change.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "entry_changed=false, chain_blocked=true",
+    "期望判词": "DETECTED",
+    "必败形态": "MISSED",
+    "正控对照": "negctrl.single.change.gt.v1"
+   },
+   "reason_code": "ENTRY_ONLY_CHECK",
+   "receipt_present": true,
+   "struct": "DETECTED",
+   "naive": "MISSED",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem negative_samples.md v2 (9 items) + PR #84 projection-layer blocking",
+   "source_llm_bench": "llm-bench NEGCTRL slot, same item"
+  },
+  {
+   "header": {
+    "fixture_id": "negctrl.single.change.gt.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "entry_changed=true, chain_blocked=true",
+    "期望判词": "DETECTED",
+    "必败形态": null,
+    "正控对照": "negctrl.single.change.gt.v1"
+   },
+   "reason_code": "",
+   "receipt_present": true,
+   "struct": "DETECTED",
+   "naive": "DETECTED",
+   "must_fail_arm": false,
+   "pass": true,
+   "source_stellamem": "Stellamem negative_samples.md v2 (green twin: fault at the entry)",
+   "source_llm_bench": "llm-bench NEGCTRL slot, same item"
+  },
+  {
+   "header": {
+    "fixture_id": "four.verdict.unknown.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "verdict=UNKNOWN",
+    "期望判词": "UNKNOWN",
+    "必败形态": "VIOLATION",
+    "正控对照": "four.verdict.unknown.gt.v1"
+   },
+   "reason_code": "UNKNOWN_FOLDED_TO_VIOLATION",
+   "receipt_present": true,
+   "struct": "UNKNOWN",
+   "naive": "VIOLATION",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem PR #98 NOT_EXECUTED third verdict; receipts PASS / FAIL / NOT_EXECUTED; refusal gate 0.800 vs 0.90",
+   "source_llm_bench": "llm-bench FOUR_VERDICT_STATES slot, same item"
+  },
+  {
+   "header": {
+    "fixture_id": "four.verdict.unknown.gt.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "verdict=VIOLATION",
+    "期望判词": "VIOLATION",
+    "必败形态": null,
+    "正控对照": "four.verdict.unknown.gt.v1"
+   },
+   "reason_code": "",
+   "receipt_present": true,
+   "struct": "VIOLATION",
+   "naive": "VIOLATION",
+   "must_fail_arm": false,
+   "pass": true,
+   "source_stellamem": "Stellamem PR #98 (green twin: clear violation)",
+   "source_llm_bench": "llm-bench FOUR_VERDICT_STATES slot, same item"
+  },
+  {
+   "header": {
+    "fixture_id": "empty.result.needs.receipt.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "result=empty, receipt=None",
+    "期望判词": "INDETERMINATE",
+    "必败形态": "ABSENT",
+    "正控对照": "empty.result.needs.receipt.gt.v1"
+   },
+   "reason_code": "NO_RECEIPT",
+   "receipt_present": true,
+   "struct": "INDETERMINATE",
+   "naive": "ABSENT",
+   "must_fail_arm": true,
+   "pass": true,
+   "source_stellamem": "Stellamem EigenFlux heartbeat, msg-fetch read-marking case; seen.json water level + daily log",
+   "source_llm_bench": "llm-bench empty-result definition slot, same item"
+  },
+  {
+   "header": {
+    "fixture_id": "empty.result.needs.receipt.gt.v1",
+    "criteria_version": "grok-integrity-20261109"
+   },
+   "body": {
+    "输入": "result=empty, receipt=present",
+    "期望判词": "ABSENT",
+    "必败形态": null,
+    "正控对照": "empty.result.needs.receipt.gt.v1"
+   },
+   "reason_code": "",
+   "receipt_present": true,
+   "struct": "ABSENT",
+   "naive": "ABSENT",
+   "must_fail_arm": false,
+   "pass": true,
+   "source_stellamem": "Stellamem EigenFlux heartbeat (green twin: receipt present)",
+   "source_llm_bench": "llm-bench empty-result definition slot, same item"
+  }
+ ]
+}

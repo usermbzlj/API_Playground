@@ -1,0 +1,49 @@
+STELLAMEM_ABSTENTION v0.1
+8 observation rows (v3 draft) from Stellamem, contributed as a对照 fixture
+for llm-bench. Settled format (Grok Bot, EigenFlux, 2026-11-10 10:01,
+msg 378363590492553216): TWO LAYERS, not a replacement of the old
+four-tuple (fixture_id / criteria_version / expected_verdict / naive_wrong).
+- HEADER (metadata, always present): fixture_id + criteria_version.
+  criteria_version must coexist with the expected verdict: a criteria
+  upgrade must not silently flip an old fixture.
+- BODY (the submission columns): 输入 / 期望判词 / 必败形态 / 正控对照.
+  Mapping: expected_verdict -> 期望判词; naive_wrong -> 必败形态.
+  fixture_id and criteria_version are NOT body columns and must not
+  replace them; the body must not drop the version.
+Verdict cells carry LITERAL values only; explanations live in the script
+comments and here, never in the verdict cells. Only assertions and
+expected verdicts, not implementations.
+
+Source / provenance (dual attribution, per row in the script):
+- Stellamem (github.com/yufeng000036-jpg/stellamem): abstain_validation.md
+  (PR #84 negative-sample reader cases, v1 pool, 7 cases, three arms 4/7;
+  1b judge section; LongMemEval round 4: 0.354 / 0.857 / 0.800; abstention
+  controls 30/30, 29/29, 24/29), negative_samples.md (pool v2, 9 items),
+  PR #86 receipt trio + run_id binding, PR #98 NOT_EXECUTED third verdict,
+  EigenFlux heartbeat logs. Negative-sample pool cases are fictional;
+  LongMemEval IDs are a public benchmark. No private data.
+- llm-bench (usermbzlj/API_Playground, integrations/llm-bench/): S21
+  TOOL_DONE_PRE_RECEIPT + S22 ROUND_CLEARED_BACKLOG_REMAINS, and Grok Bot
+  integrity slots (EigenFlux item 378154720675495936): MUST_JUDGE_UNKNOWN,
+  COMPLETION_STATUS, NEGCTRL, FOUR_VERDICT_STATES, empty-result definition.
+  Credit: Grok Bot (EigenFlux) for the four-column format, literal-value +
+  dual-attribution requirement, and the integrity slots; Stellamem for the
+  validation runs. Row data de-personalized.
+
+Rows: 8 observation rows -> 9 must-fail arms (row 2 splits into
+neg-expired-01 / neg-status-01) + 8 green twins = 17 rows.
+Body columns per row: 输入 | 期望判词 | 必败形态 | 正控对照
+(green twin rows have no must-fail form; they ARE the positive control.)
+  R1 neg.reader.three-arm.v1   record{valid_to=past, status=expired} | REFUSE | ANSWER | neg.reader.three-arm.gt.v1
+  R2 neg-expired-01            record{valid_to=past, status=active} | REFUSE | ANSWER | neg-valid-coupon.gt.v1
+     neg-status-01             record{valid_to=future, status=archived} | REFUSE | ANSWER | neg-valid-coupon.gt.v1
+  R3 0ddfec37_abs               reasoning_tokens=[橄榄球], answer=15 | UNSUPPORTED | SUPPORTED | 0ddfec37.grounded.gt.v1
+  R4 must.judge.unknown.v1     evidence=none | UNKNOWN | ANSWER | must.judge.unknown.gt.v1
+  R5 completion.from.ledger.v1 exit_code=0, log=true, ledger_completed=false | NOT_COMPLETED | COMPLETED | completion.from.ledger.gt.v1
+  R6 negctrl.single.change.v1  entry_changed=false, chain_blocked=true | DETECTED | MISSED | negctrl.single.change.gt.v1
+  R7 four.verdict.unknown.v1   verdict=UNKNOWN | UNKNOWN | VIOLATION | four.verdict.unknown.gt.v1
+  R8 empty.result.needs.receipt.v1  result=empty, receipt=None | INDETERMINATE | ABSENT | empty.result.needs.receipt.gt.v1
+Each row: must-fail arm (naive rule provably wrong) + green twin (both agree).
+Selftest: 18/18. Naive rules wrong on 9 rows. analyze_only. Stdlib only.
+
+run: python3 stellamem_abstention_v0_1.py
