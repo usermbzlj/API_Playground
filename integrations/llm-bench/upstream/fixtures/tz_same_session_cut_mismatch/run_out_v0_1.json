@@ -1,0 +1,100 @@
+{
+ "fixture": "tz_same_session_cut_mismatch",
+ "version": "0.1",
+ "rows": [
+  {
+   "id": "R1",
+   "verdict": "HASH_MATCH",
+   "field": null,
+   "detail": null,
+   "hash_checked": true,
+   "expected": "HASH_MATCH",
+   "must_fail": false,
+   "naive": "HASH_MATCH",
+   "provenance": "hand_built",
+   "ok": true
+  },
+  {
+   "id": "R2",
+   "verdict": "NOT_COMPARABLE",
+   "field": "day_cut_utc",
+   "detail": "16:00 vs 00:00",
+   "hash_checked": false,
+   "expected": "NOT_COMPARABLE",
+   "must_fail": true,
+   "naive": "HASH_MATCH",
+   "provenance": "hand_built",
+   "ok": true
+  },
+  {
+   "id": "R3",
+   "verdict": "NOT_COMPARABLE",
+   "field": "session_rule",
+   "detail": "24h_cont_v1 vs rb_night21_t1_v1",
+   "hash_checked": false,
+   "expected": "NOT_COMPARABLE",
+   "must_fail": true,
+   "naive": "HASH_MATCH",
+   "provenance": "hand_built",
+   "ok": true
+  },
+  {
+   "id": "R4",
+   "verdict": "PRESENCE_MISSING",
+   "field": "day_cut_utc",
+   "detail": null,
+   "hash_checked": false,
+   "expected": "PRESENCE_MISSING",
+   "must_fail": true,
+   "naive": "HASH_MATCH",
+   "provenance": "hand_built",
+   "ok": true
+  },
+  {
+   "id": "R5",
+   "verdict": "HASH_MISMATCH",
+   "field": null,
+   "detail": null,
+   "hash_checked": true,
+   "expected": "HASH_MISMATCH",
+   "must_fail": true,
+   "naive": "HASH_MISMATCH",
+   "provenance": "hand_built",
+   "ok": true
+  },
+  {
+   "id": "R6",
+   "verdict": "TYPE_INVALID",
+   "field": "tz",
+   "detail": null,
+   "hash_checked": false,
+   "expected": "TYPE_INVALID",
+   "must_fail": true,
+   "naive": "NOT_COMPARABLE",
+   "provenance": "hand_built",
+   "ok": true
+  },
+  {
+   "id": "R7",
+   "verdict": "NOT_COMPARABLE",
+   "field": "session_rule",
+   "detail": "24h_cont_v1 vs 24h_cont_v2",
+   "hash_checked": false,
+   "expected": "NOT_COMPARABLE",
+   "must_fail": true,
+   "naive": "HASH_MATCH",
+   "provenance": "hand_built",
+   "ok": true
+  }
+ ],
+ "C3_naive_false_green": [
+  "R2",
+  "R3",
+  "R4",
+  "R7"
+ ],
+ "C3_ok": true,
+ "C4_hash_order_violations": [],
+ "C4_ok": true,
+ "selftest": "9/9"
+}

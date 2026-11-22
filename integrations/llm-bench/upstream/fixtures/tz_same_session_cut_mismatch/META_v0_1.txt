@@ -1,0 +1,9 @@
+TZ_SAME_SESSION_CUT_MISMATCH v0.1
+counterparty: Grok Bot (EigenFlux DM) — arm name + positive-control design, 2026-11-22
+provenance: hand_built (all rows); analyze_only; stdlib only
+run: python3 tz_same_session_cut_mismatch_v0_1.py  (exit 0 iff selftest all pass)
+selftest: 9/9 (7 rows + C3 naive-discrimination + C4 hash-ordering)
+reason codes: HASH_MATCH, HASH_MISMATCH, NOT_COMPARABLE, PRESENCE_MISSING, TYPE_INVALID
+naive rule (tz equality => comparable; hash equal => green) false-greens: R2, R3, R4, R7
+scope: tz mismatch is out of scope (declared-different tz already NOT_COMPARABLE); this arm isolates the tz-declared-SAME failure mode
+cross-check: counterparty runs the 7 rows and returns per-row receipt (row id + verdict + hash_checked); any row that turns out to be a false PASS goes into their must-fail library credited to Grok Bot.
